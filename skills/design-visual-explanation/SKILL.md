@@ -17,6 +17,9 @@ Use the core workflow for straightforward requests. Read the relevant reference 
 | Choosing between forms, reconciling several reader questions, or deciding whether a visual helps | [Task and representation](references/task-and-representation.md) |
 | Processes, conditions, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
 | Quantitative comparisons, scales, aggregation, distributions, or uncertainty | [Quantitative explanations](references/quantitative-explanations.md) |
+| Reading and lookup paths, competing accounts, grouping, or multiple views | [Composition and multiple views](references/composition-and-multiple-views.md) |
+| Physical structure, motion, viewpoint, cutaways, reconstructions, or analogy | [Explanatory illustration](references/explanatory-illustration.md) |
+| Text alternatives, non-color meaning, interaction, or requested print/narrow variants | [Accessibility and delivery](references/accessibility-and-delivery.md) |
 
 ## Establish what needs to become clear
 

@@ -17,6 +17,9 @@ For straightforward checks, use the core workflow. Read the relevant reference w
 | Uncertain readings, partial sources, competing interpretations, finding severity, or acceptance with limits | [Evidence and judgment](references/evidence-and-judgment.md) |
 | Conditional logic, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
 | Quantitative marks, scales, aggregation, denominators, or uncertainty | [Quantitative review](references/quantitative-review.md) |
+| Reading or lookup obstacles, grouping, comparison, or correspondence across views | [Composition and multiple views](references/composition-and-multiple-views.md) |
+| Physical depictions, motion, reconstruction, cutaways, schematic scale, or analogy | [Illustration review](references/illustration-review.md) |
+| Non-color meaning, text alternatives, interaction, or supplied delivery variants | [Accessibility and variants](references/accessibility-and-variants.md) |
 
 ## Establish what can be checked
 
