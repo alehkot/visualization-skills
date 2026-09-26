@@ -8,6 +8,16 @@ description: >-
 
 Make the important inference easy to see. Deliver the information's structure and a suggested way to represent it. The same handoff should be usable for a graphical diagram, a text chart, or another medium. Production belongs to a separate step when the wider task calls for it.
 
+## Load detail when it changes a decision
+
+Use the core workflow for straightforward requests. Read the relevant reference when the material raises one of these choices; combine references for mixed explanations without loading the whole collection. References deepen the work, not the requested output length. Their examples are teaching material, not required layouts.
+
+| When the task needs more guidance | Read |
+| --- | --- |
+| Choosing between forms, reconciling several reader questions, or deciding whether a visual helps | [Task and representation](references/task-and-representation.md) |
+| Processes, conditions, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
+| Quantitative comparisons, scales, aggregation, distributions, or uncertainty | [Quantitative explanations](references/quantitative-explanations.md) |
+
 ## Establish what needs to become clear
 
 Infer the reader's prior knowledge, the question they need answered, and the intended use from the supplied context. Consider whether they will learn a mechanism, compare alternatives, or repeatedly look something up, and any known viewing constraints. Ask only when an unresolved difference would materially change the explanation. State consequential assumptions briefly rather than conducting a routine interview.
