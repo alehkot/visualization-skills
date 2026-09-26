@@ -33,13 +33,13 @@ For a causal-loop model, check the meaning of each link's polarity and any delay
 
 Require source support for a causal assertion, but distinguish lack of support from disproof. If the artifact labels the link as a hypothesis and preserves competing evidence, the appropriate review may accept that qualification. Do not demand false certainty as the repair.
 
-## Worked example: sequence mistaken for cause
+## Worked example: membership mistaken for a partition
 
-An invented field log records that a park installed lamps in April and that a moth survey counted more moths in June. It supplies no comparison sites or causal analysis. The explanatory brief places the events in two boxes connected by “caused an increase.”
+An invented museum catalog classifies object C as both **ceramic** and **ritual**. These categories overlap. A diagram brief describes two mutually exclusive groups, places C in ceramic, and states that objects in that group cannot also be ritual.
 
-The defect is the asserted causal relationship, not the use of boxes or the horizontal arrangement. A minimal repair is to label the timeline as two reported events, retain the dates, and remove the unsupported causal claim. Do not replace it with “lamps had no effect”; the source does not establish that either.
+The defect is the exclusive membership claim, not the choice to use boxes. A minimal repair is to remove that exclusivity claim and represent both memberships, using two labeled connections, overlapping groups, or an explicit membership table. Do not create two different objects to avoid showing the overlap.
 
-A control version says “April: lamps installed” and “June: higher count recorded,” joined by a timeline labeled “reported sequence; cause not established.” That version should not receive the same causal finding. If the review asks only about source fidelity, alternative layouts are optional preferences.
+A control version places C under a ceramic heading but also labels it “ritual” and explains that headings show material while tags show use. It preserves both classifications without requiring a particular graph layout. Do not report the primary grouping alone as a lost membership.
 
 ## Preserve meaning when repairing structure
 
@@ -53,4 +53,4 @@ State a repair in terms of the actual affected relationship: relabel a link, res
 - [C4 notation guidance](https://c4model.com/diagrams/notation) and [arc42's building block view](https://docs.arc42.org/section-5/) illustrate explicit labels and scoped architectural views. Their domain conventions are not mandatory for other diagrams.
 - [Cascade Institute's causal-loop handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) explains qualitative loop conventions, not empirical validation of the reviewed causal account.
 
-The probes and moth-log contrast are original examples of source-based review, not a validated comprehension test.
+The probes and catalog contrast are original examples of source-based review, not a validated comprehension test.
