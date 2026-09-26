@@ -83,7 +83,9 @@ Keep the content structure separate from the presentation suggestion. Use compac
 - suggested labels, necessary qualifications, and source pointers;
 - material to omit or defer, with a reason when omission could be disputed.
 
-For suggestions-only requests, identify the key elements and relationships each proposed form would carry without expanding into a full brief. Use the actual source names and assignments when they determine whether the form works; instructing someone to fill them in later is not a usable content structure. For a full handoff, make the structure explicit enough that the next person can change the medium without re-deriving the meaning.
+For suggestions-only requests, identify the key elements and relationships each proposed form would carry without expanding into a full brief. Use the actual source names and assignments when they determine whether the form works; instructing someone to fill them in later is not a usable content structure.
+
+For a full handoff, distinguish reader-facing wording from directions to the designer. Keep conditions that change the claim with the visible claim; a production caution such as “do not invent dimensions” need not become a printed label. Specify what each proposed view contains so the next person can change the medium without deciding which essential facts survive. When space is constrained, identify the primary explanation and supporting detail instead of asking for several complete explanations at once.
 
 Keep renderer syntax, pixel coordinates, palettes, and tool configuration out of the semantic structure. A recommendation such as a branching flow describes a representation, not an instruction to emit PlantUML, Mermaid, or an ASCII chart. Convert to a specific medium only when production is requested. Offer alternatives only when a real unresolved tradeoff merits them. Honor the user's length limit: cut repeated framing and internal commentary before dropping essential content, relationships, or qualifications.
 

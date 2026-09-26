@@ -16,6 +16,8 @@ An artifact can be internally coherent and factually wrong, or factually correct
 
 Do not require all evidence types for every review. A source-free chart can still contradict its own scale. A written brief can still reverse a causal relationship. Match the finding to the available evidence rather than broadening the assignment to obtain everything.
 
+For a brief-to-render comparison, trace a disputed claim through the supplied source, specified content, and visible mark or label. Record where they first disagree without guessing which tool or person caused it. If the brief correctly specifies two connections but the drawing contains one, restore the missing connection in the drawing. If the brief itself omits it, repair that handoff too. When an intermediate artifact is unavailable, leave that origin unresolved. Production notes in a brief are not automatically intended as reader-facing captions.
+
 ## Build and countercheck a finding
 
 1. Locate the exact mark, label, omission, or arrangement. “The diagram is confusing” is not yet a finding.
