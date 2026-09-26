@@ -9,6 +9,18 @@ Two independent Agent Skills for making difficult information easier to understa
 
 Each skill works on its own. Use design for a new brief, review for an existing explanation. Ordinary summaries, formal logic audits, and implementation from an existing specification do not need these skills. Neither skill has external runtime dependencies.
 
+## Guidance and references
+
+Each entrypoint links to focused references with explicit loading conditions. Agents read the detail needed for the current task; a simple request does not require the entire collection. References contain decision procedures, original worked examples and counterexamples, and annotated sources with their limits.
+
+| Topic | Design guidance | Review guidance |
+| --- | --- | --- |
+| Reader task and representation | [Choose forms by the inference they support](skills/design-visual-explanation/references/task-and-representation.md) | [Distinguish established problems from preferences](skills/review-visual-explanation/references/evidence-and-judgment.md) |
+| Systems and relationships | [Preserve conditions, states, membership, and feedback](skills/design-visual-explanation/references/systems-and-relationships.md) | [Trace and countercheck the asserted model](skills/review-visual-explanation/references/systems-and-relationships.md) |
+| Quantities and uncertainty | [Define comparisons and select encodings](skills/design-visual-explanation/references/quantitative-explanations.md) | [Check values, marks, scales, and inferences](skills/review-visual-explanation/references/quantitative-review.md) |
+
+The organization takes inspiration from [Impeccable](https://github.com/pbakaus/impeccable). The guidance and teaching examples are written for visual explanation; source links distinguish research findings, frameworks, practitioner advice, and local applications. Sources are attribution and further reading, not runtime dependencies or evidence that these skills improve comprehension.
+
 ## Install with npx skills
 
 Run this from your project's directory to choose skills and agents interactively:
@@ -44,7 +56,7 @@ Evaluation fixtures, source material, research notes, model outputs, galleries, 
 
 ## Evidence limits
 
-These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence. The latest review composition additions have not had a model evaluation.
+These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence. The reference expansion has not had a model evaluation or a human comprehension study. Earlier checks of shorter skill versions do not validate this expanded collection or its conditional reference loading.
 
 ## License
 

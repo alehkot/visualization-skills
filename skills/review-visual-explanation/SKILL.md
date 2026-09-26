@@ -8,6 +8,16 @@ description: >-
 
 Determine whether the explanation supports its intended reader's question. Report material problems with concrete repairs, or accept the explanation with any evidence limits. Rewrite or edit the original only when requested.
 
+## Load the reference that matches the inspection
+
+For straightforward checks, use the core workflow. Read the relevant reference when a consequential detail needs deeper verification or judgment; combine references for mixed artifacts without loading everything. Reference checklists are diagnostic aids, not finding quotas. Their examples do not prescribe the reviewed artifact's form.
+
+| When the review needs more guidance | Read |
+| --- | --- |
+| Uncertain readings, partial sources, competing interpretations, finding severity, or acceptance with limits | [Evidence and judgment](references/evidence-and-judgment.md) |
+| Conditional logic, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
+| Quantitative marks, scales, aggregation, denominators, or uncertainty | [Quantitative review](references/quantitative-review.md) |
+
 ## Establish what can be checked
 
 Infer the audience, reader question, and intended use from the request and artifact: learning a mechanism, comparing evidence, or looking up a known item may need different structures. Clarify only consequential ambiguity. The reviewer's unfamiliarity does not establish confusion for an expert audience.
