@@ -29,6 +29,8 @@ Inspect the actual artifact with available viewing tools. Read its title, captio
 
 Distinguish the inspected artifact, the supplied underlying source, and any actual reader-study evidence. When only a written brief is available, check its specified content and relationships; visual placement, legibility, and other unspecified properties remain uninspected. Without a reader study, a predicted misunderstanding is a hypothesis, not a measured outcome.
 
+When both a brief and its rendering are supplied, check each against the source and compare them. Locate the demonstrated defect: the brief may omit a condition, or the rendering may lose one the brief preserves. Direct the repair to the affected artifact; a correct brief does not certify its drawing, and a drawing's defect does not by itself justify changing the brief.
+
 ## Establish a problem before selecting its repair
 
 A material finding needs a specific artifact feature and evidence of at least one of these problems:
