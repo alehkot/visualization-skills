@@ -11,16 +11,22 @@ Each skill works on its own. Use design for a new brief, review for an existing 
 
 ## Install with npx skills
 
-From this checkout:
+Run this from your project's directory to choose skills and agents interactively:
 
 ```bash
-npx skills add . --list
-npx skills add . --skill design-visual-explanation -a codex -y
-npx skills add . --skill review-visual-explanation -a claude-code -y
-npx skills add . --skill '*' -a codex -a claude-code -y
+npx skills add alehkot/visualization-skills
 ```
 
-Add `-g` to explicitly install globally. To install into another project, run the command there and replace `.` with this checkout's absolute path. A published Git repository can be supplied in place of the path. No npm package or plugin manifest is required. See the [skills CLI](https://github.com/vercel-labs/skills).
+To list available skills or select them explicitly:
+
+```bash
+npx skills add alehkot/visualization-skills --list
+npx skills add alehkot/visualization-skills --skill design-visual-explanation -a codex -y
+npx skills add alehkot/visualization-skills --skill review-visual-explanation -a claude-code -y
+npx skills add alehkot/visualization-skills --skill '*' -a codex -a claude-code -y
+```
+
+Add `-g` to install globally instead of into the current project. For a local checkout, replace `alehkot/visualization-skills` with its path (`.` when running inside it). No npm package or plugin manifest is required. See the [skills CLI](https://github.com/vercel-labs/skills).
 
 ## Try it
 
