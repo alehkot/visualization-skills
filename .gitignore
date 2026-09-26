@@ -1,0 +1,13 @@
+# Track only the distributable skills and essential repository files.
+/*
+!/.gitignore
+!/LICENSE
+!/README.md
+!/skills/
+!/references/
+
+# Keep generated files out of runtime folders too.
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
