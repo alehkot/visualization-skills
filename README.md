@@ -59,7 +59,9 @@ Evaluation fixtures, source material, research notes, model outputs, galleries, 
 
 ## Evidence limits
 
-These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence. The reference expansion has not had a model evaluation or a human comprehension study. Earlier checks of shorter skill versions do not validate this expanded collection or its conditional reference loading.
+These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence.
+
+A local five-problem with-skill/without-skill model comparison covered the expanded design skill at `152108e`, with all six references supplied inline. It does not establish a general benefit or test conditional reference loading. The expanded review skill and subsequent instruction changes have not had behavioral model evaluation, and neither skill has had a human comprehension study.
 
 ## License
 
