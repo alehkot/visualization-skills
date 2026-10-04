@@ -89,4 +89,10 @@ For a full handoff, distinguish reader-facing wording from directions to the des
 
 Keep renderer syntax, pixel coordinates, palettes, and tool configuration out of the semantic structure. A recommendation such as a branching flow describes a representation, not an instruction to emit PlantUML, Mermaid, or an ASCII chart. Convert to a specific medium only when production is requested. Offer alternatives only when a real unresolved tradeoff merits them. Honor the user's length limit: cut repeated framing and internal commentary before dropping essential content, relationships, or qualifications.
 
-Before handing off, check that a renderer would not need to guess the central logic, evidence, or qualifications. Read proposed reader-facing labels on their own and restore any condition required for them to remain true. Name the most likely wrong inference and ensure the brief does not invite it. Treat clearer comprehension as a design intention, not a measured result.
+Before handing off, track these checkpoints internally:
+
+- [ ] A renderer can recover the central logic, evidence, and qualifications without guessing.
+- [ ] Reader-facing labels remain true on their own, with every load-bearing condition visible.
+- [ ] The brief addresses the most likely wrong inference and preserves the requested scope and format.
+
+Correct confirmed gaps once, then recheck the complete brief against the source and these checkpoints. Report remaining gaps; a caller's explicit review budget takes precedence. Do not print progress unless requested. Treat clearer comprehension as a design intention, not a measured result.
