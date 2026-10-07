@@ -35,7 +35,7 @@ Check a headline and its primary view independently of optional detail. If a cla
 
 ## Verify claimed changes between snapshots
 
-Check whether a claimed addition, removal, replacement, relocation, or changed connection follows from the supplied snapshots and their scope. A renamed entity can retain its identity; the same label can also be reused for a replacement. Do not settle that question from appearance alone. For a changed connection, compare the actual endpoints and meaning: rerouting a line around a label is not a change in the subject.
+Check whether a claimed addition, removal, replacement, relocation, or changed connection follows from the supplied snapshots and their scope. A renamed entity can retain its identity; the same label can also be reused for a replacement. Do not settle that question from appearance alone. For a changed connection, compare the actual endpoints and meaning. Rerouting a schematic line around a label is not a change in the subject when path geometry carries no subject meaning; a changed physical route can matter even if its endpoints stay the same.
 
 Match any change summary against the views in both directions: is each stated change visible or otherwise explicitly supported, and does a consequential depicted difference go unexplained? An omitted entity is not necessarily removed from the real system. Different cropping, abstraction, or incomplete source coverage may explain its absence. Report an unsupported removal claim as such; do not repair it by asserting the entity still exists.
 
