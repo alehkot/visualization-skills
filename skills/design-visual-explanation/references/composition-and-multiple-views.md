@@ -34,13 +34,13 @@ Use only as many views as the questions warrant. No universal node count determi
 
 ## Separate changes in the subject from changes in the drawing
 
-For a before/after comparison, name the snapshots and establish which entities correspond. Distinguish a retained entity with changed attributes from a replacement; a rename or a new position on the page does not settle identity. Describe changes to relationships through their endpoints and meaning, not through the bends in their drawn paths. Include concise old/new descriptions for consequential differences rather than relying on absence or color alone.
+For a before/after comparison, name the snapshots and establish which entities correspond. Distinguish a retained entity with changed attributes from a replacement; a rename or a new position on the page does not settle identity. For schematic connections, describe changes through their endpoints and meaning rather than incidental bends. If path geometry encodes a physical route or another consequential property, preserve that information too. Include concise old/new descriptions for consequential differences rather than relying on absence or color alone.
 
 Keep unaffected context recognizable where that helps comparison, but do not require identical coordinates. When repositioning is merely a layout choice, avoid presenting it as physical relocation or changed responsibility. If a component is absent from a later view, establish whether it was removed from the subject or simply omitted from that view. With incomplete snapshots, leave that difference unresolved.
 
 For example, an invented lending network retains branches East and West, but redirects East's returns from depot A to depot B. Preserve the branch identities and state the changed destination. Depot A's absence from a later cropped diagram does not establish that it closed. If the only change is East's opening hours, a short attribute comparison may answer the question without two network views.
 
-Two snapshots establish a difference, not the intermediate steps, migration order, downtime, or reason for the change. Supply those only when the task needs them and the source supports them.
+Even when snapshots establish a change, they do not by themselves establish the intermediate steps, migration order, downtime, or reason for it. Supply those only when the task needs them and the source supports them.
 
 ## Worked example: two incompatible accounts
 
