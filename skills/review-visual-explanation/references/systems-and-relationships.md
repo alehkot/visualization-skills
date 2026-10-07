@@ -25,6 +25,14 @@ Use the smallest relevant probe, not an exhaustive simulation of the whole domai
 
 Check exact scope words before alleging an error. “Usually,” “only if,” “at least,” and “after approval” have different consequences. A shortened title can contradict correctly specified branch logic; correct detail does not rescue a false summary.
 
+## Check waiting and execution outcomes
+
+For an explanation of delay, inspect whether the artifact distinguishes waiting work, active work, and the resource that limits progress. Compare counts, occupancy limits, and processing rates with their stated units and source. Do not infer overload from convergence alone or a waiting time from a backlog count alone. Flag a missing queue only when the source and reader's question make waiting consequential; a connectivity map need not describe scheduling.
+
+For compared executions, trace a case that stops early. Does the artifact report later checks as failed even though they never ran? Distinguish an evaluated failure from deliberate bypass, non-execution after a stop, and an unrecorded result. Verify any claimed first difference against the aligned steps and available evidence; a first difference does not by itself prove causation. For retries, follow the return edge and check whether the source says to resume, repeat one step, or restart.
+
+For example, invented inspection records say item R failed an identity check, so its condition check did not run; item S passed both. A comparison that marks both of R's checks “failed” invents a condition result. Repair that cell to “not evaluated: identity check stopped the inspection.” If the record merely omits the condition result, label it unknown instead of asserting why it is absent. A summary that reports only the supported final rejection is not defective merely because it omits the unused checks.
+
 ## Inspect causal and temporal claims
 
 An ordering diagram may establish that one event precedes another without asserting why. A source describing an association does not justify a causal arrow solely because the entities fit a neat story. Conversely, an arrow labeled “reported before” is not a causal overclaim merely because it is directional.
