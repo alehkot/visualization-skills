@@ -33,6 +33,14 @@ For comparison tasks, examine the evidence the reader must integrate, including 
 
 Check a headline and its primary view independently of optional detail. If a claim becomes false without a hidden qualification, restoring the qualification is often a smaller repair than rebuilding the whole explanation.
 
+## Verify claimed changes between snapshots
+
+Check whether a claimed addition, removal, replacement, relocation, or changed connection follows from the supplied snapshots and their scope. A renamed entity can retain its identity; the same label can also be reused for a replacement. Do not settle that question from appearance alone. For a changed connection, compare the actual endpoints and meaning. Rerouting a schematic line around a label is not a change in the subject when path geometry carries no subject meaning; a changed physical route can matter even if its endpoints stay the same.
+
+Match any change summary against the views in both directions: is each stated change visible or otherwise explicitly supported, and does a consequential depicted difference go unexplained? An omitted entity is not necessarily removed from the real system. Different cropping, abstraction, or incomplete source coverage may explain its absence. Report an unsupported removal claim as such; do not repair it by asserting the entity still exists.
+
+Treat rearrangement as a finding only when it contradicts the declared encoding or obstructs a necessary match. Two independently arranged panels with clear identities can be valid. Conversely, a legend that defines position as physical location makes an unexplained position change consequential. A before/after comparison alone cannot verify a claimed transition sequence or uninterrupted operation between the snapshots.
+
 ## Worked example: position loses identity
 
 An invented soil-pit explanation shows **P** on the left and **Q** on the right in an overview. A detail panel sorts the same pits by depth, with **Q** on the left and **P** on the right. The caption says “The left pit contains the ash layer,” but provides no panel name or pit identifier. The source assigns the ash layer to **Q**.

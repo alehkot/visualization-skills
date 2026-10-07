@@ -29,6 +29,16 @@ Check a normal case and a case at the boundary of the rule. Ask what the depicte
 
 For a process, identify the actor responsible for a step only if responsibility matters and is known. For a state model, distinguish stable states from actions. For a dependency map, do not impose chronological order merely to make a left-to-right story.
 
+## Explain waiting and incomplete execution
+
+When the question is why work waits, preserve the stated condition for proceeding or leave the cause unresolved. Waiting may depend on a date, an approval, or missing information rather than resource contention. Where competition for a shared resource is established, identify the competing arrivals, that resource, and what can wait. Distinguish work waiting from work being served. A count of queued items, a simultaneous occupancy limit, and a processing rate describe different quantities; retain their units and observation periods. Converging arrows alone establish neither overload nor a particular waiting time. Show rejection, expiry, or priority only when supported; do not invent an ordered queue where service order is unknown.
+
+For example, an invented repair desk has six jobs waiting and two benches. This supports a view of waiting work and limited simultaneous workspaces, but not a claim that two jobs finish each hour. Completion time needs further evidence about service duration and how the benches are used. If only the shared dependency is known, a labeled convergence is enough; fabricated queue slots would imply an observed backlog.
+
+When comparing executions of a procedure, match the same checks across cases and retain each check's recorded outcome. A failed check, a deliberately bypassed check, a check never reached after an earlier stop, and an unknown result are different states. Use these distinctions only where the evidence supplies them. When explaining differing outcomes, identify the earliest established difference relevant to the comparison, without treating its position in the sequence as causal evidence. If rule order or applicability differs, make that difference explicit rather than forcing a false row-by-row equivalence.
+
+For lifecycle explanations, preserve a consequential pause or retry with its trigger and return destination. Distinguish cancellation, failure, and completion when the source does. A retry is not necessarily a restart, and a successful example does not establish that interruption is impossible.
+
 ## Represent feedback and abstraction without inventing behavior
 
 In a causal-loop explanation, specify how changing one variable affects another, all else held as described, and where a delayed effect changes interpretation. “Positive” and “negative” link polarity describe direction of change, not desirable and undesirable outcomes. A loop's polarity does not by itself establish timing, magnitude, stability, or a forecast.
