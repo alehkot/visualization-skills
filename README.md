@@ -17,7 +17,7 @@ Each entrypoint links to focused references with explicit loading conditions. Ag
 | --- | --- | --- |
 | Reader task and representation | [Choose forms by the inference they support](skills/design-visual-explanation/references/task-and-representation.md) | [Distinguish established problems from preferences](skills/review-visual-explanation/references/evidence-and-judgment.md) |
 | Systems and relationships | [Preserve conditions, states, membership, and feedback](skills/design-visual-explanation/references/systems-and-relationships.md) | [Trace and countercheck the asserted model](skills/review-visual-explanation/references/systems-and-relationships.md) |
-| Quantities and uncertainty | [Define comparisons and select encodings](skills/design-visual-explanation/references/quantitative-explanations.md) | [Check values, marks, scales, and inferences](skills/review-visual-explanation/references/quantitative-review.md) |
+| Quantities and uncertainty | [Define comparisons, conditional percentages, and encodings](skills/design-visual-explanation/references/quantitative-explanations.md) | [Check values, reference groups, scales, and inferences](skills/review-visual-explanation/references/quantitative-review.md) |
 | Composition and multiple views | [Arrange evidence around the reader's task](skills/design-visual-explanation/references/composition-and-multiple-views.md) | [Locate reading obstacles and lost correspondence](skills/review-visual-explanation/references/composition-and-multiple-views.md) |
 | Explanatory illustration | [Choose views and disclose transformations](skills/design-visual-explanation/references/explanatory-illustration.md) | [Separate physical claims from drawing conventions](skills/review-visual-explanation/references/illustration-review.md) |
 | Accessibility and delivery | [Preserve meaning across requested surfaces](skills/design-visual-explanation/references/accessibility-and-delivery.md) | [Check alternative access and supplied variants](skills/review-visual-explanation/references/accessibility-and-variants.md) |
@@ -61,7 +61,9 @@ Evaluation fixtures, source material, research notes, model outputs, galleries, 
 
 These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence.
 
-A local five-problem with-skill/without-skill model comparison covered the expanded design skill at `152108e`, with all six references supplied inline. It does not establish a general benefit or test conditional reference loading. The expanded review skill and subsequent instruction changes have not had behavioral model evaluation, and neither skill has had a human comprehension study.
+A local five-problem with-skill/without-skill model comparison covered the expanded design skill at `152108e`, with all six references supplied inline. It does not establish a general benefit or test conditional reference loading. That comparison did not evaluate the expanded review skill or later instruction changes.
+
+A local ten-problem text-only smoke comparison of `ea0cb4a` and the conditional-percentage guidance used one separately prompted model run per version, with both skills exercised. Both versions met all ten hand-checked semantic criteria, so it detected no regression and no demonstrated performance improvement. It did not assess rendered artifacts, general reference-loading reliability, or reader comprehension. Neither skill has had a human comprehension study.
 
 ## License
 

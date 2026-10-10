@@ -10,6 +10,14 @@ Check that compared values answer the same question. Total activity and activity
 
 If the task asks for a derived quantity, compute it only from compatible inputs and label the derivation. Do not infer missing counts from rounded percentages when several counts could fit. A source's approximation should not become a more precise label because the chart has room for decimals.
 
+## Keep the direction of conditional percentages
+
+Restate a consequential conditional percentage as “Among [reference group], what share [has the property]?” Match that reference group to the reader's question and the proposed headline. “Among faulty parts, the share flagged” and “among flagged parts, the share faulty” refer to the same intersection but different denominators; one percentage does not in general answer both questions.
+
+When the requested direction differs from a supplied percentage, identify the intersection that forms the numerator and the complete reference group that forms the denominator. Use compatible joint counts or rates with enough information to determine that ratio. A count table with explicit row and column totals, or a subset view that brings the required groups together, can make the operation visible. Do not force a particular form or a complete table when a labeled fraction already answers the question.
+
+If the supplied information does not determine the requested ratio, name the missing information rather than reusing the reverse percentage. Do not combine incompatible populations, periods, or category definitions to fill the gap. When rates support an illustrative “per 1,000” explanation, label that population as hypothetical, preserve source precision, and do not present it as an observed sample size. A zero denominator makes the conditional share undefined, not zero.
+
 ## Choose an encoding for the required judgment
 
 | Reader needs to see | Candidate structure | Preserve or check |
@@ -45,10 +53,25 @@ For “When was uptake higher?”, the relevant comparison is **30% versus 60%**
 
 For “When were more guides used?”, the relevant values are **18 versus 12**. A count chart is correct. It becomes misleading only if the explanation uses that count comparison to claim a higher uptake rate. The form follows the question, not a blanket preference for normalization.
 
+## Worked example: which group does the percentage describe?
+
+In an invented inspection of **1,000 parts**, **100 are faulty** and **900 are sound**. The inspection flags **90 faulty** and **90 sound** parts. These categories cover the same inspected batch.
+
+| Actual condition | Flagged | Not flagged | Total |
+| --- | ---: | ---: | ---: |
+| Faulty | 90 | 10 | 100 |
+| Sound | 90 | 810 | 900 |
+| Total | 180 | 820 | 1,000 |
+
+For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For “What share of flagged parts were faulty?”, bring both flagged groups into the denominator: **90/(90 + 90) = 50%**. A brief for the second question can highlight the flagged column and label “90 of 180 flagged parts were faulty in this batch.” Showing only the 90 faulty parts as the reference group would omit half the denominator.
+
+A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
+
 ## Basis and limits
 
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies specific perceptual judgments. Use its results to inform comparable tasks, not to certify whole-chart understanding.
 - [Wilke, Proportional ink](https://clauswilke.com/dataviz/proportional-ink.html) discusses how filled marks imply magnitude. [Visualizing uncertainty](https://clauswilke.com/dataviz/visualizing-uncertainty.html) distinguishes uncertainty displays and their interpretation. These are authored textbook guidance, not evaluations of this skill.
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
+- [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey and decision procedure are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, inspection example, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
