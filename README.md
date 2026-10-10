@@ -53,11 +53,13 @@ Supply the material and audience when known. Rendered reviews need an agent that
 
 ## Repository contents
 
-Git tracks the skills and their runtime references, this README, the license, and ignore rules. Each skill keeps any required references inside its own folder so it can be installed independently.
+Git tracks the skills and their runtime references, this README, the license, ignore rules, and curated [evaluation sources](evaluation/README.md). Each skill keeps any required references inside its own folder so it can be installed independently; evaluation tooling is outside the installable skill folders.
 
-Evaluation fixtures, source material, research notes, model outputs, galleries, maintenance tooling, and `AGENTS.md` remain local and ignored. They are not required to use either skill.
+The close-bar evaluation suite includes replayable model prompts and rubrics, plus separate deterministic rendering checks. Generated outputs, galleries, historical local evaluations, research notes, and `AGENTS.md` remain ignored. None are required to use either skill.
 
 ## Evidence limits
+
+The [close-bar evaluation suite](evaluation/README.md) makes its inputs and checks reproducible. Preparing prompts or passing arithmetic/rendering fixtures does not establish model compliance or improved reader comprehension; model responses need separate rubric-based review.
 
 These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence.
 
