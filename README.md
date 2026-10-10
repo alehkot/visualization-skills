@@ -61,7 +61,9 @@ Evaluation fixtures, source material, research notes, model outputs, galleries, 
 
 These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence.
 
-A local five-problem with-skill/without-skill model comparison covered the expanded design skill at `152108e`, with all six references supplied inline. It does not establish a general benefit or test conditional reference loading. The expanded review skill and subsequent instruction changes have not had behavioral model evaluation, and neither skill has had a human comprehension study.
+A local five-problem with-skill/without-skill model comparison covered the expanded design skill at `152108e`, with all six references supplied inline. It does not establish a general benefit or test conditional reference loading. That comparison did not evaluate the expanded review skill or later instruction changes.
+
+A local ten-problem text-only smoke comparison of `ea0cb4a` and the conditional-percentage guidance used one separately prompted model run per version, with both skills exercised. Both versions met all ten hand-checked semantic criteria, so it detected no regression and no demonstrated performance improvement. It did not assess rendered artifacts, general reference-loading reliability, or reader comprehension. Neither skill has had a human comprehension study.
 
 ## License
 
