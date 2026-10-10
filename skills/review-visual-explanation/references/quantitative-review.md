@@ -34,6 +34,14 @@ A nonzero origin can distort magnitude bars even when the tick labels are correc
 
 A break, inset, transformation, or schematic view needs enough disclosure to support its intended use. Disclosure is not a universal cure: a small footnote cannot make a prominently false ratio true.
 
+## Check whether a close comparison can be read
+
+For values or small differences the task requires, check whether labels, ticks, or associated content let the reader recover them. Coarse ticks and absent direct labels are not intrinsically defective: broad-pattern reading or an adequate table may need no repair.
+
+If the comparison is left to estimation, suggest source-backed labels near the relevant bar ends or a directed, unit-labeled difference. Check source precision, rounding that hides the gap, and percentage points versus relative percent. Do not infer exact values from pixels or add unsupported digits. Correct labels do not cure truncated magnitude bars or establish significance.
+
+On supplied renderings, check label association, collisions, clipping, and conflicts with uncertainty marks at the intended size. Selective labels or an associated table may avoid crowding. Do not claim placement or legibility defects from an unrendered brief.
+
 ## Check uncertainty and aggregation without inventing analysis
 
 Identify what an interval means before judging it: spread among observations, uncertainty about a parameter, or predicted future variation. The label should match the source. An unexplained range is not automatically a confidence interval; missing interval metadata is a verification limit unless the artifact makes a conflicting claim.
@@ -52,6 +60,10 @@ The South endpoint is inconsistent with the declared axis: 1.5 cm is 15 mm. Corr
 
 A control version uses a table with an explicit unit beside each value and makes no numeric ranking claim. It preserves the source correctly. Converting both values to one unit could make comparison easier, but the mixed-unit table is not automatically a factual defect. If a rendered version is unavailable, do not claim its labels overlap or its bars have measured lengths.
 
+## Worked example: a gap hidden by labels
+
+An invented static-chart brief asks readers to retrieve **control: 51.2 seconds** and **test: 51.4 seconds**, but specifies zero-based bars, 10-second ticks, “51 s” labels, and no accompanying values. Restore “51.2 s” and “51.4 s” at the corresponding bar ends. A control version with an adequate associated value table needs no duplicate labels. Actual placement remains untested without the rendering.
+
 ## Worked example: a correct percentage answering the wrong question
 
 An invented survey covers **200 visitors**: **50 attended a workshop**, of whom **40 are local**, and **150 did not**, of whom **60 are local**. A brief shows the correct workshop-group value, **40/50 = 80%**, but labels it “80% of local visitors attended the workshop.”
@@ -68,9 +80,10 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [data.europa.eu, Grids versus data labels](https://data.europa.eu/apps/data-visualisation-guide/grids-versus-data-labels-in-bar-charts) recommends end-of-bar values for direct lookup. [ONS rounding guidance](https://service-manual.ons.gov.uk/content/numbers/rounding) balances readability with task-relevant precision. These are authored guidance, not tests of this skill or rules to label every mark.
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies particular comparison judgments, not an all-purpose ranking of finished charts.
 - [Wilke, Proportional ink](https://clauswilke.com/dataviz/proportional-ink.html) and [Visualizing uncertainty](https://clauswilke.com/dataviz/visualizing-uncertainty.html) provide authored guidance on quantitative marks and uncertainty displays.
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall example, and visitor example are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, and visitor examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.

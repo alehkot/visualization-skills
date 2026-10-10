@@ -35,6 +35,14 @@ When bar length encodes magnitude, define a meaningful zero baseline. A truncate
 
 Do not use area, volume, or width casually for emphasis when it also appears to encode a number. If area carries value, doubling a symbol's radius quadruples its area. A qualitative flow should not acquire unsupported quantitative widths. Keep decorative emphasis separate from measured magnitude.
 
+## Make close comparisons readable
+
+When close bars and coarse ticks leave needed values or differences to estimation, specify source-backed labels near the relevant bar ends, clearly associated with category and series. Keep the zero baseline for magnitude bars; finer ticks alone may not resolve the task.
+
+Use consistent units and enough supported precision to preserve the relevant distinction. Compute differences before display rounding when underlying values are available. Do not invent digits from rounded sources or call their difference exact. For “by how much?”, consider a signed difference with its direction and unit explicit. Percentage-point differences are not relative percentage changes; a relative change needs an explicit, nonzero reference. A descriptive gap alone establishes neither significance nor practical importance.
+
+At the intended size, reserve room for labels without colliding with neighbors, uncertainty marks, or plot boundaries. For crowded displays, prefer selected comparison labels or an associated value table over tiny text. Preserve needed values in requested static and nonvisual versions. Broad-pattern tasks and displays with adequate associated values do not require every mark labeled.
+
 ## Preserve variation and uncertainty
 
 Determine whether an interval describes variation among observations, uncertainty about a parameter, or a range of future outcomes. These answer different questions. Name the interval type and level when supplied; otherwise retain the source's wording and flag the missing definition. Do not relabel an unexplained range as a confidence interval.
@@ -53,6 +61,10 @@ For “When was uptake higher?”, the relevant comparison is **30% versus 60%**
 
 For “When were more guides used?”, the relevant values are **18 versus 12**. A count chart is correct. It becomes misleading only if the explanation uses that count comparison to claim a higher uptake rate. The form follows the question, not a blanket preference for normalization.
 
+## Worked example: close test and control bars
+
+An invented report gives comparable rates of **42.1% for control** and **42.4% for test**. With zero-based bars and 10-point ticks, label those reported values near the bar ends; if the task asks for the gap, add “Reported test − control difference: +0.3 percentage points.” Whole-percent labels would hide it. No uncertainty analysis is supplied, so do not claim a proven improvement.
+
 ## Worked example: which group does the percentage describe?
 
 In an invented inspection of **1,000 parts**, **100 are faulty** and **900 are sound**. The inspection flags **90 faulty** and **90 sound** parts. These categories cover the same inspected batch.
@@ -69,9 +81,11 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [data.europa.eu, Grids versus data labels](https://data.europa.eu/apps/data-visualisation-guide/grids-versus-data-labels-in-bar-charts) recommends end-of-bar values for direct lookup. [ONS rounding guidance](https://service-manual.ons.gov.uk/content/numbers/rounding) balances readability with task-relevant precision. These are authored guidance, not tests of this skill or rules to label every mark.
+- [Srinivasan et al., What's the Difference?](https://www.microsoft.com/en-us/research/wp-content/uploads/2018/01/paper2869-camera-ready.pdf) evaluates explicit difference encodings in two-series bar comparisons. It motivates reducing mental subtraction, but did not compare textual annotations; a signed difference label here is a local application, not a proven best format.
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies specific perceptual judgments. Use its results to inform comparable tasks, not to certify whole-chart understanding.
 - [Wilke, Proportional ink](https://clauswilke.com/dataviz/proportional-ink.html) discusses how filled marks imply magnitude. [Visualizing uncertainty](https://clauswilke.com/dataviz/visualizing-uncertainty.html) distinguishes uncertainty displays and their interpretation. These are authored textbook guidance, not evaluations of this skill.
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, inspection example, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, and inspection examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
