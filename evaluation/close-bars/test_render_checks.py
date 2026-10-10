@@ -62,6 +62,16 @@ class ArithmeticAndInputChecks(unittest.TestCase):
         self.assertIn('unsupported_precision',
                       fixtures.delta_issues('Test − control: +0.300 pp', '42.4', '42.1', 'pp'))
 
+    def test_tick_label_parser_allows_equivalent_numbers_without_source_precision_limit(self):
+        for label in ('−10', '-10.000', '-1e1', ' -10 units '):
+            with self.subTest(label=label):
+                self.assertEqual(fixtures.tick_label_issues(label, -10, 'units'), [])
+        self.assertEqual(fixtures.tick_label_issues('10.000 %', 10, '%'), [])
+        self.assertEqual(fixtures.tick_label_issues('10 seconds', 10, 's'), [])
+        self.assertEqual(fixtures.tick_label_issues('0.3%', 0.1 + 0.2, '%'), [])
+        for label in ('10% / 100%', 'about 10%', 'NaN', '∞'):
+            self.assertIn('numeric_tick_label_invalid', fixtures.tick_label_issues(label, 10, '%'))
+
     def test_png_header_reads_actual_dimensions(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'header.png'
@@ -144,13 +154,14 @@ class RenderChecks(unittest.TestCase):
             'positive_bad_geometry': {'bar_value_mismatch', 'endpoint_pixel_mismatch'},
             'positive_bad_uncertainty': {'label_uncertainty_collision'},
             'positive_bad_labelswap': {'label_value_mismatch'},
+            'positive_bad_tickscale': {'numeric_tick_value_mismatch'},
             'negative_bad_clipping': {'text_clipped'},
         }
         with tempfile.TemporaryDirectory() as directory:
             results = fixtures.run_fixtures(directory)
             self.assertEqual(sum(r['status'] == 'PASS' for r in results), 8)
             controls = [r for r in results if r['expected_failure_codes']]
-            self.assertEqual(len(controls), 9)
+            self.assertEqual(len(controls), 10)
             for result in results:
                 with self.subTest(name=result['name'], width=result['width_px']):
                     self.assertIn(result['status'], ('PASS', 'EXPECTED_FAILURE_DETECTED'))
@@ -162,6 +173,140 @@ class RenderChecks(unittest.TestCase):
                     self.assertTrue(expected <= codes)
                     if result['status'] == 'PASS':
                         self.assertEqual(result['issues'], [])
+
+    def test_wrong_numeric_tick_magnitude_is_detected(self):
+        for generator in (fixtures.positive, fixtures.dense, fixtures.rounding):
+            with self.subTest(generator=generator.__name__):
+                def corrupt(arguments):
+                    axis = arguments['fig'].axes[0]
+                    suffix = '%' if generator is not fixtures.rounding else ''
+                    axis.set_yticklabels([f'{value / 10:g}{suffix}' for value in axis.get_yticks()])
+                self.assertIn('numeric_tick_value_mismatch', self.codes_after_mutation(generator, corrupt))
+
+    def test_numeric_label_anchor_must_match_tick_position(self):
+        for generator in (fixtures.positive, fixtures.negative):
+            with self.subTest(generator=generator.__name__):
+                def move(arguments):
+                    from matplotlib.transforms import Affine2D
+                    axis = arguments['fig'].axes[0]
+                    dimension = axis.xaxis if generator is fixtures.negative else axis.yaxis
+                    label = dimension.get_major_ticks()[1].label1
+                    shift = (8, 0) if generator is fixtures.negative else (0, 8)
+                    label.set_transform(label.get_transform() + Affine2D().translate(*shift))
+                self.assertIn('numeric_tick_position_mismatch', self.codes_after_mutation(generator, move))
+
+    def test_wrong_negative_tick_sign_is_detected(self):
+        def corrupt(arguments):
+            axis = arguments['fig'].axes[0]
+            axis.set_xticklabels([str(abs(value)) for value in axis.get_xticks()])
+        self.assertIn('numeric_tick_value_mismatch', self.codes_after_mutation(fixtures.negative, corrupt))
+
+    def test_numeric_tick_units_and_complete_text_are_checked(self):
+        for suffix, code in (('', 'numeric_tick_unit_mismatch'),
+                             (' pp', 'numeric_tick_unit_mismatch'),
+                             ('% / 100%', 'numeric_tick_label_invalid'),
+                             ('% approx', 'numeric_tick_label_invalid')):
+            with self.subTest(suffix=suffix):
+                def corrupt(arguments):
+                    axis = arguments['fig'].axes[0]
+                    axis.set_yticklabels([f'{value:g}{suffix}' for value in axis.get_yticks()])
+                self.assertIn(code, self.codes_after_mutation(fixtures.positive, corrupt))
+
+    def test_missing_numeric_ticks_and_labels_are_detected(self):
+        for mode in ('none', 'blank', 'tick_hidden', 'hidden', 'alpha_zero', 'transparent_color'):
+            with self.subTest(mode=mode):
+                def hide(arguments):
+                    axis = arguments['fig'].axes[0]
+                    if mode == 'none':
+                        axis.set_yticks([])
+                    elif mode == 'blank':
+                        axis.set_yticklabels([''] * len(axis.get_yticks()))
+                    elif mode == 'tick_hidden':
+                        for tick in axis.yaxis.get_major_ticks():
+                            tick.set_visible(False)
+                    else:
+                        for label in axis.get_yticklabels():
+                            self.make_invisible(label, mode)
+                code = 'numeric_tick_count_mismatch' if mode == 'none' else 'numeric_tick_not_visible'
+                self.assertIn(code, self.codes_after_mutation(fixtures.positive, hide))
+
+    def test_hidden_numeric_axis_is_detected(self):
+        for mode in ('dimension', 'axis_off'):
+            with self.subTest(mode=mode):
+                def hide(arguments):
+                    axis = arguments['fig'].axes[0]
+                    if mode == 'dimension':
+                        axis.yaxis.set_visible(False)
+                    else:
+                        axis.set_axis_off()
+                self.assertIn('numeric_axis_not_visible', self.codes_after_mutation(fixtures.positive, hide))
+
+    def test_both_visible_tick_label_sides_are_checked(self):
+        # Axis.draw regenerates both texts. Corrupt the actual label2 setter so
+        # the wrong side is already wrong when painted, not only after drawing.
+        def corrupt(arguments):
+            axis = arguments['fig'].axes[0]
+            axis.tick_params(axis='y', labelright=True)
+            label = axis.yaxis.get_major_ticks()[1].label2
+            set_text = label.set_text
+            label.set_text = lambda value: set_text('1%' if value == '10%' else value)
+        self.assertIn('numeric_tick_value_mismatch', self.codes_after_mutation(fixtures.positive, corrupt))
+
+    def test_valid_numeric_tick_representations_and_spacing(self):
+        for generator in (fixtures.positive, fixtures.negative, fixtures.rounding, fixtures.dense):
+            with self.subTest(generator=generator.__name__):
+                def format_ticks(arguments):
+                    from matplotlib.ticker import FuncFormatter
+                    axis = arguments['fig'].axes[0]
+                    dimension = axis.xaxis if generator is fixtures.negative else axis.yaxis
+                    values = [-10, -5, 0] if generator is fixtures.negative else [0, 20, 40, 60]
+                    dimension.set_ticks(values)
+                    suffix = '%' if generator in (fixtures.positive, fixtures.dense) else ''
+                    places = 0 if suffix else 1
+                    dimension.set_major_formatter(FuncFormatter(lambda value, _: f'{value:.{places}f}{suffix}'))
+                # Other geometry assertions remain active; changed spacing is valid.
+                self.assertEqual(self.codes_after_mutation(generator, format_ticks), set())
+
+    def test_out_of_view_numeric_tick_labels_are_ignored(self):
+        def extra(arguments):
+            axis = arguments['fig'].axes[0]
+            axis.set_yticks([-100, 0, 10, 20, 30, 40, 50, 60, 100])
+            axis.set_yticklabels(['wrong', '0%', '10%', '20%', '30%', '40%', '50%', '60%', 'wrong'])
+            axis.set_ylim(0, 65)  # set_ticks expands limits; restore the intended view.
+        self.assertEqual(self.codes_after_mutation(fixtures.positive, extra), set())
+
+    def test_labeled_minor_ticks_are_checked_but_unlabeled_are_allowed(self):
+        for bad in (False, True):
+            with self.subTest(bad=bad):
+                def minor(arguments):
+                    axis = arguments['fig'].axes[0]
+                    axis.set_yticks([5], minor=True)
+                    if bad:
+                        axis.set_yticklabels(['50%'], minor=True)
+                codes = self.codes_after_mutation(fixtures.positive, minor)
+                if bad:
+                    self.assertIn('numeric_tick_value_mismatch', codes)
+                else:
+                    self.assertEqual(codes, set())
+
+    def test_inherited_numeric_tick_units_need_visible_caption(self):
+        for generator in (fixtures.negative, fixtures.rounding):
+            with self.subTest(generator=generator.__name__):
+                def hide(arguments):
+                    arguments['fig'].texts[1].set_visible(False)
+                self.assertIn('numeric_axis_unit_context_missing', self.codes_after_mutation(generator, hide))
+
+    def test_separate_formatter_offset_and_nonlinear_scale_are_explicitly_unsupported(self):
+        def offset(arguments):
+            from matplotlib.ticker import FixedFormatter
+            axis = arguments['fig'].axes[0]
+            formatter = FixedFormatter([f'{value:g}%' for value in axis.get_yticks()])
+            formatter.set_offset_string('×10')
+            axis.yaxis.set_major_formatter(formatter)
+        self.assertIn('numeric_axis_offset_unsupported', self.codes_after_mutation(fixtures.positive, offset))
+        def scale(arguments):
+            arguments['fig'].axes[0].set_yscale('symlog')
+        self.assertIn('numeric_axis_scale_unsupported', self.codes_after_mutation(fixtures.positive, scale))
 
     def test_label_association_is_not_certified_by_correct_number(self):
         def move_label(arguments):
