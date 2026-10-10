@@ -51,7 +51,21 @@ Show the distribution when its shape, tails, or subgroups are necessary to the q
 
 When comparing estimates, a visually larger center is not by itself an established difference in the underlying populations. An interval-overlap shortcut is not a substitute for the relevant comparison or statistical analysis. Keep limitations near a headline that would otherwise imply certainty.
 
-Missing observations are not zero. If a line spans unobserved periods, explain whether the segment merely connects observations or represents a model. If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
+If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
+
+## Preserve missingness as part of the evidence
+
+Keep observed zero, unavailable observations, and source-supplied estimates distinct. Preserve the source’s meaning for blanks or status codes; do not assign one when it is unknown. Establish the relevant categories or expected observation schedule from the source; missing records may omit a category or timestamp altogether, not merely contain an empty value. Retain their place in a requested complete comparison instead of silently closing the gap. Do not infer a failed observation from irregular spacing alone: event-driven sampling and periods outside the stated coverage can be legitimate. Preserve actual time spacing when elapsed time matters.
+
+Make the missingness recoverable in the proposed display or clearly associated text. An absent bar can look like a measured zero; use a clearly associated “not available” label, status row, or another explicit distinction rather than inventing a height. For a line, distinguish observed points from a connector across unobserved time. A gap, an annotated connector, or a separate estimate can suit different tasks; do not mandate breaks everywhere. If the source supplies imputed values, identify them and their method when known without presenting them as observations. Do not fill gaps just to make a smooth chart or invent why data is missing. Keep isolated observations recoverable when no line segment connects them.
+
+Scope conclusions and derived summaries to the available evidence. An average of available observations is not automatically the full-period average; preserve its denominator and coverage when used. Missingness need not invalidate a correctly scoped reported value. Avoid a headline that implies complete coverage when missing observations could change its answer.
+
+## Worked example: a missing reading is not a zero
+
+An invented daily record specifies **Monday: 12 visits, Tuesday: unavailable after a logging failure, Wednesday: 0 visits, Thursday: 18 visits**. A complete daily comparison should retain Tuesday with “not available” and Wednesday with “0”; neither deleting Tuesday nor drawing both as unlabeled zero-height bars preserves that distinction. If a line is chosen, keep the daily spacing and distinguish any bridge over Tuesday from measured values. The available-day mean is **10 visits over three recorded days**, not an established four-day mean.
+
+A control source records only irregular inspection dates and specifies no daily schedule. Keep those dates; do not manufacture missing daily observations or diagnose a logging failure. A captioned line that only joins recorded inspections can be legitimate when it does not claim measurements between them.
 
 ## Worked example: rate versus count
 
@@ -81,6 +95,9 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) studies missing-data and imputation displays in synthetic time-series averaging and trend tasks. It shows tradeoffs between interpretation and perceived data quality, not a universally best gap treatment or validation of these skills.
+- [Matplotlib’s missing-value example](https://matplotlib.org/stable/gallery/lines_bars_and_markers/masked_demo.html) illustrates that deleting points can leave a continuous line while masked values can break it. This implementation example motivates an explicit semantic handoff; it does not require that renderer or prove reader comprehension.
+
 - [data.europa.eu, Grids versus data labels](https://data.europa.eu/apps/data-visualisation-guide/grids-versus-data-labels-in-bar-charts) recommends end-of-bar values for direct lookup. [ONS rounding guidance](https://service-manual.ons.gov.uk/content/numbers/rounding) balances readability with task-relevant precision. These are authored guidance, not tests of this skill or rules to label every mark.
 - [Srinivasan et al., What's the Difference?](https://www.microsoft.com/en-us/research/wp-content/uploads/2018/01/paper2869-camera-ready.pdf) evaluates explicit difference encodings in two-series bar comparisons. It motivates reducing mental subtraction, but did not compare textual annotations; a signed difference label here is a local application, not a proven best format.
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies specific perceptual judgments. Use its results to inform comparable tasks, not to certify whole-chart understanding.
@@ -88,4 +105,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, and inspection examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
