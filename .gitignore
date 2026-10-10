@@ -1,10 +1,17 @@
-# Track only the distributable skills and essential repository files.
+# Track distributable skills, essential repository files, and curated eval sources.
 /*
 !/.gitignore
 !/LICENSE
 !/README.md
 !/skills/
 !/references/
+!/evaluation/
+
+# Opt evaluation suites in deliberately; keep historical local research ignored.
+/evaluation/*
+!/evaluation/README.md
+!/evaluation/close-bars/
+/evaluation/close-bars/results/
 
 # Keep generated files out of runtime folders too.
 __pycache__/

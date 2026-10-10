@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "instructions": "Return a renderer-neutral brief or material findings as requested, in no more than 120 words. Do not edit files or search external sources. These are written briefs, not actual renderings.",
+  "review_instructions": [
+    "Review the model response semantically against the corresponding case. Wording need not match these criteria; equivalent correct labels, units, and minimal repairs are acceptable.",
+    "Record pass only when all acceptance criteria are materially satisfied and no material failure criterion applies. Record fail for an established omission or error, or unclear when the response cannot be judged reliably. Quote response evidence and explain each judgment; this harness does not score responses.",
+    "Preserving a valid existing feature or evidence limit may satisfy a criterion implicitly. Do not require ritual caveats or restatement of unchanged features when the task does not request them: a concise descriptive answer can pass without an uncertainty disclaimer if it does not invite an unsupported inference or claim inspection of an unseen rendering.",
+    "The response must honor the requested scope and 120-word limit. Do not require a particular renderer, visual styling, or an unnecessary chart redesign.",
+    "Do not award significance, practical importance, causal improvement, verified legibility, accessibility conformance, or measured reader comprehension without evidence. A faithful descriptive comparison may pass without invented uncertainty analysis.",
+    "Keep these review instructions and per-case criteria out of the model input. Supply only the selected case's model_prompt in a fresh conversation, and retain the exact response plus model/version, settings, date, case ID, and bundle provenance for manual comparison."
+  ],
+  "cases": [
+    {
+      "id": "P1",
+      "title": "Close reported rates need a readable difference",
+      "skill": "design-visual-explanation",
+      "task_prompt": "For a static slide, compare control 42.1% and test 42.4%, comparable observed rates reported to one decimal place. Reader needs reported values and size of difference. Existing idea is grouped vertical bars with ticks 0,10,20,30,40,50. No uncertainty analysis supplied. Recommend the smallest useful improvement.",
+      "acceptance_criteria": [
+        "Preserve clearly associated control 42.1% and test 42.4% values in the static display, preferably as nearby bar-end labels; an equally direct associated value display is acceptable.",
+        "Give the reported test-minus-control difference as +0.3 percentage points, or equivalent directed wording, without promoting the rounded reported values into exact underlying measurements.",
+        "Keep a zero baseline for magnitude bars; finer ticks alone do not replace the requested value and difference lookup.",
+        "Keep the conclusion descriptive without claiming that the gap establishes statistical significance, practical importance, or a proven improvement; an explicit uncertainty disclaimer is not mandatory."
+      ],
+      "material_failure_criteria": [
+        "Round both labels to 42%, leave the values or requested difference to visual estimation, or report the gap as a 0.3% relative increase.",
+        "Truncate magnitude bars to emphasize the gap, invent more source digits or error bars, or claim statistical significance or practical importance."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Whole-second labels erase a needed distinction",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source comparable reported mean durations: control 51.2 seconds, test 51.4 seconds. Static chart brief asks readers to retrieve both values, but specifies zero-based bars, 10-second ticks, labels 51 s on both, no table/caption values. Give material findings and smallest repair only.",
+      "acceptance_criteria": [
+        "Identify the two 51 s labels, together with coarse ticks and no associated values, as losing the exact reported lookup required by the brief.",
+        "Repair the lookup with clearly associated control 51.2 s and test 51.4 s labels or an equally direct associated value display, retaining the valid zero baseline.",
+        "Keep the finding limited to the supplied brief; placement and legibility have not been inspected."
+      ],
+      "material_failure_criteria": [
+        "Accept the erased distinction, repair only the tick interval while leaving exact values unavailable, or invent additional source precision.",
+        "Demand a truncated bar baseline or wholesale redesign, claim a significant duration difference, or allege observed clipping or collisions without a rendering."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Rounded-only sources cannot supply hidden decimals",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Only supplied source reports both groups as 42%, rounded to nearest whole percent. User says test is probably a tiny bit higher and asks for exact decimal labels and a precise delta on their bars. Explain what the brief can supply without inventing data.",
+      "acceptance_criteria": [
+        "Retain 42% for both groups and identify the whole-percent source rounding; any 0 percentage-point difference is explicitly a difference between reported rounded values only.",
+        "Explain that neither exact decimal values nor a precise underlying difference or direction can be recovered; request unrounded source values if that distinction is needed.",
+        "Do not treat the user's speculation as evidence that test is higher, or add unsupported significance or uncertainty intervals."
+      ],
+      "material_failure_criteria": [
+        "Invent decimal values, infer an exact underlying zero difference from equal rounded labels, or assert that test is higher.",
+        "Present added trailing digits as new measured precision or pretend that bar geometry can recover unavailable source values."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Adequate associated table permits unlabeled bars",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Static chart answers exact lookup with zero-based grouped bars. Each series and category is clearly identified; an adjacent table has control 42.1%, test 42.4%, same study/date. Bars have no value labels and ticks every 10 points. There is no claim of significance. Report only material defects. No rendering supplied.",
+      "acceptance_criteria": [
+        "Report no established material defect: the adjacent associated table already supplies the exact values needed for lookup.",
+        "Do not require duplicate labels, finer ticks, a different chart form, or invented uncertainty analysis.",
+        "Bound acceptance to the written brief; actual mark geometry, label placement, and legibility remain uninspected."
+      ],
+      "material_failure_criteria": [
+        "Flag absent bar labels or coarse ticks as intrinsically defective despite the sufficient table, or require a repair without an established problem.",
+        "Certify an unseen rendering, invent a collision or association defect, or treat absent uncertainty analysis as a false descriptive value."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Correct labels do not cure false geometry or significance",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source control 42.1%, test 42.4%, comparable observed values; no uncertainty analysis. Brief uses magnitude bars with axis 42–43, correct endpoint labels, and headline 'Test is significantly better'. Give material findings and minimal repairs.",
+      "acceptance_criteria": [
+        "Identify the 42–43 origin as a distortion of magnitude-bar length and repair it to a meaningful zero baseline, or explicitly switch to an appropriate position encoding with a disclosed restricted scale.",
+        "Identify the headline's significant improvement as unsupported; replace it with a descriptive comparison such as test 42.4% versus control 42.1%, a reported +0.3 percentage-point gap.",
+        "Keep correct endpoint labels and source precision; do not fabricate statistical evidence or claim to have measured a rendering."
+      ],
+      "material_failure_criteria": [
+        "Treat correct numeric labels as fixing the truncated bar encoding or proving significance; miss either independent defect.",
+        "Invent uncertainty intervals, p-values, practical benefit, or observed pixel/placement findings."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Zero reference makes relative increase undefined",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A report of observed adverse-event counts gives control 0 and test 2 for compatible equal-exposure groups. User asks for exact labels and relative percentage increase compared with control. No inferential analysis supplied. Give a concise chart brief that handles the requested comparison.",
+      "acceptance_criteria": [
+        "Clearly associate control 0 events and test 2 events with their categories, preserve equal-exposure context, and retain zero as the origin if magnitude bars are used.",
+        "Give test-minus-control as +2 events; explain that relative percentage increase versus control is undefined because its reference count is zero.",
+        "Keep the adverse-event comparison descriptive without an unsupported significance or causal claim."
+      ],
+      "material_failure_criteria": [
+        "Report a finite relative percentage, a 100% or 200% increase, or an infinite percentage as a defined relative increase from zero.",
+        "Hide the zero count, change counts into unsupported rates, invent inferential analysis, or describe more adverse events as a demonstrated benefit."
+      ]
+    },
+    {
+      "id": "P7",
+      "title": "Broad overview and accessible table do not need every label",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A dense 60-category static chart serves a broad-pattern overview. Exact source-supported values are already supplied in an adjacent accessible table. User asks whether to add a label above every bar because two individual values are close. Explain a task-appropriate choice without redesigning the whole display.",
+      "acceptance_criteria": [
+        "Explain that an all-bar labeling requirement is unnecessary for this broad-pattern task because the accessible associated table already supplies exact lookup.",
+        "Retain the overview and table; selective labels for a specifically important comparison are acceptable but not obligatory.",
+        "Treat crowding as a design consideration rather than an observed defect without a supplied rendering, and do not claim verified accessibility or comprehension."
+      ],
+      "material_failure_criteria": [
+        "Mandate labeling every bar, removing the useful table, or redesigning the entire chart solely because two values are close.",
+        "Invent numerical values, allege observed collisions, or claim measured comprehension or accessibility conformance."
+      ]
+    },
+    {
+      "id": "P8",
+      "title": "Negative balances need signed values and directed difference",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A static horizontal magnitude-bar chart compares balances of −3.2 million dollars for control and −3.4 million dollars for test from a comparable ledger snapshot. User needs both values and test-minus-control difference. Give labels, baseline, and reading requirements, without claiming to inspect an actual rendering.",
+      "acceptance_criteria": [
+        "Clearly associate control −$3.2 million and test −$3.4 million with their bars, preserving minus signs and consistent dollar units.",
+        "Give test-minus-control as −$0.2 million (−$200,000), or equivalent wording that test is $0.2 million lower.",
+        "Specify a zero baseline and negative bars extending left with lengths corresponding to their absolute magnitudes; a longer negative bar must not imply a larger signed balance.",
+        "Require readable label association and space in the static view without asserting that an unseen rendering was inspected or is collision-free."
+      ],
+      "material_failure_criteria": [
+        "Drop or reverse minus signs, report +$0.2 million for test minus control, confuse million-dollar units, or use a truncated magnitude-bar origin.",
+        "Declare test's signed balance larger because its bar is longer, or claim verified layout, statistical significance, or economic importance from the supplied snapshot alone."
+      ]
+    },
+    {
+      "id": "P9",
+      "title": "Subtract underlying values before display rounding",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A static magnitude-bar chart compares compatible mean durations. The supplied unrounded values for this task are control 51.24 seconds and test 51.36 seconds. The existing layout proposes one-decimal value labels. The reader also needs the test-minus-control difference. Give source-faithful labels and explain how to derive the difference, using enough supported precision to avoid a misleading caption. No uncertainty analysis or rendering is supplied.",
+      "acceptance_criteria": [
+        "Clearly associate control and test values; 51.2 s and 51.4 s are acceptable as rounded display labels, and retaining source values 51.24 s and 51.36 s is also acceptable.",
+        "Derive the difference from 51.36 − 51.24 = +0.12 s before any display rounding. Show +0.12 s, or an explicitly rounded approximately +0.1 s; distinguish the source-derived difference from subtracting rounded endpoints.",
+        "Retain a zero baseline for magnitude bars and preserve the descriptive scope; actual layout and statistical significance are unverified."
+      ],
+      "material_failure_criteria": [
+        "Subtract the displayed endpoints and present +0.2 s as the source-derived difference, omit the requested directed difference, reverse its sign, or use percent units for the absolute gap.",
+        "Claim a rounded +0.1 s is the exact source difference, invent extra source precision, truncate the magnitude bars, invent error bars or claim significance or inspected legibility."
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Distinguish percentage points from relative percent",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Comparable observed rates are reported as control 42.1% and test 42.4% to one decimal place. A static brief has zero-based bars, correctly associated labels, and the caption 'Test minus control: +0.3% relative to control'. Reader needs both the absolute percentage-point difference and relative percentage change using control as reference. Review the caption and give the smallest repair. No uncertainty analysis or rendering is supplied.",
+      "acceptance_criteria": [
+        "Identify that +0.3 is the percentage-point difference between the reported rates, not the relative percentage increase.",
+        "Replace the caption with a directed reported difference of +0.3 percentage points and a relative increase of approximately +0.7% versus control, calculated as (42.4 − 42.1) / 42.1 × 100.",
+        "Keep the nonzero control reference explicit, qualify the relative result as derived from reported rounded rates, and do not imply an exact underlying effect or significance.",
+        "Preserve correct zero-based bars and labels; do not invent unrelated rendering defects."
+      ],
+      "material_failure_criteria": [
+        "Accept +0.3% as the relative increase, confuse percentage points and percent, divide by test instead of the requested control reference, or give the wrong direction.",
+        "Present approximately +0.7% as an exact underlying change, infer significance or practical benefit, or demand unrelated geometry or layout repairs."
+      ]
+    }
+  ]
+}
