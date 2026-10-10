@@ -15,6 +15,12 @@ SKILLS = {
     "review-visual-explanation": "quantitative-review.md",
 }
 
+# Explicitly opt curated suites in; ignoring an arbitrary directory is not enough.
+RESULTS_DIRS = (
+    "evaluation/close-bars/results",
+    "evaluation/missing-data/results",
+)
+
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
@@ -125,9 +131,11 @@ def write_bundle(bundle, repo, output, cases_path):
     if output in (Path(cases_path).resolve(), Path(__file__).resolve()):
         raise ValueError("Output must not replace evaluation inputs or tooling")
     if output.is_relative_to(root):
-        results = root / "evaluation" / "close-bars" / "results"
-        if not output.is_relative_to(results):
-            raise ValueError("Write outside the repository or inside ignored evaluation/close-bars/results/")
+        if not any(output.is_relative_to(root / path) for path in RESULTS_DIRS):
+            raise ValueError(
+                "Write outside the repository or inside an ignored results directory: "
+                + ", ".join(RESULTS_DIRS)
+            )
         try:
             git(root, "check-ignore", "--quiet", "--", str(output.relative_to(root)))
         except ValueError as error:

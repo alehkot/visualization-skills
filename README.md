@@ -17,7 +17,7 @@ Each entrypoint links to focused references with explicit loading conditions. Ag
 | --- | --- | --- |
 | Reader task and representation | [Choose forms by the inference they support](skills/design-visual-explanation/references/task-and-representation.md) | [Distinguish established problems from preferences](skills/review-visual-explanation/references/evidence-and-judgment.md) |
 | Systems and relationships | [Preserve conditions, states, membership, and feedback](skills/design-visual-explanation/references/systems-and-relationships.md) | [Trace and countercheck the asserted model](skills/review-visual-explanation/references/systems-and-relationships.md) |
-| Quantities and uncertainty | [Define comparisons, conditional percentages, and encodings](skills/design-visual-explanation/references/quantitative-explanations.md) | [Check values, reference groups, scales, and inferences](skills/review-visual-explanation/references/quantitative-review.md) |
+| Quantities and uncertainty | [Define comparisons, conditional percentages, missingness, and encodings](skills/design-visual-explanation/references/quantitative-explanations.md) | [Check values, reference groups, missingness, scales, and inferences](skills/review-visual-explanation/references/quantitative-review.md) |
 | Composition and multiple views | [Arrange evidence around the reader's task](skills/design-visual-explanation/references/composition-and-multiple-views.md) | [Locate reading obstacles and lost correspondence](skills/review-visual-explanation/references/composition-and-multiple-views.md) |
 | Explanatory illustration | [Choose views and disclose transformations](skills/design-visual-explanation/references/explanatory-illustration.md) | [Separate physical claims from drawing conventions](skills/review-visual-explanation/references/illustration-review.md) |
 | Accessibility and delivery | [Preserve meaning across requested surfaces](skills/design-visual-explanation/references/accessibility-and-delivery.md) | [Check alternative access and supplied variants](skills/review-visual-explanation/references/accessibility-and-variants.md) |
@@ -55,11 +55,11 @@ Supply the material and audience when known. Rendered reviews need an agent that
 
 Git tracks the skills and their runtime references, this README, the license, ignore rules, and curated [evaluation sources](evaluation/README.md). Each skill keeps any required references inside its own folder so it can be installed independently; evaluation tooling is outside the installable skill folders.
 
-The close-bar evaluation suite includes replayable model prompts and rubrics, plus separate deterministic rendering checks. Generated outputs, galleries, historical local evaluations, research notes, and `AGENTS.md` remain ignored. None are required to use either skill.
+The close-bar and missing-data evaluation suites include replayable model prompts and rubrics. The close-bar suite also has separate deterministic rendering checks. Generated outputs, galleries, historical local evaluations, research notes, and `AGENTS.md` remain ignored. None are required to use either skill.
 
 ## Evidence limits
 
-The [close-bar evaluation suite](evaluation/README.md) makes its inputs and checks reproducible. Preparing prompts or passing arithmetic/rendering fixtures does not establish model compliance or improved reader comprehension; model responses need separate rubric-based review.
+The [evaluation suites](evaluation/README.md) make their inputs and checks reproducible. Preparing prompts or passing arithmetic/rendering fixtures does not establish model compliance or improved reader comprehension; model responses need separate rubric-based review.
 
 These skills guide design and review; they do not guarantee factual accuracy or improved reader comprehension. Structural validation and model-output checks are different from human comprehension evidence.
 

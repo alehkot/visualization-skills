@@ -185,16 +185,49 @@ class BundleTests(unittest.TestCase):
     def test_only_ignored_results_directory_is_permitted_inside_repo(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()
-            output = root / "evaluation" / "close-bars" / "results" / "bundle.json"
-            with patch.object(prepare_eval, "git", side_effect=[str(root).encode(), b""]) as mock_git:
-                prepare_eval.write_bundle(self.bundle, root, output, CASES)
-            self.assertTrue(output.is_file())
-            self.assertEqual(mock_git.call_args.args[1:], ("check-ignore", "--quiet", "--", "evaluation/close-bars/results/bundle.json"))
-            rejected = output.with_name("not-ignored.json")
-            with patch.object(prepare_eval, "git", side_effect=[str(root).encode(), ValueError("not ignored")]):
+            for suite in ("close-bars", "missing-data"):
+                with self.subTest(suite=suite):
+                    relative = f"evaluation/{suite}/results/bundle.json"
+                    output = root / relative
+                    with patch.object(prepare_eval, "git", side_effect=[str(root).encode(), b""]) as mock_git:
+                        prepare_eval.write_bundle(self.bundle, root, output, CASES)
+                    self.assertTrue(output.is_file())
+                    self.assertEqual(mock_git.call_args.args[1:], ("check-ignore", "--quiet", "--", relative))
+                    rejected = output.with_name("not-ignored.json")
+                    with patch.object(prepare_eval, "git", side_effect=[str(root).encode(), ValueError("not ignored")]):
+                        with self.assertRaises(ValueError):
+                            prepare_eval.write_bundle(self.bundle, root, rejected, CASES)
+                    self.assertFalse(rejected.exists())
+
+    def test_unapproved_results_and_source_paths_remain_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            for relative in (
+                "evaluation/other-suite/results/bundle.json",
+                "evaluation/missing-data/results-copy/bundle.json",
+                "evaluation/missing-data/cases.json",
+                "evaluation/missing-data/results/../source.json",
+            ):
+                with self.subTest(relative=relative):
+                    output = root / relative
+                    with patch.object(prepare_eval, "git", return_value=str(root).encode()) as mock_git:
+                        with self.assertRaisesRegex(ValueError, "results directory"):
+                            prepare_eval.write_bundle(self.bundle, root, output, CASES)
+                    self.assertEqual(mock_git.call_count, 1)
+                    self.assertFalse(output.exists())
+
+    def test_results_symlink_cannot_write_into_repository_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            source = root / "skills"
+            source.mkdir()
+            results = root / "evaluation" / "missing-data" / "results"
+            results.parent.mkdir(parents=True)
+            results.symlink_to(source, target_is_directory=True)
+            with patch.object(prepare_eval, "git", return_value=str(root).encode()):
                 with self.assertRaises(ValueError):
-                    prepare_eval.write_bundle(self.bundle, root, rejected, CASES)
-            self.assertFalse(rejected.exists())
+                    prepare_eval.write_bundle(self.bundle, root, results / "bundle.json", CASES)
+            self.assertFalse((source / "bundle.json").exists())
 
     def test_cli_outputs_bundle_and_reports_errors_without_traceback(self):
         with tempfile.TemporaryDirectory() as directory:
