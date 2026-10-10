@@ -50,7 +50,19 @@ Do not infer significance solely from whether two separate error bars overlap. E
 
 Check whether aggregation hides information required for the question: changing subgroup composition, paired changes, skew, or a relevant tail. Do not demand raw data on every summary chart. A faithful summary can be sufficient for a summary question; detailed analysis may be needed for a different inference.
 
-Missing data should not silently become zero. A connecting segment may indicate interpolation, a modeled trajectory, or merely a link between observations. Read the stated convention before alleging a false observation.
+## Check missingness without inventing observations
+
+Compare the artifact’s coverage with source-established categories and observation schedules. Check both empty values and entirely absent records. A missing timestamp can disappear when remaining points are connected or equally spaced, and an omitted bar can look like an observed zero. Report the specific loss of meaning when the task needs that distinction; preserve true zero values and the source’s status definitions. Unknown blank codes are a verification limit, not automatically zero or missing. Irregular observation dates alone do not establish missing scheduled readings, and an unspecified cause remains unknown.
+
+Read the marks together with their stated convention. A connector may merely join observations, or represent interpolation or a modeled trajectory. Do not demand a break when the source-supported convention and context already preserve the distinction. Conversely, flag an imputed point presented as observed or a line that claims measurements across a known unobserved interval. Recommend explicit status wording, restored time/category context, or a distinct labeled estimate as appropriate, rather than inventing values or enforcing one visual treatment. Preserve isolated observations when a repair breaks their connecting segments.
+
+Check conclusions and derived summaries too: a mean over available records must not silently become a mean over the whole requested period. Missing data can leave a claim unverified without proving its value false. Preserve a valid available-case summary when its scope and denominator answer the question. Without a rendering, review these specified meanings rather than asserting unseen gap visibility or label placement.
+
+## Worked example: a zero-shaped absence
+
+An invented brief specifies monthly counts **May: 8, June: not reported, July: 0**, but draws no bar for either June or July and gives neither a status label nor accompanying values. Readers must distinguish a recorded zero from no report. Keep July’s zero and add an explicit June “not reported” indication, retaining all three months. Do not replace June with 0 or infer its missingness cause.
+
+A control brief already labels both statuses in an associated table and makes no stronger coverage claim. It needs no duplicate marks solely to satisfy a gap rule. If only the artifact is supplied without a source or stated schedule, an absent month is not by itself proof that a record was lost.
 
 ## Worked example: inconsistent units
 
@@ -80,10 +92,13 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) evaluates missing-data displays and imputation in synthetic time-series tasks. The observed tradeoffs motivate checking what missingness communicates, not prescribing one universally superior encoding.
+- [D3’s line documentation](https://d3js.org/d3-shape/line#line_defined) explains how supplied undefined points can terminate segments; absent rows need separate consideration. This is implementation evidence, not an evaluation of this review skill.
+
 - [data.europa.eu, Grids versus data labels](https://data.europa.eu/apps/data-visualisation-guide/grids-versus-data-labels-in-bar-charts) recommends end-of-bar values for direct lookup. [ONS rounding guidance](https://service-manual.ons.gov.uk/content/numbers/rounding) balances readability with task-relevant precision. These are authored guidance, not tests of this skill or rules to label every mark.
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies particular comparison judgments, not an all-purpose ranking of finished charts.
 - [Wilke, Proportional ink](https://clauswilke.com/dataviz/proportional-ink.html) and [Visualizing uncertainty](https://clauswilke.com/dataviz/visualizing-uncertainty.html) provide authored guidance on quantitative marks and uncertainty displays.
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall, close-bar, and visitor examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, visitor, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
