@@ -2,6 +2,8 @@
 
 These sources are kept outside `skills/` so either skill remains independently installable without evaluation dependencies. Curated suites are explicitly allowed by `.gitignore`; generated outputs and older local research remain ignored.
 
+Both quantitative suites use the single [prompt preparer](close-bars/prepare_eval.py). Select a suite with `--cases`; its case manifest and rubrics remain separate. Case IDs are local to a suite: record `close-bars/P1` or `missing-data/P1`, not an ambiguous `P1` when combining results.
+
 ## Close-bar comparisons
 
 The [case manifest and rubrics](close-bars/cases.json) cover the close-bar failure modes and legitimate counterexamples. Several cases deliberately resemble the skill's worked examples; these are regression/smoke probes, not held-out generalization evidence.
@@ -49,7 +51,7 @@ python3 evaluation/close-bars/prepare_eval.py --revision 42cbc37 --output evalua
 python3 evaluation/close-bars/prepare_eval.py --revision HEAD --output evaluation/close-bars/results/candidate.json
 ```
 
-`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the ignored results directory; an external directory is also allowed.
+`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the explicitly allowed, Git-ignored `evaluation/close-bars/results/` and `evaluation/missing-data/results/` directories; an external directory is also allowed. Merely ignoring another repository directory does not allow output there.
 
 The JSON `cases` array contains `id` and `model_prompt`. Submit only that prompt in a fresh model context. The separate `rubric` object contains the review instructions and case criteria. No provider integration, credentials, paid API calls, or automatic semantic grading are included. Preserve the raw responses and per-criterion judgments alongside the bundle; do not quietly replace old runs.
 
@@ -69,3 +71,40 @@ The render command fails clearly when required packages are unavailable. A succe
 Rendered examples use explicit synthetic source data. A passing run must accept all intended-good fixtures and detect the specified failure in every deliberately broken control. A failure control may have additional defects; the named expected failure must still be detected. Numeric and renderer-object assertions should be supplemented with actual PNG inspection at the exported size. Labels that fit geometrically are not thereby proven easy for every reader to understand.
 
 Keep arithmetic/render checks distinct from model scores. Never report “the model passed” merely because a Python test or a hand-authored chart passed.
+
+## Missing observations, zeros, and estimates
+
+The [missing-data case manifest and rubrics](missing-data/cases.json) contain ten targeted written probes, evenly split between design and review. They cover:
+
+- Explicit missing readings versus observed zero, including isolated observations that a line-only display could lose
+- Scheduled dates absent from exported rows
+- Missing bars visually indistinguishable from zero without sufficient status information
+- Legitimate irregular sampling, unknown cadence, and labeled connectors as controls against overcorrection
+- Source-supplied estimates with their measured/estimated distinction preserved
+- An adequate associated status table that does not need duplicate labels
+- Unknown missingness reasons that do not establish an outage or cause
+- A required monthly average whose missing day cannot silently become zero or change the denominator
+
+These are targeted regression/smoke probes informed by the guidance, not held-out generalization evidence. Review source-faithful outcomes rather than requiring every gap to be broken, a universal chart form, an API, or invented inference. The suite has no model runner, keyword-based semantic grader, or missing-data renderer. Its standard-library tests validate the authored manifest, shared preparer, hashes, rubric separation, and output safeguards; passing them is not evidence of model improvement.
+
+### Prepare the same missing-data tasks for both revisions
+
+Run from the repository root. `be6de0f` is the pre-missing-data-guidance baseline. Commit the candidate skill edits before using `HEAD`, or replace it with another available committed revision. The preparer never reads uncommitted skill edits.
+
+```sh
+python3 evaluation/close-bars/prepare_eval.py --revision be6de0f --cases evaluation/missing-data/cases.json --output evaluation/missing-data/results/baseline.json
+python3 evaluation/close-bars/prepare_eval.py --revision HEAD --cases evaluation/missing-data/cases.json --output evaluation/missing-data/results/candidate.json
+```
+
+Both commands must use the same unchanged local case manifest and preparer. Verify that `provenance.cases_sha256` and `provenance.preparer_sha256` match across bundles; retain each bundle's resolved skill commit and per-file hashes. Do not fetch cases independently from each skill revision, quietly replace an old bundle, or compare unlike task sets. Use fresh filenames for additional runs.
+
+Follow the model-evaluation protocol above: submit only one `model_prompt` per fresh context, keep rubrics private from the model, hold model/settings/tool access fixed, and retain raw responses before manual grading. The missing-data tasks permit up to 160 words; the close-bar tasks permit 120. Report every paired case, the design/review breakdown, both denominators, and unclear judgments. A single run is a smoke check; these brief-only tasks cannot establish actual rendering behavior, readability, accessibility conformance, or reader comprehension. Inline references also do not test autonomous reference selection.
+
+### Run all checks
+
+```sh
+python3 -m unittest discover -s evaluation/close-bars -p 'test_*.py' -v
+python3 -m unittest discover -s evaluation/missing-data -p 'test_*.py' -v
+```
+
+The first command includes optional close-bar rendering checks; inspect skips as described above. For standard-library-only checks, replace its pattern with `test_semantic.py`. The missing-data suite requires only Python's standard library and Git. Generated bundles, responses, scores, and reports belong in its ignored `results/` directory or outside the repository, never in either installable skill.

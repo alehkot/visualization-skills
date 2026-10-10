@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "instructions": "Return a renderer-neutral brief or material findings as requested, in no more than 160 words. Do not edit files or search external sources. Use only the supplied source facts; these are written briefs, not actual renderings.",
+  "review_instructions": [
+    "Review the response semantically against the corresponding case. Equivalent task-faithful encodings, labels, and minimal repairs are acceptable; do not grade by keyword matching or require a particular chart type, renderer, API, or missing-value representation.",
+    "Record pass only when all acceptance criteria are materially satisfied and no material failure criterion applies. Record fail for an established omission or error, or unclear when the response cannot be judged reliably. Quote response evidence and explain each judgment; this harness does not score responses.",
+    "Preserve expected observational positions only when the source establishes their scope or cadence. An irregular record does not by itself establish omitted scheduled observations. Distinguish supplied missing values, observed zeros, and source-backed estimates without inventing values or reasons.",
+    "A clearly labeled connector between observations can be legitimate when it does not claim unobserved measurements or conceal established missingness. Do not demand that every gap be broken, every absent date be inserted, or every estimated value be discarded.",
+    "An adequate associated table or status annotation can already satisfy the reader's task. Preserving valid features may satisfy a criterion implicitly; do not demand duplicate marks, labels, redesigns, or ritual caveats.",
+    "Honor the requested scope and 160-word limit. No rendering is supplied, so do not certify actual geometry, clipping, legibility, accessibility conformance, or measured comprehension.",
+    "Keep these review instructions and per-case criteria out of model input. Supply only the selected case's model_prompt in a fresh context. Retain the exact response, suite name, case ID, model/version, settings, tools, date, and bundle provenance for manual comparison."
+  ],
+  "cases": [
+    {
+      "id": "P1",
+      "title": "Explicit missing readings differ from isolated observed zero",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Source is one scheduled count per day, Monday through Friday: Monday 4, Tuesday missing, Wednesday 0 observed, Thursday missing, Friday 6. Reader needs the reported daily counts and reporting coverage. Existing idea is a line with breaks at missing days, no point markers, labels, or associated table. Propose a small static display preserving this five-day scope and each observed value. No missingness reason or estimate is supplied.",
+      "acceptance_criteria": [
+        "Keep Monday through Friday identifiable in their daily order and make the observed counts 4, 0, and 6 retrievable at the correct days, including isolated observations when lines are broken. Points, labels, an associated table, or equivalent direct representations are acceptable.",
+        "Make Tuesday and Thursday missing readings distinguishable from Wednesday's observed zero through source-faithful marks, labels, an associated table, or equivalent explicit status.",
+        "Do not fabricate missing counts or reasons. Any connector or trend description must not imply a measured or estimated reading on Tuesday or Thursday."
+      ],
+      "material_failure_criteria": [
+        "Replace missing readings with zero, omit expected days so the established five-day coverage is hidden, or make missing days and Wednesday's observed zero indistinguishable.",
+        "Retain only broken line segments with no way to retrieve the isolated observations, interpolate unprovided counts, or invent why readings are missing."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Absent scheduled row must not disappear from coverage",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source contract requires one reading on each of June 1–4. The export contains June 1: 8, June 2: 9, June 4: 7; there is no June 3 row. A brief places the three readings at equally spaced row-number positions, labels them with their dates, and headlines 'Complete four-day record'; it has no missing-status note or table. Reader needs daily coverage and observed values. Give material findings and smallest repairs.",
+      "acceptance_criteria": [
+        "Identify June 3 as an absent expected observation because the four-day daily schedule is explicitly supplied; identify the completeness claim as unsupported.",
+        "Restore the June 1–4 temporal scope and make June 3's unavailable reading explicit without filling in a measurement. Use actual date spacing or an equivalent daily-position display with status.",
+        "Preserve the supplied readings 8, 9, and 7; repair the headline and coverage encoding without claiming inspection of an unseen rendering."
+      ],
+      "material_failure_criteria": [
+        "Accept the complete-record headline or hide the absent scheduled day by retaining row-number spacing without a sufficient scope/status repair.",
+        "Assign a zero or inferred reading to June 3, invent a missingness cause, or allege actual pixel defects without a rendering."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Missing bar and true zero cannot share an unexplained blank",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source counts for three named sites are A: 12, B: not reported, C: 0 observed. Static zero-based bars retain all three category names, but both B and C have no visible bar, no labels, and no associated values or status table. Caption says 'B and C recorded none'. Reader needs each site's count and reporting status. Give material findings and minimal repair.",
+      "acceptance_criteria": [
+        "Identify that the unexplained B/C blanks and caption conflate a missing count with an observed zero.",
+        "Clearly associate B with not reported and C with observed 0, retaining A's 12, the categories, and the valid zero baseline; labels, an associated table, or equivalent status distinctions are acceptable.",
+        "Correct the claim that B recorded none without inventing B's value or requiring a wholesale redesign."
+      ],
+      "material_failure_criteria": [
+        "Accept B as zero, omit B, or retain the unsupported claim that both B and C recorded none.",
+        "Repair only the scale or colors while still leaving missingness and zero indistinguishable, or invent B's count or missingness reason."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Legitimate irregular observations need no invented daily gaps",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source records all three visits made during July: July 1 value 5, July 4 value 7, July 11 value 6. Visits occur when requested; no daily or weekly sampling schedule exists. Brief uses date-positioned points with these values and caption 'Readings at recorded visits'. No lines, imputation, or continuous-coverage claim is present. Reader needs visit values and timing. Report only material defects; no rendering is supplied.",
+      "acceptance_criteria": [
+        "Report no established material defect in the described encoding: actual dates preserve the intentionally irregular visit timing and values.",
+        "Do not recast unvisited dates as missing scheduled observations or require insertion of daily null rows, gap markers, or a different chart type.",
+        "Keep any judgment confined to the supplied brief rather than certifying the unseen rendering."
+      ],
+      "material_failure_criteria": [
+        "Infer a daily or weekly schedule and flag intervening dates as missing, or demand a repair solely because sampling intervals differ.",
+        "Invent observations, require interpolation, or claim verified rendered legibility or accessibility."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Source-supplied imputation retains its estimated status",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Publisher's daily series is August 1: 10 observed; August 2: 12 estimated by the publisher using linear interpolation between August 1 and August 3; August 3: 14 observed; August 4: 0 observed. Reader needs all published values and which were measured. Give a static display brief using this source, including the supplied estimate and its provenance.",
+      "acceptance_criteria": [
+        "Associate the four dates with published values 10, 12, 14, and 0, preserving August 4 as an observed zero.",
+        "Visibly distinguish August 2's 12 as a publisher-supplied estimate rather than a measurement, and disclose the supplied linear-interpolation method/source in a directly associated note or equivalent encoding.",
+        "Keep the supplied estimate without inventing additional values, uncertainty, or measurement claims; do not imply its inclusion closes the measurement gap."
+      ],
+      "material_failure_criteria": [
+        "Present August 2 as observed, silently make all four points appear measured, or change the estimate's source or method.",
+        "Discard the requested supplied estimate merely because it is imputed, replace it with zero or a different invented value, or claim all four days were measured."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Disclosed connector across missing reading can be legitimate",
+      "skill": "review-visual-explanation",
+      "task_prompt": "A daily source reports September 1: 10, September 2: no reading, September 3: 14, September 4: 9. Brief uses a real date axis, labeled points only at observed readings, and an explicit September 2 'no reading' annotation. A dashed straight connector spans September 1 to 3, keyed 'Connects recorded readings; no September 2 observation or estimate'. Reader needs recorded values and reporting coverage; no continuous-trend claim is made. Report only material defects in this written brief.",
+      "acceptance_criteria": [
+        "Report no established material defect solely from the spanning connector: the source-backed observations, expected date position, missing status, and connector semantics are explicit.",
+        "Do not require removal or a break merely because a connector spans the missing date, and do not reinterpret the connector as a supplied September 2 estimate.",
+        "Bound the judgment to the written brief, without certifying actual visibility, mark separation, or legibility."
+      ],
+      "material_failure_criteria": [
+        "Automatically fail the brief because every missing-value gap must be broken, or demand deleting the legitimate labeled connector without another established defect.",
+        "Read off or invent a September 2 value, claim complete daily measurement, or certify an unseen rendering."
+      ]
+    },
+    {
+      "id": "P7",
+      "title": "Unknown cadence does not establish omitted observations",
+      "skill": "design-visual-explanation",
+      "task_prompt": "An export contains May 2: 8, May 9: 11, May 20: 10, with dates and values only. The source says nothing about intended cadence, coverage window, or whether records were omitted. User asks for a time display that 'shows the missing days'. Explain what can be shown now and what is needed to establish missing observations.",
+      "acceptance_criteria": [
+        "Preserve the three supplied values at their actual dates and distinguish elapsed time between readings from known missing scheduled measurements.",
+        "Explain that the intended cadence and coverage window are unknown, so the supplied record cannot establish which additional dates should have observations.",
+        "Request or identify the schedule/coverage metadata needed for the requested missing-observation claim rather than inserting invented daily missing rows or estimated readings."
+      ],
+      "material_failure_criteria": [
+        "Assume daily sampling or an unsupported start/end date and declare intervening or boundary days missing observations.",
+        "Create or impute unprovided readings, claim the export is complete, or compress the actual time intervals into a misleading regular-cadence display."
+      ]
+    },
+    {
+      "id": "P8",
+      "title": "Associated status table already distinguishes missing and zero",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source counts are A: 5 observed, B: not reported, C: 0 observed. Brief uses zero-based bars retaining A, B, C category names; B and C have no visible bar. An adjacent always-visible associated table lists exactly 'A: 5 observed; B: not reported; C: 0 observed', and the caption directs readers to that table for values and reporting status. Reader needs exact count/status lookup. Report only material defects; no rendering is supplied.",
+      "acceptance_criteria": [
+        "Report no established material defect: the associated table already distinguishes B's missing count from C's true zero and supplies the required exact lookup.",
+        "Do not require duplicate bar-end labels, a special missing bar, replacement of the chart, or removal of B solely because its bar is absent.",
+        "Keep acceptance limited to the described source/status association rather than verifying the unseen layout or accessibility."
+      ],
+      "material_failure_criteria": [
+        "Treat the absent bars as inherently misleading despite the adequate always-visible table, or incorrectly claim that B's status is unavailable.",
+        "Invent a zero for B, allege observed table/label collisions, or certify actual rendered legibility."
+      ]
+    },
+    {
+      "id": "P9",
+      "title": "Missingness does not identify its cause",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Monthly service counts supplied for April–June are April 14, May not reported, June 13. The source provides no reason for May's missing count. User proposes a red May band labeled 'Service stopped during outage' and a caption about the outage's effect. Recommend a source-faithful brief that still makes the missing month clear.",
+      "acceptance_criteria": [
+        "Keep April, May, and June identifiable, retain observed counts 14 and 13, and label May as not reported or equivalent unknown-value status.",
+        "Explain that the supplied record does not establish an outage or stopped service, and replace those causal labels/caption with supported missing-data language.",
+        "Do not infer a May zero, hidden count, missingness mechanism, or causal effect from the absence of the reported value."
+      ],
+      "material_failure_criteria": [
+        "Endorse the outage/stopped-service label or causal caption without evidence, even if the missing month is visually distinct.",
+        "Treat May as zero or invent an estimate, omit the established month, or claim that missingness proves a particular reporting mechanism."
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Required monthly average cannot silently change its denominator",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Source defines September's requested metric as the arithmetic mean of daily completed-job counts across all 30 calendar days. There are 29 reported daily counts summing to 290, including a genuine 0 on September 10. September 16 is explicitly missing, with no estimate or missingness reason. User needs a monthly-average KPI plus a daily coverage display. Propose source-faithful values and labels; do not change the metric definition.",
+      "acceptance_criteria": [
+        "State that the requested all-30-day monthly mean cannot be determined from the supplied counts; do not treat the missing reading as zero or invent its value.",
+        "Keep September 16 visibly missing within the 30-day scope and September 10 as an observed zero; communicate that coverage is 29 of 30 days.",
+        "If offering 290 / 29 = 10, label it explicitly as the observed-day mean, separate from the unavailable requested monthly KPI. An optional observed-day statistic must not silently replace the required denominator.",
+        "Identify the missing reading or an explicitly authorized, disclosed estimation method as needed to obtain a full-month measured value or a separately labeled estimated KPI; do not invent such an estimate."
+      ],
+      "material_failure_criteria": [
+        "Report 290 / 30 (about 9.67) as the measured monthly mean by assigning zero to September 16, or report 10 as the requested all-calendar-day mean without disclosing the denominator change.",
+        "Invent the missing count, silently drop the day from coverage, treat the observed September 10 zero as missing, or claim a measured complete-month KPI."
+      ]
+    }
+  ]
+}

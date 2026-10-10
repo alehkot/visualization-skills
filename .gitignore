@@ -12,6 +12,8 @@
 !/evaluation/README.md
 !/evaluation/close-bars/
 /evaluation/close-bars/results/
+!/evaluation/missing-data/
+/evaluation/missing-data/results/
 
 # Keep generated files out of runtime folders too.
 __pycache__/
