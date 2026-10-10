@@ -10,6 +10,14 @@ Recompute a consequential transformation when the inputs support it. A percentag
 
 Check whether the headline makes a stronger claim than the values. A higher total need not imply a higher individual rate; a higher sample average need not imply every individual improved. Report the specific unsupported inference rather than demanding a particular replacement chart.
 
+## Check which group a percentage is about
+
+Read a consequential conditional percentage as “Among [reference group], what share [has the property]?” Compare the source's reference group, the artifact's labels and highlighted marks, and the group named in its headline. Reversing the property and reference group generally changes the denominator even when the numerator stays the same.
+
+When supplied joint counts or compatible rates determine the requested ratio, reconstruct its numerator and full denominator. Include every relevant subgroup, not only the successful, selected, or highlighted branch. Check row versus column totals in a table and which parent group a branch percentage refers to. If the denominator is zero, the share is undefined; do not accept or repair it to 0%.
+
+If the evidence establishes only the reverse conditional, report the requested share as unverified and identify the missing support; do not invent a replacement percentage or declare an independently supported label false. An explicitly hypothetical “per 1,000” population is a legitimate explanatory device when the supplied rates support it. It must not be presented as an observed sample or add unsupported precision. A correctly scoped conditional percentage does not need its reverse displayed unless the reader's task requires it.
+
 ## Inspect marks independently of labels
 
 For an actual rendering, compare mark positions and extents with the stated scale. Use a clear view or available geometry when needed. Do not invent exact pixel measurements from a fuzzy screenshot.
@@ -44,6 +52,14 @@ The South endpoint is inconsistent with the declared axis: 1.5 cm is 15 mm. Corr
 
 A control version uses a table with an explicit unit beside each value and makes no numeric ranking claim. It preserves the source correctly. Converting both values to one unit could make comparison easier, but the mixed-unit table is not automatically a factual defect. If a rendered version is unavailable, do not claim its labels overlap or its bars have measured lengths.
 
+## Worked example: a correct percentage answering the wrong question
+
+An invented survey covers **200 visitors**: **50 attended a workshop**, of whom **40 are local**, and **150 did not**, of whom **60 are local**. A brief shows the correct workshop-group value, **40/50 = 80%**, but labels it “80% of local visitors attended the workshop.”
+
+The label reverses the condition. The local-visitor denominator is **40 + 60 = 100**, so the supported share for that label is **40/100 = 40%**. If the task asks about local visitors' attendance, repair the value and specify the local-visitor comparison group. If the task asks where workshop attendees live, keep 80% and repair the wording to “80% of workshop attendees were local.” The reader's question determines which repair fits.
+
+A control brief already uses the latter wording and clearly associates 40/50 with the workshop group. It has no reversal defect. If the source instead supplies only the 40-of-50 workshop count, a claimed share of all local visitors remains unverified; missing information alone does not establish that it is 40%.
+
 ## Return a bounded finding
 
 Name the location, affected comparison, supporting source or internal arithmetic, and smallest repair. Preserve uncertainty and source precision in replacement wording. If the necessary denominator or definition is unavailable, explain what would resolve the concern; do not substitute an invented value.
@@ -55,5 +71,6 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 - [Heer and Bostock, Crowdsourcing Graphical Perception](https://idl.uw.edu/papers/crowdsourcing-graphical-perception) studies particular comparison judgments, not an all-purpose ranking of finished charts.
 - [Wilke, Proportional ink](https://clauswilke.com/dataviz/proportional-ink.html) and [Visualizing uncertainty](https://clauswilke.com/dataviz/visualizing-uncertainty.html) provide authored guidance on quantitative marks and uncertainty displays.
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
+- [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedure and rainfall example are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall example, and visitor example are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
