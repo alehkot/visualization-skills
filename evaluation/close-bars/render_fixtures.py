@@ -153,12 +153,30 @@ def tick_label_issues(label, location, unit):
     return issues
 
 
-def numeric_axis_issues(axis, orientation, unit, visible_texts):
+def text_clipping_issues(artist, renderer):
+    """Conservatively bound text clipping; path bounds cannot prove containment."""
+    if not artist.get_clip_on():
+        return []
+    issues = []
+    bounds = artist.get_window_extent(renderer)
+    clip_box = artist.get_clip_box()
+    if clip_box is not None and not (
+            clip_box.x0 <= bounds.x0 + 0.5 and clip_box.y0 <= bounds.y0 + 0.5
+            and clip_box.x1 >= bounds.x1 - 0.5 and clip_box.y1 >= bounds.y1 - 0.5):
+        issues.append('clipped')
+    clip_path, _ = artist.get_transformed_clip_path_and_affine()
+    if clip_path is not None:
+        issues.append('clip_path_unsupported')
+    return issues
+
+
+def numeric_axis_issues(axis, orientation, unit, visible_texts, renderer):
     """Audit drawn tick text for the fixtures' linear, unscaled numeric axes.
 
     Major tick spacing is flexible, with at least two distinct in-range ticks.
     Unlabeled minor ticks and ticks outside the view are not drawn labels.
-    Separate formatter offsets/scientific multipliers are explicitly unsupported.
+    Separate formatter offsets/scientific multipliers and arbitrary tick-label
+    clip paths are explicitly unsupported.
     """
     dimension = axis.yaxis if orientation == 'v' else axis.xaxis
     limits = axis.get_ylim() if orientation == 'v' else axis.get_xlim()
@@ -184,6 +202,8 @@ def numeric_axis_issues(axis, orientation, unit, visible_texts):
             if required and not labels:
                 issues.append(('numeric_tick_not_visible', float(tick.get_loc())))
             for label in labels:
+                for code in text_clipping_issues(label, renderer):
+                    issues.append(('numeric_tick_' + code, float(tick.get_loc())))
                 coordinate = 1 if orientation == 'v' else 0
                 position = label.get_transform().transform(label.get_position())[coordinate]
                 point = (0, tick.get_loc()) if orientation == 'v' else (tick.get_loc(), 0)
@@ -198,7 +218,9 @@ def numeric_axis_issues(axis, orientation, unit, visible_texts):
     # These known captions supply the units for the otherwise bare numeric ticks.
     caption = {'units': 'Illustrative change, in units',
                's': 'Illustrative elapsed time, in seconds'}.get(unit)
-    if inherited_units and caption and caption not in visible_texts:
+    if inherited_units and caption and not any(
+            artist.get_text() == caption and not text_clipping_issues(artist, renderer)
+            for artist in visible_texts):
         issues.append(('numeric_axis_unit_context_missing', caption))
     return issues
 
@@ -291,7 +313,7 @@ def audit(fig,name,width,height,kind,bars,labels,intervals=(),deltas=(),table=()
     source_values=source['control']+source['test'] if kind=='dense' else source['values']
     axis=fig.axes[0]
     for code, detail in numeric_axis_issues(axis, 'h' if kind=='negative' else 'v',
-                                          source['unit'], {t.get_text() for t, _ in texts}):
+                                          source['unit'], [t for t, _ in texts], renderer):
         issue(code, detail)
     categories=axis.get_yticklabels() if kind=='negative' else axis.get_xticklabels()
     expected_categories=source['series']*len(source['groups']) if kind=='positive' else source['groups']

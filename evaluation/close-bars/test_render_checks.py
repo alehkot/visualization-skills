@@ -230,6 +230,40 @@ class RenderChecks(unittest.TestCase):
                 code = 'numeric_tick_count_mismatch' if mode == 'none' else 'numeric_tick_not_visible'
                 self.assertIn(code, self.codes_after_mutation(fixtures.positive, hide))
 
+    def test_clipped_numeric_tick_labels_cannot_pass(self):
+        for mode in ('axes_patch', 'empty_box', 'partial_box', 'custom_path'):
+            with self.subTest(mode=mode):
+                def clip(arguments):
+                    from matplotlib.patches import Circle
+                    from matplotlib.transforms import Bbox
+                    axis = arguments['fig'].axes[0]
+                    arguments['fig'].canvas.draw()
+                    renderer = arguments['fig'].canvas.get_renderer()
+                    for label in axis.get_yticklabels():
+                        label.set_clip_on(True)
+                        if mode == 'axes_patch':
+                            label.set_clip_path(axis.patch)
+                        elif mode == 'empty_box':
+                            label.set_clip_box(Bbox.from_bounds(0, 0, 0, 0))
+                        elif mode == 'partial_box':
+                            bounds = label.get_window_extent(renderer)
+                            label.set_clip_box(Bbox.from_extents(bounds.x0, bounds.y0, bounds.x0 + 2, bounds.y1))
+                        else:
+                            label.set_clip_path(Circle((0.5, 0.5), 0.5, transform=axis.transAxes))
+                code = 'numeric_tick_clip_path_unsupported' if mode == 'custom_path' else 'numeric_tick_clipped'
+                self.assertIn(code, self.codes_after_mutation(fixtures.positive, clip))
+
+    def test_nonclipping_or_containing_clip_boxes_are_valid(self):
+        for clipping in (False, True):
+            with self.subTest(clipping=clipping):
+                def clip(arguments):
+                    from matplotlib.transforms import Bbox
+                    axis = arguments['fig'].axes[0]
+                    for label in axis.get_yticklabels():
+                        label.set_clip_box(arguments['fig'].bbox if clipping else Bbox.from_bounds(0, 0, 0, 0))
+                        label.set_clip_on(clipping)
+                self.assertEqual(self.codes_after_mutation(fixtures.positive, clip), set())
+
     def test_hidden_numeric_axis_is_detected(self):
         for mode in ('dimension', 'axis_off'):
             with self.subTest(mode=mode):
@@ -291,10 +325,17 @@ class RenderChecks(unittest.TestCase):
 
     def test_inherited_numeric_tick_units_need_visible_caption(self):
         for generator in (fixtures.negative, fixtures.rounding):
-            with self.subTest(generator=generator.__name__):
-                def hide(arguments):
-                    arguments['fig'].texts[1].set_visible(False)
-                self.assertIn('numeric_axis_unit_context_missing', self.codes_after_mutation(generator, hide))
+            for clipped in (False, True):
+                with self.subTest(generator=generator.__name__, clipped=clipped):
+                    def hide(arguments):
+                        from matplotlib.transforms import Bbox
+                        caption = arguments['fig'].texts[1]
+                        if clipped:
+                            caption.set_clip_on(True)
+                            caption.set_clip_box(Bbox.from_bounds(0, 0, 0, 0))
+                        else:
+                            caption.set_visible(False)
+                    self.assertIn('numeric_axis_unit_context_missing', self.codes_after_mutation(generator, hide))
 
     def test_separate_formatter_offset_and_nonlinear_scale_are_explicitly_unsupported(self):
         def offset(arguments):
