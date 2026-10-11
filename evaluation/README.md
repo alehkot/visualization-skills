@@ -28,6 +28,12 @@ Record the bundle's resolved commit and content hashes, model/version if availab
 
 The preparer supplies the selected skill entrypoint and quantitative reference inline. It therefore evaluates application of those instructions, not whether an agent autonomously discovers the right reference. The hashes identify the inputs, not a promise that a provider can replay identical outputs.
 
+### Continuous integration
+
+[Evaluation regressions](../.github/workflows/evaluations.yml) runs on every push and pull request using Python 3.12 on Ubuntu, with the existing pinned optional renderer installed. It invokes both suite directories explicitly: root-level unittest discovery does not find these tests. It also runs the full rendering CLI, which fails when renderer dependencies are unavailable rather than silently accepting skipped rendering tests.
+
+The job runs the same checks documented below. It does not run a model, grade written responses, install a skill in a separate agent, or establish reader comprehension. The gallery is generated in the runner's temporary directory; reproduce it locally to inspect the PNGs. Actions are pinned to full commit hashes, the token is read-only, checkout credentials are not persisted, and the job has a ten-minute timeout. No credentials or paid model service are required. This workflow does not configure branch protection or make itself a required check.
+
 ### Commands
 
 Run from the repository root. The preparer and non-rendering tests use Python's standard library and Git. The suite was tested with Python 3.12; rendering dependencies are optional and separate from the skills.
