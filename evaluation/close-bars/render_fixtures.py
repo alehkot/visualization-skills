@@ -131,6 +131,100 @@ def delta_issues(label, b, a, unit, places=1, direction='Test − control'):
     return issues
 
 
+def tick_label_issues(label, location, unit):
+    """Check these fixtures' plain numeric ticks, not arbitrary formatter syntax.
+
+    Unlike value labels, tick decimals do not imply measurement precision. Bare
+    numbers inherit the non-percent fixture's caption; percent ticks show %.
+    """
+    match = re.fullmatch(r'\s*(' + NUMBER.pattern + r')\s*(%|[A-Za-z]+)?\s*', label)
+    if match is None:
+        return ['numeric_tick_label_invalid']
+    value = Decimal(match.group(1).replace('−', '-'))
+    suffix = match.group(2) or ''
+    issues = []
+    if not math.isclose(float(value), float(location), rel_tol=1e-9, abs_tol=1e-9):
+        issues.append('numeric_tick_value_mismatch')
+    allowed_units = {'%'} if unit == '%' else {'', unit}
+    if unit == 's':
+        allowed_units.add('seconds')
+    if suffix not in allowed_units:
+        issues.append('numeric_tick_unit_mismatch')
+    return issues
+
+
+def text_clipping_issues(artist, renderer):
+    """Conservatively bound text clipping; path bounds cannot prove containment."""
+    if not artist.get_clip_on():
+        return []
+    issues = []
+    bounds = artist.get_window_extent(renderer)
+    clip_box = artist.get_clip_box()
+    if clip_box is not None and not (
+            clip_box.x0 <= bounds.x0 + 0.5 and clip_box.y0 <= bounds.y0 + 0.5
+            and clip_box.x1 >= bounds.x1 - 0.5 and clip_box.y1 >= bounds.y1 - 0.5):
+        issues.append('clipped')
+    clip_path, _ = artist.get_transformed_clip_path_and_affine()
+    if clip_path is not None:
+        issues.append('clip_path_unsupported')
+    return issues
+
+
+def numeric_axis_issues(axis, orientation, unit, visible_texts, renderer):
+    """Audit drawn tick text for the fixtures' linear, unscaled numeric axes.
+
+    Major tick spacing is flexible, with at least two distinct in-range ticks.
+    Unlabeled minor ticks and ticks outside the view are not drawn labels.
+    Separate formatter offsets/scientific multipliers and arbitrary tick-label
+    clip paths are explicitly unsupported.
+    """
+    dimension = axis.yaxis if orientation == 'v' else axis.xaxis
+    limits = axis.get_ylim() if orientation == 'v' else axis.get_xlim()
+    issues = []
+    if not axis.axison or not axis.get_visible() or not dimension.get_visible():
+        return [('numeric_axis_not_visible', orientation)]
+    if dimension.get_scale() != 'linear':
+        issues.append(('numeric_axis_scale_unsupported', dimension.get_scale()))
+    offset = dimension.get_offset_text()
+    if artist_visible(offset):
+        issues.append(('numeric_axis_offset_unsupported', offset.get_text()))
+    in_view = lambda tick: min(limits) - 1e-9 <= tick.get_loc() <= max(limits) + 1e-9
+    major = [tick for tick in dimension.get_major_ticks() if in_view(tick)]
+    if len({tick.get_loc() for tick in major}) < 2:
+        issues.append(('numeric_tick_count_mismatch', {'minimum': 2, 'actual': len(major)}))
+    inherited_units = False
+    for ticks, required in ((major, True), (dimension.get_minor_ticks(), False)):
+        for tick in ticks:
+            if not in_view(tick):
+                continue
+            labels = [label for label in (tick.label1, tick.label2)
+                      if tick.get_visible() and artist_visible(label)]
+            if required and not labels:
+                issues.append(('numeric_tick_not_visible', float(tick.get_loc())))
+            for label in labels:
+                for code in text_clipping_issues(label, renderer):
+                    issues.append(('numeric_tick_' + code, float(tick.get_loc())))
+                coordinate = 1 if orientation == 'v' else 0
+                position = label.get_transform().transform(label.get_position())[coordinate]
+                point = (0, tick.get_loc()) if orientation == 'v' else (tick.get_loc(), 0)
+                expected_position = axis.transData.transform(point)[coordinate]
+                if not math.isclose(position, expected_position, abs_tol=0.1, rel_tol=0):
+                    issues.append(('numeric_tick_position_mismatch', float(tick.get_loc())))
+                text = label.get_text()
+                for code in tick_label_issues(text, tick.get_loc(), unit):
+                    issues.append((code, {'label': text, 'location': float(tick.get_loc())}))
+                if re.fullmatch(r'\s*' + NUMBER.pattern + r'\s*', text):
+                    inherited_units = True
+    # These known captions supply the units for the otherwise bare numeric ticks.
+    caption = {'units': 'Illustrative change, in units',
+               's': 'Illustrative elapsed time, in seconds'}.get(unit)
+    if inherited_units and caption and not any(
+            artist.get_text() == caption and not text_clipping_issues(artist, renderer)
+            for artist in visible_texts):
+        issues.append(('numeric_axis_unit_context_missing', caption))
+    return issues
+
+
 def png_dimensions(path):
     """Read actual saved PNG dimensions without an OCR or image-reader dependency."""
     with Path(path).open('rb') as stream:
@@ -218,6 +312,9 @@ def audit(fig,name,width,height,kind,bars,labels,intervals=(),deltas=(),table=()
     source=AUDIT_SOURCE[kind]
     source_values=source['control']+source['test'] if kind=='dense' else source['values']
     axis=fig.axes[0]
+    for code, detail in numeric_axis_issues(axis, 'h' if kind=='negative' else 'v',
+                                          source['unit'], [t for t, _ in texts], renderer):
+        issue(code, detail)
     categories=axis.get_yticklabels() if kind=='negative' else axis.get_xticklabels()
     expected_categories=source['series']*len(source['groups']) if kind=='positive' else source['groups']
     if [artist.get_text() for artist in categories]!=expected_categories:
@@ -365,6 +462,7 @@ def positive(width,fault=None,output_dir=None):
     ax=axis_at(fig,53,140,width-77,240)
     ax.set_ylim(0,65); ax.set_xlim(-0.6,3.6)
     ax.set_yticks(range(0,61,10)); ax.set_yticklabels([f'{v}%' for v in range(0,61,10)])
+    if fault=='tickscale': ax.set_yticklabels([f'{v}%' for v in range(7)])
     ax.grid(axis='y',color='#e3e7eb'); ax.axhline(0,color=INK,lw=1)
     xs=[0,.85,2.15,3]; source=SOURCE['positive']; bars=[]; labels=[]; intervals=[]; deltas=[]
     for i,(x,v,lo,hi) in enumerate(zip(xs,source['values'],source['low'],source['high'])):
@@ -393,7 +491,8 @@ def positive(width,fault=None,output_dir=None):
     expected={'baseline':['nonzero_bar_baseline','zero_outside_plot'],
         'geometry':['bar_value_mismatch','endpoint_pixel_mismatch'],
         'uncertainty':['label_uncertainty_collision'],
-        'labelswap':['label_value_mismatch']}.get(fault,[])
+        'labelswap':['label_value_mismatch'],
+        'tickscale':['numeric_tick_value_mismatch']}.get(fault,[])
     return audit(fig,'positive'+('_bad_'+fault if fault else ''),width,H,'positive',bars,labels,intervals,deltas,expected_fail=expected,output_dir=output_dir,context=context)
 
 
@@ -480,7 +579,7 @@ def validate_output_directory(path):
 
 
 def run_fixtures(output_dir):
-    """Eight repaired cases and nine intentionally broken controls, at real sizes."""
+    """Eight repaired cases and ten intentionally broken controls, at real sizes."""
     output_dir=validate_output_directory(output_dir)
     renderer_version=load_renderer()
     output_dir.mkdir(parents=True,exist_ok=True)
@@ -493,7 +592,7 @@ def run_fixtures(output_dir):
                         rounding(width,output_dir=output_dir),
                         dense(width,output_dir=output_dir),
                         dense(width,bad=True,output_dir=output_dir)])
-    for fault in ('baseline','geometry','uncertainty','labelswap'):
+    for fault in ('baseline','geometry','uncertainty','labelswap','tickscale'):
         results.append(positive(360,fault,output_dir=output_dir))
     results.append(negative(360,'clipping',output_dir=output_dir))
     for result in results:
