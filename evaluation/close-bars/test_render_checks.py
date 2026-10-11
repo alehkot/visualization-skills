@@ -134,7 +134,7 @@ class RenderChecks(unittest.TestCase):
         except RuntimeError as error:
             raise unittest.SkipTest(str(error)) from error
 
-    def codes_after_mutation(self, generator, mutate, **options):
+    def codes_after_mutation(self, generator, mutate, width=360, **options):
         audit = fixtures.audit
 
         def audit_mutated(*args, **kwargs):
@@ -143,7 +143,7 @@ class RenderChecks(unittest.TestCase):
             return audit(**arguments)
 
         with patch.object(fixtures, 'audit', side_effect=audit_mutated):
-            result = generator(360, **options)
+            result = generator(width, **options)
         return {issue['code'] for issue in result['issues']}
 
     def test_repaired_and_deliberately_bad_fixtures(self):
@@ -155,13 +155,14 @@ class RenderChecks(unittest.TestCase):
             'positive_bad_uncertainty': {'label_uncertainty_collision'},
             'positive_bad_labelswap': {'label_value_mismatch'},
             'positive_bad_tickscale': {'numeric_tick_value_mismatch'},
+            'positive_bad_missing_uncertainty': {'uncertainty_count_mismatch'},
             'negative_bad_clipping': {'text_clipped'},
         }
         with tempfile.TemporaryDirectory() as directory:
             results = fixtures.run_fixtures(directory)
             self.assertEqual(sum(r['status'] == 'PASS' for r in results), 8)
             controls = [r for r in results if r['expected_failure_codes']]
-            self.assertEqual(len(controls), 10)
+            self.assertEqual(len(controls), 11)
             for result in results:
                 with self.subTest(name=result['name'], width=result['width_px']):
                     self.assertIn(result['status'], ('PASS', 'EXPECTED_FAILURE_DETECTED'))
@@ -494,6 +495,204 @@ class RenderChecks(unittest.TestCase):
             artist.set_color((0, 0, 0, 0))
         elif mode == 'removed':
             artist.remove()
+
+    @staticmethod
+    def errorbars(arguments):
+        from matplotlib.container import ErrorbarContainer
+        return [container for axis in arguments['fig'].axes for container in axis.containers
+                if isinstance(container, ErrorbarContainer)]
+
+    def test_missing_uncertainty_containers_and_registration_are_detected(self):
+        for generator in (fixtures.positive, fixtures.negative):
+            for all_intervals in (False, True):
+                for mode in ('remove', 'unregister'):
+                    with self.subTest(generator=generator.__name__, all_intervals=all_intervals, mode=mode):
+                        def mutate(arguments):
+                            errors = self.errorbars(arguments)
+                            for error in errors if all_intervals else errors[:1]:
+                                if mode == 'remove':
+                                    error.remove()
+                                else:
+                                    arguments['fig'].axes[0].containers.remove(error)
+                        codes = self.codes_after_mutation(generator, mutate)
+                        self.assertIn('uncertainty_count_mismatch', codes)
+                        if mode == 'unregister':
+                            self.assertIn('uncertainty_artist_unsupported', codes)
+
+    def test_actual_uncertainty_stems_and_caps_must_be_visible(self):
+        for generator in (fixtures.positive, fixtures.negative):
+            for part in ('stem', 'low_cap', 'high_cap'):
+                for mode in ('hidden', 'alpha_zero', 'transparent_color', 'removed', 'zero_width', 'zero_size'):
+                    if part == 'stem' and mode == 'zero_size':
+                        continue
+                    with self.subTest(generator=generator.__name__, part=part, mode=mode):
+                        def mutate(arguments):
+                            error = self.errorbars(arguments)[0]
+                            artist = error.lines[2][0] if part == 'stem' else error.lines[1][part == 'high_cap']
+                            if mode == 'zero_width':
+                                (artist.set_linewidth if part == 'stem' else artist.set_markeredgewidth)(0)
+                            elif mode == 'zero_size':
+                                artist.set_markersize(0)
+                            elif mode == 'transparent_color' and part != 'stem':
+                                artist.set_markeredgecolor((0, 0, 0, 0))
+                            else:
+                                self.make_invisible(artist, mode)
+                        self.assertIn('uncertainty_not_visible', self.codes_after_mutation(generator, mutate))
+
+    def test_wrong_uncertainty_endpoints_associations_and_transforms_are_detected(self):
+        from matplotlib.transforms import Affine2D
+        for generator in (fixtures.positive, fixtures.negative):
+            for part in ('stem', 'cap', 'stem_transform', 'cap_transform'):
+                with self.subTest(generator=generator.__name__, part=part):
+                    def mutate(arguments):
+                        error = self.errorbars(arguments)[0]
+                        artist = error.lines[2][0] if part.startswith('stem') else error.lines[1][0]
+                        if part.endswith('transform'):
+                            artist.set_transform(artist.get_transform() + Affine2D().translate(15, 15))
+                        elif part == 'stem':
+                            points = artist.get_segments()[0].copy()
+                            points[0][1 if generator is fixtures.positive else 0] += 1
+                            artist.set_segments([points])
+                        else:
+                            points = artist.get_xydata().copy()
+                            points[0][1 if generator is fixtures.positive else 0] += 1
+                            artist.set_data(points[:, 0], points[:, 1])
+                    self.assertIn('uncertainty_geometry_mismatch', self.codes_after_mutation(generator, mutate))
+            def duplicate_association(arguments):
+                errors = self.errorbars(arguments)
+                errors[1].lines[2][0].set_segments(errors[0].lines[2][0].get_segments())
+            self.assertIn('uncertainty_association_mismatch', self.codes_after_mutation(generator, duplicate_association))
+
+    def test_uncertainty_uses_independent_source_endpoints(self):
+        import copy
+        for generator in (fixtures.positive, fixtures.negative):
+            altered = copy.deepcopy(fixtures.SOURCE)
+            altered[generator.__name__]['low'][0] = str(Decimal(altered[generator.__name__]['low'][0]) - 1)
+            with self.subTest(generator=generator.__name__), patch.object(fixtures, 'SOURCE', altered):
+                self.assertIn('uncertainty_geometry_mismatch', self.codes_after_mutation(generator, lambda _: None))
+
+    def test_removed_or_invisible_whiskers_do_not_create_phantom_collisions(self):
+        for mode in ('remove', 'hidden', 'alpha_zero', 'transparent_color'):
+            with self.subTest(mode=mode):
+                def mutate(arguments):
+                    for error in self.errorbars(arguments):
+                        if mode == 'remove':
+                            error.remove()
+                        else:
+                            for artist in (*error.lines[1], *error.lines[2]):
+                                if mode == 'transparent_color' and artist in error.lines[1]:
+                                    artist.set_markeredgecolor((0, 0, 0, 0))
+                                else:
+                                    self.make_invisible(artist, mode)
+                codes = self.codes_after_mutation(fixtures.positive, mutate, fault='uncertainty')
+                self.assertNotIn('label_uncertainty_collision', codes)
+                self.assertTrue({'uncertainty_count_mismatch', 'uncertainty_not_visible'} & codes)
+
+    def test_collisions_follow_displaced_actual_caps_and_stems(self):
+        from matplotlib.transforms import IdentityTransform
+        for generator in (fixtures.positive, fixtures.negative):
+            for part in ('cap', 'stem'):
+                with self.subTest(generator=generator.__name__, part=part):
+                    def mutate(arguments):
+                        fig = arguments['fig']
+                        fig.canvas.draw()
+                        box = arguments['labels'][0][0].get_window_extent(fig.canvas.get_renderer())
+                        x, y = (box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2
+                        error = self.errorbars(arguments)[0]
+                        if part == 'cap':
+                            artist = error.lines[1][0]
+                            artist.set_data([x], [y])
+                        else:
+                            artist = error.lines[2][0]
+                            artist.set_segments([[(x, y - 2), (x, y + 2)]])
+                        artist.set_transform(IdentityTransform())
+                    codes = self.codes_after_mutation(generator, mutate)
+                    self.assertTrue({'label_uncertainty_collision', 'uncertainty_geometry_mismatch'} <= codes)
+
+    def test_uncertainty_clipping_and_unsupported_custom_artists_fail_explicitly(self):
+        from matplotlib.patches import Circle
+        from matplotlib.transforms import Affine2D, Bbox
+        for generator in (fixtures.positive, fixtures.negative):
+            for mode in ('clip_box', 'clip_path', 'offsets', 'offset_transform', 'dashes', 'marker', 'missing_cap', 'empty_stem', 'markevery', 'rotated_marker', 'animated', 'sketch', 'path_effect', 'agg_filter'):
+                with self.subTest(generator=generator.__name__, mode=mode):
+                    def mutate(arguments):
+                        error = self.errorbars(arguments)[0]
+                        stem = error.lines[2][0]
+                        if mode == 'clip_box':
+                            stem.set_clip_box(Bbox.from_extents(0, 0, 1, 1))
+                        elif mode == 'clip_path':
+                            stem.set_clip_path(Circle((0, 0), 1, transform=arguments['fig'].transFigure))
+                        elif mode == 'offsets':
+                            stem.set_offsets([[3, 0]])
+                        elif mode == 'offset_transform':
+                            stem.set_offset_transform(Affine2D().translate(3, 0))
+                        elif mode == 'dashes':
+                            stem.set_linestyle('--')
+                        elif mode == 'marker':
+                            error.lines[1][0].set_marker('o')
+                        elif mode == 'markevery':
+                            error.lines[1][0].set_markevery([])
+                        elif mode == 'rotated_marker':
+                            from matplotlib.markers import MarkerStyle
+                            marker = '_' if generator is fixtures.positive else '|'
+                            error.lines[1][0].set_marker(MarkerStyle(marker, transform=Affine2D().rotate_deg(90)))
+                        elif mode == 'animated':
+                            error.lines[1][0].set_animated(True)
+                        elif mode == 'sketch':
+                            stem.set_sketch_params(scale=15, length=10, randomness=1)
+                        elif mode == 'path_effect':
+                            from matplotlib.patheffects import Stroke
+                            stem.set_path_effects([Stroke(linewidth=10)])
+                        elif mode == 'agg_filter':
+                            stem.set_agg_filter(lambda image, dpi: (image, 0, 0))
+                        elif mode == 'missing_cap':
+                            error.lines = (None, error.lines[1][:1], error.lines[2])
+                        else:
+                            stem.set_segments([])
+                    expected = {'clip_box': 'uncertainty_clipped', 'clip_path': 'uncertainty_clip_path_unsupported'}.get(mode, 'uncertainty_artist_unsupported')
+                    self.assertIn(expected, self.codes_after_mutation(generator, mutate))
+
+    def test_extra_uncertainty_is_detected(self):
+        def mutate(arguments):
+            arguments['fig'].axes[0].errorbar(0, 42.1, yerr=0.8, capsize=3, fmt='none')
+        self.assertIn('uncertainty_count_mismatch', self.codes_after_mutation(fixtures.positive, mutate))
+
+    def test_equivalent_uncertainty_geometry_and_styles_are_positive_controls(self):
+        from matplotlib.transforms import Affine2D
+        for generator in (fixtures.positive, fixtures.negative):
+            for width in (360, 640):
+                for mode in ('reordered', 'style', 'equivalent_transform', 'containing_clip', 'disabled_clip'):
+                    with self.subTest(generator=generator.__name__, width=width, mode=mode):
+                        def mutate(arguments):
+                            errors = self.errorbars(arguments)
+                            if mode == 'reordered':
+                                axis = arguments['fig'].axes[0]
+                                for error in errors:
+                                    axis.containers.remove(error)
+                                axis.containers.extend(reversed(errors))
+                                return
+                            for error in errors:
+                                for artist in (*error.lines[1], *error.lines[2]):
+                                    if mode == 'style':
+                                        artist.set_color('#654321')
+                                        artist.set_alpha(.7)
+                                        if artist in error.lines[1]:
+                                            artist.set_markersize(7)
+                                            artist.set_markeredgewidth(1.2)
+                                        else:
+                                            artist.set_linewidth(1.2)
+                                    elif mode == 'equivalent_transform':
+                                        if artist in error.lines[1]:
+                                            points = artist.get_xydata() * 2
+                                            artist.set_data(points[:, 0], points[:, 1])
+                                        else:
+                                            artist.set_segments([artist.get_segments()[0] * 2])
+                                        artist.set_transform(Affine2D().scale(.5) + artist.get_transform())
+                                    elif mode == 'containing_clip':
+                                        artist.set_clip_box(arguments['fig'].bbox)
+                                    else:
+                                        artist.set_clip_on(False)
+                        self.assertEqual(self.codes_after_mutation(generator, mutate, width=width), set())
 
     def test_png_dimension_mismatch_is_detected(self):
         with tempfile.TemporaryDirectory() as directory:
