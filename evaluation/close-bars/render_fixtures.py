@@ -24,12 +24,16 @@ NUMBER = re.compile(r'[+−-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+−-]?\d+)?')
 
 def load_renderer():
     """Import only when rendering is explicitly requested, never on module import."""
-    global plt, Text, Bbox, to_rgba
+    global plt, Text, Bbox, to_rgba, ErrorbarContainer, LineCollection, MarkerStyle, Line2D
     try:
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         from matplotlib.text import Text
+        from matplotlib.container import ErrorbarContainer
+        from matplotlib.collections import LineCollection
+        from matplotlib.markers import MarkerStyle
+        from matplotlib.lines import Line2D
         from matplotlib.colors import to_rgba
         from matplotlib.transforms import Bbox
     except ImportError as exc:
@@ -277,7 +281,160 @@ def artist_visible(artist):
     return True
 
 
-def audit(fig,name,width,height,kind,bars,labels,intervals=(),deltas=(),table=(),selected=None,expected_fail=(),output_dir=None,context=()):
+def uncertainty_issues(fig, kind, bars, source):
+    """Inspect these fixtures' actual capped, solid, single-segment error bars.
+
+    Source intervals are independent of renderer metadata. Bounds come from the
+    attached stem/cap artists in display coordinates, never from source endpoints.
+    This is a conservative artist-geometry audit, not a pixel/occlusion analysis.
+    Unsupported custom shapes/effects/offsets fail closed instead of certifying ink.
+    """
+    if kind not in ('positive', 'negative'):
+        return [], []
+    issues, rectangles = [], []
+    axis = fig.axes[0]
+    vertical = kind == 'positive'
+    orientation = 1 if vertical else 0
+    cross = 1 - orientation
+    expected = []
+    for (bar, _, _, _), lo, hi in zip(bars, source['low'], source['high']):
+        center = (bar.get_x() + bar.get_width() / 2 if vertical
+                  else bar.get_y() + bar.get_height() / 2)
+        points = [(center, float(v)) if vertical else (float(v), center) for v in (lo, hi)]
+        expected.append(axis.transData.transform(points))
+    containers = [container for ax in fig.axes for container in ax.containers
+                  if isinstance(container, ErrorbarContainer)]
+    if len(containers) != len(source['values']):
+        issues.append(('uncertainty_count_mismatch', {'expected': len(source['values']),
+                                                     'actual': len(containers)}))
+    tracked = {artist for container in containers for artist in container.lines[2]}
+    if any(isinstance(artist, LineCollection) and artist not in tracked
+           for ax in fig.axes for artist in ax.collections):
+        issues.append(('uncertainty_artist_unsupported', 'unregistered line collection'))
+
+    def problem(code, detail):
+        issues.append(('uncertainty_' + code, detail))
+
+    def custom_paint(artist):
+        return (artist.get_path_effects() or artist.get_animated()
+                or artist.get_sketch_params() is not None or artist.get_agg_filter() is not None)
+
+    def finite_points(points, count):
+        return len(points) == count and all(len(p) == 2 and all(math.isfinite(float(v)) for v in p)
+                                           for p in points)
+
+    def same_points(actual, wanted):
+        return any(all(math.isclose(float(a), float(b), abs_tol=0.1, rel_tol=0)
+                       for p, q in zip(actual, order) for a, b in zip(p, q))
+                   for order in (wanted, wanted[::-1]))
+
+    def record_bounds(artist, points, padding, detail):
+        bounds = Bbox.from_extents(min(p[0] for p in points) - padding,
+                                   min(p[1] for p in points) - padding,
+                                   max(p[0] for p in points) + padding,
+                                   max(p[1] for p in points) + padding)
+        # The canvas always clips output, even when artist clipping is disabled.
+        clip_boxes = [fig.bbox]
+        if artist.get_clip_on():
+            path, _ = artist.get_transformed_clip_path_and_affine()
+            if path is not None:
+                problem('clip_path_unsupported', detail)
+                return  # No invented collision bounds for an unknown visible portion.
+            if artist.get_clip_box() is not None:
+                clip_boxes.append(artist.get_clip_box())
+        for clip in clip_boxes:
+            if not (clip.x0 <= bounds.x0 + 0.5 and clip.y0 <= bounds.y0 + 0.5
+                    and clip.x1 >= bounds.x1 - 0.5 and clip.y1 >= bounds.y1 - 0.5):
+                problem('clipped', detail)
+            bounds = Bbox.intersection(bounds, clip)
+            if bounds is None:
+                return
+        rectangles.append(bounds)
+
+    matched = []
+    for index, container in enumerate(containers):
+        data_line, caps, stems = container.lines
+        if (data_line is not None or len(caps) != 2 or len(stems) != 1
+                or container.has_xerr != (not vertical) or container.has_yerr != vertical
+                or any(not isinstance(cap, Line2D) for cap in caps)):
+            problem('artist_unsupported', {'interval': index, 'reason': 'expected two caps and one stem'})
+            continue
+        stem = stems[0]
+        if not isinstance(stem, LineCollection):
+            problem('artist_unsupported', {'interval': index, 'reason': 'stem is not a LineCollection'})
+            continue
+        artists = [stem, *caps]
+        for artist in artists:
+            if not artist_visible(artist) or artist.axes is not axis or artist not in axis.get_children():
+                problem('not_visible', {'interval': index, 'part': 'stem' if artist is stem else 'cap'})
+            if custom_paint(artist):
+                problem('artist_unsupported', {'interval': index, 'reason': 'custom paint or animated artist'})
+        segments = stem.get_segments()
+        offsets = stem.get_offset_transform().transform(stem.get_offsets())
+        if (len(segments) != 1 or not finite_points(segments[0], 2)
+                or not finite_points(offsets, 1) or any(float(v) != 0 for v in offsets[0])
+                or not stem.get_transform().is_affine
+                or any(dashes is not None for _, dashes in stem.get_linestyle())):
+            problem('artist_unsupported', {'interval': index, 'reason': 'stem shape, offsets, transform or dashes'})
+            continue
+        points = stem.get_transform().transform(segments[0])
+        if not finite_points(points, 2):
+            problem('artist_unsupported', {'interval': index, 'reason': 'nonfinite transformed stem'})
+            continue
+        # Discover association geometrically, so reordering containers is harmless.
+        slot = min(range(len(expected)), key=lambda i: abs(
+            sum(p[cross] for p in points) / 2 - expected[i][0][cross])) if expected else None
+        if slot is None or not same_points(points, expected[slot]):
+            problem('geometry_mismatch', {'interval': index, 'part': 'stem', 'bar_index': slot})
+        if slot is not None:
+            matched.append(slot)
+        widths, colors = stem.get_linewidths(), stem.get_edgecolors()
+        stem_ink = (len(widths) == 1 and math.isfinite(float(widths[0])) and widths[0] > 0
+                    and len(colors) == 1 and colors[0][3] > 0)
+        if not stem_ink:
+            problem('not_visible', {'interval': index, 'part': 'stem stroke'})
+        if stem_ink and artist_visible(stem) and stem.axes is axis and not custom_paint(stem):
+            record_bounds(stem, points, float(widths[0]) * fig.dpi / 144,
+                          {'interval': index, 'part': 'stem'})
+        cap_centers = []
+        for cap in caps:
+            marker = '_' if vertical else '|'
+            # Pinned Matplotlib stores the full MarkerStyle privately; get_marker()
+            # alone loses custom marker transforms (for example a rotated cap).
+            standard = MarkerStyle(marker)
+            actual_marker = cap._marker.get_path().transformed(cap._marker.get_transform())
+            standard_marker = standard.get_path().transformed(standard.get_transform())
+            standard_shape = (actual_marker.vertices.shape == standard_marker.vertices.shape
+                              and (abs(actual_marker.vertices - standard_marker.vertices) < 1e-12).all())
+            if (not isinstance(cap.get_marker(), str) or cap.get_marker() != marker or not standard_shape or cap.get_markevery() is not None
+                    or cap.get_linestyle() not in ('None', 'none', '', ' ')
+                    or not cap.get_transform().is_affine):
+                problem('artist_unsupported', {'interval': index, 'reason': 'cap marker, line or transform'})
+                continue
+            centers = cap.get_transform().transform(cap.get_xydata())
+            if not finite_points(centers, 1):
+                problem('artist_unsupported', {'interval': index, 'reason': 'expected one finite cap point'})
+                continue
+            cap_centers.append(centers[0])
+            size, edge = cap.get_markersize(), cap.get_markeredgewidth()
+            cap_ink = (math.isfinite(size) and size > 0 and math.isfinite(edge) and edge > 0
+                       and to_rgba(cap.get_markeredgecolor(), cap.get_alpha())[3] > 0)
+            if not cap_ink:
+                problem('not_visible', {'interval': index, 'part': 'cap stroke'})
+            if cap_ink and artist_visible(cap) and cap.axes is axis and not custom_paint(cap):
+                ends = [list(centers[0]), list(centers[0])]
+                ends[0][cross] -= size * fig.dpi / 144
+                ends[1][cross] += size * fig.dpi / 144
+                record_bounds(cap, ends, edge * fig.dpi / 144,
+                              {'interval': index, 'part': 'cap'})
+        if len(cap_centers) == 2 and slot is not None and not same_points(cap_centers, expected[slot]):
+            problem('geometry_mismatch', {'interval': index, 'part': 'caps', 'bar_index': slot})
+    if sorted(matched) != list(range(len(source['values']))):
+        problem('association_mismatch', {'bar_indices': matched})
+    return issues, rectangles
+
+
+def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=None,expected_fail=(),output_dir=None,context=()):
     """Inspect rendered extents plus geometry/source agreement; retain negative controls."""
     fig.canvas.draw()
     renderer=fig.canvas.get_renderer()
@@ -394,15 +551,9 @@ def audit(fig,name,width,height,kind,bars,labels,intervals=(),deltas=(),table=()
         expected_unit='pp' if source['unit']=='%' else source['unit']
         for code in delta_issues(artist.get_text(),expected_b,expected_a,expected_unit,source['decimal_places']):
             issue(code,{'label':artist.get_text(),'expected':str(decimal_delta(b,a))})
-    interval_rects=[]
-    for axis,orient,x,lo,hi in intervals:
-        if orient=='v':
-            xp,yl=axis.transData.transform((x,lo)); _,yh=axis.transData.transform((x,hi))
-            ib=Bbox.from_extents(xp-5,yl-1,xp+5,yh+1)
-        else:
-            xl,yp=axis.transData.transform((lo,x)); xh,_=axis.transData.transform((hi,x))
-            ib=Bbox.from_extents(xl-1,yp-5,xh+1,yp+5)
-        interval_rects.append(ib)
+    interval_issues, interval_rects = uncertainty_issues(fig, kind, bars, source)
+    for code, detail in interval_issues:
+        issue(code, detail)
     for artist,source_value,unit,associated_bar in labels:
         if not artist_visible(artist): continue
         lb=artist.get_window_extent(renderer)
@@ -464,7 +615,7 @@ def positive(width,fault=None,output_dir=None):
     ax.set_yticks(range(0,61,10)); ax.set_yticklabels([f'{v}%' for v in range(0,61,10)])
     if fault=='tickscale': ax.set_yticklabels([f'{v}%' for v in range(7)])
     ax.grid(axis='y',color='#e3e7eb'); ax.axhline(0,color=INK,lw=1)
-    xs=[0,.85,2.15,3]; source=SOURCE['positive']; bars=[]; labels=[]; intervals=[]; deltas=[]
+    xs=[0,.85,2.15,3]; source=SOURCE['positive']; bars=[]; labels=[]; deltas=[]
     for i,(x,v,lo,hi) in enumerate(zip(xs,source['values'],source['low'],source['high'])):
         height=float(v); baseline=0
         if fault=='baseline': baseline=40; height-=40; ax.set_ylim(40,65)
@@ -473,13 +624,16 @@ def positive(width,fault=None,output_dir=None):
                  edgecolor=INK,lw=.5,hatch=None if i%2==0 else '///')[0]
         bars.append((b,ax,'v',v))
         ax.errorbar(x,float(v),yerr=[[float(v)-float(lo)],[float(hi)-float(v)]],color=INK,capsize=3,lw=1,fmt='none')
-        intervals.append((ax,'v',x,float(lo),float(hi)))
         target=float(v) if fault=='uncertainty' else float(hi)
         offset=(0,-7) if fault=='uncertainty' else (0,6)
         s=pct(v)
         if fault=='labelswap' and i<2: s=pct(source['values'][1-i])
         a=annotate(ax,x,target,s,offset)
         labels.append((a,v,'%',b))
+    if fault == 'missing_uncertainty':
+        for container in list(ax.containers):
+            if isinstance(container, ErrorbarContainer):
+                container.remove()
     ax.set_xticks(xs); ax.set_xticklabels(['Control','Test','Control','Test'])
     context=[text(ax,x,-.16,group,ha='center',va='top',clip_on=False,transform=ax.get_xaxis_transform())
              for x,group in zip([.425,2.575],source['groups'])]
@@ -492,8 +646,9 @@ def positive(width,fault=None,output_dir=None):
         'geometry':['bar_value_mismatch','endpoint_pixel_mismatch'],
         'uncertainty':['label_uncertainty_collision'],
         'labelswap':['label_value_mismatch'],
-        'tickscale':['numeric_tick_value_mismatch']}.get(fault,[])
-    return audit(fig,'positive'+('_bad_'+fault if fault else ''),width,H,'positive',bars,labels,intervals,deltas,expected_fail=expected,output_dir=output_dir,context=context)
+        'tickscale':['numeric_tick_value_mismatch'],
+        'missing_uncertainty':['uncertainty_count_mismatch']}.get(fault,[])
+    return audit(fig,'positive'+('_bad_'+fault if fault else ''),width,H,'positive',bars,labels,deltas,expected_fail=expected,output_dir=output_dir,context=context)
 
 
 def negative(width,fault=None,output_dir=None):
@@ -502,18 +657,17 @@ def negative(width,fault=None,output_dir=None):
     ax=axis_at(fig,93,101,width-117,203)
     ax.set_xlim(-11.8,.5); ax.set_ylim(-.65,3.65); ax.invert_yaxis()
     ax.set_xticks([-10,-5,0]); ax.grid(axis='x',color='#e3e7eb'); ax.axvline(0,color=INK,lw=1)
-    source=SOURCE['negative']; bars=[]; labels=[]; intervals=[]
+    source=SOURCE['negative']; bars=[]; labels=[]
     for y,(v,lo,hi) in enumerate(zip(source['values'],source['low'],source['high'])):
         b=ax.barh(y,float(v),height=.58,color=C if y%2==0 else T,edgecolor=INK,lw=.5,hatch=None if y%2==0 else '///')[0]
         bars.append((b,ax,'h',v)); ax.errorbar(float(v),y,xerr=[[float(v)-float(lo)],[float(hi)-float(v)]],color=INK,capsize=3,lw=1,fmt='none')
-        intervals.append((ax,'h',y,float(lo),float(hi)))
         s=str(Decimal(v)).replace('-','−')
         a=annotate(ax,float(lo),y,s,(-7,0),ha='right',va='center')
         labels.append((a,v,'',b))
     ax.set_yticks(range(4)); ax.set_yticklabels(source['groups'])
     note(fig,'Whiskers: synthetic 95% CI.\nSigns and zero baseline are retained.')
     if fault=='clipping': labels[0][0].set_position((-300,0))
-    return audit(fig,'negative'+('_bad_clipping' if fault else ''),width,H,'negative',bars,labels,intervals,expected_fail=['text_clipped'] if fault else [],output_dir=output_dir)
+    return audit(fig,'negative'+('_bad_clipping' if fault else ''),width,H,'negative',bars,labels,expected_fail=['text_clipped'] if fault else [],output_dir=output_dir)
 
 
 def rounding(width,bad=False,output_dir=None):
@@ -579,7 +733,7 @@ def validate_output_directory(path):
 
 
 def run_fixtures(output_dir):
-    """Eight repaired cases and ten intentionally broken controls, at real sizes."""
+    """Eight repaired cases and eleven intentionally broken controls, at real sizes."""
     output_dir=validate_output_directory(output_dir)
     renderer_version=load_renderer()
     output_dir.mkdir(parents=True,exist_ok=True)
@@ -592,7 +746,7 @@ def run_fixtures(output_dir):
                         rounding(width,output_dir=output_dir),
                         dense(width,output_dir=output_dir),
                         dense(width,bad=True,output_dir=output_dir)])
-    for fault in ('baseline','geometry','uncertainty','labelswap','tickscale'):
+    for fault in ('baseline','geometry','uncertainty','labelswap','tickscale','missing_uncertainty'):
         results.append(positive(360,fault,output_dir=output_dir))
     results.append(negative(360,'clipping',output_dir=output_dir))
     for result in results:
