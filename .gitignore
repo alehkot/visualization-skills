@@ -6,6 +6,7 @@
 !/skills/
 !/references/
 !/evaluation/
+!/.github/
 
 # Opt evaluation suites in deliberately; keep historical local research ignored.
 /evaluation/*

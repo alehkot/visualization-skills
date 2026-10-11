@@ -1,0 +1,37 @@
+name: Evaluation regressions
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evaluations-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluations:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+      XDG_CACHE_HOME: ${{ runner.temp }}/cache
+    steps:
+      - name: Check out the tested revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install the pinned renderer
+        run: python -m pip install -r evaluation/close-bars/requirements-render.txt
+      - name: Check close-bar inputs and rendering regressions
+        run: python -m unittest discover -s evaluation/close-bars -p 'test_*.py' -v
+      - name: Check missing-data evaluation inputs
+        run: python -m unittest discover -s evaluation/missing-data -p 'test_*.py' -v
+      - name: Require the complete rendering gallery
+        run: python evaluation/close-bars/render_fixtures.py --output-dir "${{ runner.temp }}/evaluation-gallery"
