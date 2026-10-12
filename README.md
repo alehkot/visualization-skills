@@ -55,7 +55,7 @@ Supply the material and audience when known. Rendered reviews need an agent that
 
 Git tracks the skills and their runtime references, this README, the license, ignore rules, and curated [evaluation sources](evaluation/README.md). Each skill keeps any required references inside its own folder so it can be installed independently; evaluation tooling is outside the installable skill folders.
 
-The close-bar and missing-data evaluation suites include replayable model prompts and rubrics. The close-bar suite also has separate deterministic rendering checks. Generated outputs, galleries, historical local evaluations, research notes, and `AGENTS.md` remain ignored. None are required to use either skill.
+The close-bar, missing-data, and mix-effects evaluation suites include replayable model prompts and rubrics. The close-bar suite also has separate deterministic rendering checks. Generated outputs, galleries, historical local evaluations, research notes, and `AGENTS.md` remain ignored. None are required to use either skill.
 
 ## Evidence limits
 
