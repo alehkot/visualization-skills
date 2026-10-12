@@ -5,6 +5,9 @@ Pure checks work with the standard library; render checks explicitly skip withou
 Matplotlib. The full render_fixtures.py CLI requires its renderer and never skips.
 """
 from decimal import Decimal, DivisionByZero, localcontext
+from contextlib import ExitStack, redirect_stdout
+import io
+import json
 import inspect
 import os
 from pathlib import Path
@@ -126,6 +129,151 @@ class ArithmeticAndInputChecks(unittest.TestCase):
             self.assertFalse(output.exists())
 
 
+class ReportPublicationChecks(unittest.TestCase):
+    """Exercise run lifecycle without optional rendering or a model service."""
+
+    def fake_gallery(self, stack, mutate=None):
+        stack.enter_context(patch.object(fixtures, 'load_renderer', return_value='test-renderer'))
+        calls = []
+
+        def generate(width, *args, **kwargs):
+            calls.append(width)
+            if mutate is not None:
+                mutate(len(calls), kwargs['output_dir'])
+            return {'name': 'test-fixture', 'width_px': width, 'status': 'PASS', 'issues': []}
+
+        for name in ('positive', 'negative', 'rounding', 'dense'):
+            stack.enter_context(patch.object(fixtures, name, side_effect=generate))
+        stack.enter_context(redirect_stdout(io.StringIO()))
+        return calls
+
+    def seed_gallery(self, root):
+        report = root / 'validation_results.json'
+        report.write_text('{"counts": {"PASS": 8}}', encoding='utf-8')
+        (root / 'source_data.json').write_text('previous source', encoding='utf-8')
+        (root / 'previous.png').write_bytes(b'previous image')
+        return report
+
+    def test_interrupted_reruns_cannot_retain_previous_report(self):
+        for error in (RuntimeError('renderer failed'), OSError('disk full'), KeyboardInterrupt()):
+            for stop_at in (1, 7, 19):
+                with self.subTest(error=type(error).__name__, stop_at=stop_at):
+                    with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+                        root = Path(directory)
+                        report = self.seed_gallery(root)
+
+                        def interrupt(call, output):
+                            self.assertFalse(report.exists())
+                            (output / 'partial.png').write_bytes(b'new partial image')
+                            if call == stop_at:
+                                raise error
+
+                        self.fake_gallery(stack, interrupt)
+                        with self.assertRaises(type(error)):
+                            fixtures.run_fixtures(root)
+                        self.assertFalse(report.exists())
+                        self.assertTrue((root / 'partial.png').exists())
+                        self.assertEqual(json.loads((root / 'source_data.json').read_text()), fixtures.SOURCE)
+                        self.assertEqual(list(root.glob('.validation-results-*.tmp')), [])
+
+    def test_source_write_failure_invalidates_previous_report(self):
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+            root = Path(directory)
+            report = self.seed_gallery(root)
+            calls = self.fake_gallery(stack)
+            stack.enter_context(patch.object(Path, 'write_text', side_effect=OSError('source write failed')))
+            with self.assertRaisesRegex(OSError, 'source write failed'):
+                fixtures.run_fixtures(root)
+            self.assertFalse(report.exists())
+            self.assertEqual(calls, [])
+
+    def test_unlink_failure_stops_before_modifying_gallery(self):
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+            root = Path(directory)
+            self.seed_gallery(root)
+            before = {p.name: p.read_bytes() for p in root.iterdir()}
+            calls = self.fake_gallery(stack)
+            stack.enter_context(patch.object(Path, 'unlink', side_effect=PermissionError('report locked')))
+            with self.assertRaisesRegex(PermissionError, 'report locked'):
+                fixtures.run_fixtures(root)
+            self.assertEqual(calls, [])
+            self.assertEqual(before, {p.name: p.read_bytes() for p in root.iterdir()})
+
+    def test_preflight_failures_preserve_previous_gallery(self):
+        for target in ('validate_output_directory', 'load_renderer'):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.seed_gallery(root)
+                before = {p.name: p.read_bytes() for p in root.iterdir()}
+                with patch.object(fixtures, target, side_effect=RuntimeError('preflight failed')):
+                    with self.assertRaisesRegex(RuntimeError, 'preflight failed'):
+                        fixtures.run_fixtures(root)
+                self.assertEqual(before, {p.name: p.read_bytes() for p in root.iterdir()})
+
+    def test_failed_report_serialization_leaves_no_published_or_temporary_report(self):
+        for error in (OSError('report write failed'), KeyboardInterrupt()):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+                root = Path(directory)
+                report = self.seed_gallery(root)
+                self.fake_gallery(stack)
+
+                def partial_dump(data, stream, **kwargs):
+                    stream.write('{"counts":')
+                    self.assertFalse(report.exists())
+                    raise error
+
+                stack.enter_context(patch.object(fixtures.json, 'dump', side_effect=partial_dump))
+                with self.assertRaises(type(error)):
+                    fixtures.run_fixtures(root)
+                self.assertFalse(report.exists())
+                self.assertEqual(list(root.glob('.validation-results-*.tmp')), [])
+
+    def test_failed_report_publication_leaves_no_stale_verdict(self):
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+            root = Path(directory)
+            report = self.seed_gallery(root)
+            self.fake_gallery(stack)
+            stack.enter_context(patch.object(os, 'replace', side_effect=OSError('rename failed')))
+            with self.assertRaisesRegex(OSError, 'rename failed'):
+                fixtures.run_fixtures(root)
+            self.assertFalse(report.exists())
+            self.assertEqual(list(root.glob('.validation-results-*.tmp')), [])
+
+    def test_complete_failing_evaluation_is_reported_with_nonzero_exit(self):
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+            root = Path(directory)
+            report = self.seed_gallery(root)
+            self.fake_gallery(stack)
+            stack.enter_context(patch.object(fixtures, 'negative', return_value={
+                'name': 'failed-fixture', 'width_px': 360, 'status': 'FAIL', 'issues': []}))
+            self.assertEqual(fixtures.main(['--output-dir', str(root)]), 1)
+            current = json.loads(report.read_text())
+            self.assertEqual(current['counts'], {'PASS': 16, 'FAIL': 3})
+            self.assertEqual(len(current['results']), 19)
+            self.assertEqual(list(root.glob('.validation-results-*.tmp')), [])
+
+    def test_successful_rerun_publishes_complete_current_report(self):
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
+            root = Path(directory)
+            report = self.seed_gallery(root)
+            self.fake_gallery(stack, lambda call, output: self.assertFalse(report.exists()))
+            replace = os.replace
+
+            def inspect_publication(source, destination):
+                self.assertFalse(report.exists())
+                self.assertEqual(source.parent, root)
+                self.assertEqual(destination, report)
+                pending = json.loads(source.read_text(encoding='utf-8'))
+                self.assertEqual(pending['counts'], {'PASS': 19})
+                self.assertEqual(len(pending['results']), 19)
+                replace(source, destination)
+
+            stack.enter_context(patch.object(os, 'replace', side_effect=inspect_publication))
+            results = fixtures.run_fixtures(root)
+            self.assertEqual(json.loads(report.read_text())['results'], results)
+            self.assertEqual(list(root.glob('.validation-results-*.tmp')), [])
+
+
 class RenderChecks(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -160,6 +308,9 @@ class RenderChecks(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as directory:
             results = fixtures.run_fixtures(directory)
+            report = json.loads((Path(directory) / 'validation_results.json').read_text())
+            self.assertEqual(report['results'], results)
+            self.assertEqual(report['counts'], {'PASS': 8, 'EXPECTED_FAILURE_DETECTED': 11})
             self.assertEqual(sum(r['status'] == 'PASS' for r in results), 8)
             controls = [r for r in results if r['expected_failure_codes']]
             self.assertEqual(len(controls), 11)

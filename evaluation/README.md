@@ -72,6 +72,10 @@ On restricted machines with a read-only home directory, point `MPLCONFIGDIR` and
 
 The render command fails clearly when required packages are unavailable. A successful run reports eight `PASS` fixtures and eleven `EXPECTED_FAILURE_DETECTED` controls, writes PNGs plus `source_data.json` and `validation_results.json`, and returns zero only when every expected outcome is met. Inspect the PNGs at their actual 640 px and 360 px widths. Rendering does not run or grade a model.
 
+Rerunning a gallery directory replaces its generated artifacts. Once rendering dependencies and the output directory are accepted, the previous `validation_results.json` is removed **before** any source/PNG output is changed. A new report appears only after all fixtures finish and its complete JSON has been written to a sibling temporary file. An interrupted or failed generation can leave partial or mixed artifacts without a report; do not treat those files as a completed evaluation. Rerun successfully or use a fresh directory. Invalid output paths or unavailable renderer dependencies leave the previous gallery untouched.
+
+This protects report publication, not the entire gallery as a transaction: use a distinct output directory for each concurrent run or for evidence you need to retain. Abrupt process termination can leave a `.validation-results-*.tmp` file; it is not a completed report. A complete report can contain failed checks, so inspect statuses and the command's exit code rather than treating report existence as success.
+
 ### Interpreting render results
 
 Rendered examples use explicit synthetic source data. A passing run must accept all intended-good fixtures and detect the specified failure in every deliberately broken control. A failure control may have additional defects; the named expected failure must still be detected. Numeric and renderer-object assertions should be supplemented with actual PNG inspection at the exported size. Labels that fit geometrically are not thereby proven easy for every reader to understand.
