@@ -19,6 +19,7 @@ SKILLS = {
 RESULTS_DIRS = (
     "evaluation/close-bars/results",
     "evaluation/missing-data/results",
+    "evaluation/mix-effects/results",
 )
 
 

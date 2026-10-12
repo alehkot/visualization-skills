@@ -2,7 +2,7 @@
 
 These sources are kept outside `skills/` so either skill remains independently installable without evaluation dependencies. Curated suites are explicitly allowed by `.gitignore`; generated outputs and older local research remain ignored.
 
-Both quantitative suites use the single [prompt preparer](close-bars/prepare_eval.py). Select a suite with `--cases`; its case manifest and rubrics remain separate. Case IDs are local to a suite: record `close-bars/P1` or `missing-data/P1`, not an ambiguous `P1` when combining results.
+All quantitative suites use the single [prompt preparer](close-bars/prepare_eval.py). Select a suite with `--cases`; its case manifest and rubrics remain separate. Case IDs are local to a suite: record `close-bars/P1` or `missing-data/P1` or `mix-effects/P1`, not an ambiguous `P1` when combining results.
 
 ## Close-bar comparisons
 
@@ -30,7 +30,7 @@ The preparer supplies the selected skill entrypoint and quantitative reference i
 
 ### Continuous integration
 
-[Evaluation regressions](../.github/workflows/evaluations.yml) runs on every push and pull request using Python 3.12 on Ubuntu, with the existing pinned optional renderer installed. It invokes both suite directories explicitly: root-level unittest discovery does not find these tests. It also runs the full rendering CLI, which fails when renderer dependencies are unavailable rather than silently accepting skipped rendering tests.
+[Evaluation regressions](../.github/workflows/evaluations.yml) runs on every push and pull request using Python 3.12 on Ubuntu, with the existing pinned optional renderer installed. It invokes all three suite directories explicitly: root-level unittest discovery does not find these tests. It also runs the full rendering CLI, which fails when renderer dependencies are unavailable rather than silently accepting skipped rendering tests.
 
 The job runs the same checks documented below. It does not run a model, grade written responses, install a skill in a separate agent, or establish reader comprehension. The gallery is generated in the runner's temporary directory; reproduce it locally to inspect the PNGs. Actions are pinned to full commit hashes, the token is read-only, checkout credentials are not persisted, and the job has a ten-minute timeout. No credentials or paid model service are required. This workflow does not configure branch protection or make itself a required check.
 
@@ -57,7 +57,7 @@ python3 evaluation/close-bars/prepare_eval.py --revision 42cbc37 --output evalua
 python3 evaluation/close-bars/prepare_eval.py --revision HEAD --output evaluation/close-bars/results/candidate.json
 ```
 
-`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the explicitly allowed, Git-ignored `evaluation/close-bars/results/` and `evaluation/missing-data/results/` directories; an external directory is also allowed. Merely ignoring another repository directory does not allow output there.
+`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the explicitly allowed, Git-ignored `evaluation/close-bars/results/`, `evaluation/missing-data/results/`, and `evaluation/mix-effects/results/` directories; an external directory is also allowed. Merely ignoring another repository directory does not allow output there.
 
 The JSON `cases` array contains `id` and `model_prompt`. Submit only that prompt in a fresh model context. The separate `rubric` object contains the review instructions and case criteria. No provider integration, credentials, paid API calls, or automatic semantic grading are included. Preserve the raw responses and per-criterion judgments alongside the bundle; do not quietly replace old runs.
 
@@ -125,6 +125,25 @@ Follow the model-evaluation protocol above: submit only one `model_prompt` per f
 ```sh
 python3 -m unittest discover -s evaluation/close-bars -p 'test_*.py' -v
 python3 -m unittest discover -s evaluation/missing-data -p 'test_*.py' -v
+python3 -m unittest discover -s evaluation/mix-effects -p 'test_*.py' -v
 ```
 
 The first command includes optional close-bar rendering checks; inspect skips as described above. For standard-library-only checks, replace its pattern with `test_semantic.py`. The missing-data suite requires only Python's standard library and Git. Generated bundles, responses, scores, and reports belong in its ignored `results/` directory or outside the repository, never in either installable skill.
+
+
+## Aggregation and mix effects
+
+The [mix-effects manifest and rubrics](mix-effects/cases.json) exercise existing quantitative guidance on subgroup composition, weighting, and task-dependent comparisons. The ten written cases are split evenly between design and review. They distinguish an aggregate rate from subgroup rates, actual counts from a source-specified standardized comparison, and incomplete or overlapping groups from an exhaustive partition. Controls preserve valid aggregate-only summaries rather than requiring every chart to be disaggregated.
+
+For example, both request types can improve while the overall completion rate falls as the request mix changes. Replacing the observed overall rate with an unweighted average of the subgroup rates is not a valid repair. These tasks ask for source-faithful explanation, not a universal chart type, causal diagnosis, or invented counterfactual adjustment.
+
+[Armstrong and Wattenberg, Visualizing Statistical Mix Effects and Simpson's Paradox](https://research.google/pubs/visualizing-statistical-mix-effects-and-simpsons-paradox/) (IEEE InfoVis 2014) motivates explicitly inspecting mixture effects in aggregated visualizations. The tasks and numbers here are original synthetic fixtures. The paper does not validate this suite, and its proposed comet chart is not required by these rubrics. The separation between executable checks and task/readability evidence also follows the distinction made by [VisEval](https://github.com/microsoft/VisEval); this repository does not add that toolkit as a dependency.
+
+Prepare inputs using the same local manifest and preparer for each committed skill revision:
+
+```sh
+python3 evaluation/close-bars/prepare_eval.py --revision HEAD --cases evaluation/mix-effects/cases.json --output evaluation/mix-effects/results/inputs.json
+python3 -m unittest discover -s evaluation/mix-effects -p 'test_*.py' -v
+```
+
+Choose explicit baseline and candidate revisions when comparing a later skill change, and use new output names. This suite adds no skill change and establishes no before/after model gain. Follow the fresh-context, rubric-withholding and raw-response retention protocol above. Tasks permit 160 words. No model is run or scored by the tests or CI: they check the manifest, its arithmetic fixtures, provenance, rubric separation, and output protections. The tasks are targeted smoke/regression probes, not held-out generalization, rendered-output, causal-inference, or human-comprehension evidence.

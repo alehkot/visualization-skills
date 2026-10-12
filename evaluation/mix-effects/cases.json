@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "instructions": "Return a renderer-neutral brief or material findings as requested, in no more than 160 words. Do not edit files or search external sources. Use only the supplied source facts; these are written briefs, not actual renderings.",
+  "review_instructions": [
+    "Review each response semantically against its case. Equivalent task-faithful forms, correct values, and minimal repairs are acceptable; do not grade by keywords or require a particular chart type.",
+    "Record pass only when every acceptance criterion is materially satisfied and no material failure criterion applies. Record fail for an established omission or error, or unclear when judgment is unreliable. Retain response evidence and explain the judgment; this harness does not score responses.",
+    "Distinguish observed aggregate quantities, subgroup quantities, and standardized quantities computed with supplied target weights. The requested reader question determines which quantity matters. An aggregate is not automatically invalid because composition differs, and subgroup displays are not universally required.",
+    "Use only compatible, nonoverlapping counts or explicitly supplied applicable weights to pool groups. Do not invent denominators, group independence, a target population, or an adjustment method. Descriptive mixture patterns do not establish causal effects or statistical significance.",
+    "Preserving an unchanged valid feature may satisfy a criterion implicitly; do not require ritual disclaimers, duplication, or redesign. Honor the 160-word limit and the task's scope. No rendering is supplied, so do not certify actual geometry, legibility, accessibility conformance, or measured comprehension.",
+    "Keep these instructions and per-case rubrics out of model input. Submit only one selected model_prompt in a fresh context. Retain the exact response, suite and case ID, model/version, settings, tools, date, and bundle provenance for manual comparison."
+  ],
+  "cases": [
+    {
+      "id": "P1",
+      "title": "Both subgroup rates rise while the aggregate falls",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A service records completed requests out of all requests using the same definition in January and February. Routine and complex types are mutually exclusive and exhaustive. January: routine 90/100, complex 30/100. February: routine 19/20, complex 72/180. Reader asks how the overall completion rate changed and whether each type changed in the same direction. Give a compact static brief preserving the evidence behind the answer. No causal analysis is supplied.",
+      "acceptance_criteria": [
+        "Give January's overall completion rate as 120/200 = 60% and February's as 91/200 = 45.5%, identifying a 14.5 percentage-point decline or equivalent accurate directional comparison.",
+        "Show that routine rises from 90% to 95% and complex from 30% to 40%, preserving their group identities and sufficient count or denominator context.",
+        "Make the composition change recoverable: complex requests rise from 100/200 = 50% to 180/200 = 90% of requests, or an equivalent explicit comparison of supplied group sizes. Distinguish the aggregate decline from subgroup improvement without a causal claim."
+      ],
+      "material_failure_criteria": [
+        "Use an unweighted average of subgroup rates as the observed aggregate, claim both subgroup rates declined, or omit either the requested aggregate or subgroup comparison.",
+        "Explain the reversal without preserving the consequential composition change, invent adjusted rates or uncertainty, or claim causation, statistical significance, or inspected rendering quality."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Correct totals do not support a false subgroup headline",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Same-definition completion records have mutually exclusive, exhaustive routine and complex types. January: routine 90/100, complex 30/100. February: routine 19/20, complex 72/180. A brief has correctly labeled overall bars 'January 60%' and 'February 45.5%' and headline 'Completion rates fell for both request types'. An adjacent table correctly supplies all four fractions. Reader needs to understand the aggregate and type-specific changes. Give material findings and the smallest repair.",
+      "acceptance_criteria": [
+        "Identify the headline's subgroup claim as contradicted by routine increasing 90% to 95% and complex increasing 30% to 40%.",
+        "Preserve the correct 60% and 45.5% observed aggregates and the valid supplied table rather than correcting away the aggregate decline.",
+        "Repair the headline or associated explanation to distinguish the overall decline from improvement within both types. The existing correct counts table may already supply composition context; do not require duplicate subgroup panels or labels."
+      ],
+      "material_failure_criteria": [
+        "Accept the false subgroup headline because the overall rates decline, or call the correct overall rates arithmetically wrong because both types improve.",
+        "Replace the observed aggregate with an unweighted subgroup average or an invented adjusted value, infer a causal effect, or demand unrelated rendering repairs."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Overall-only lookup legitimately uses the observed aggregate",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Routine and complex requests are mutually exclusive and exhaustive, with the same completion definition throughout. January: routine 90/100, complex 30/100. February: routine 19/20, complex 72/180. The reader asks only for the percentage of all actual requests completed in each month. A brief supplies a table labeled 'Observed overall completion: January 120/200 = 60%; February 91/200 = 45.5%'. It makes no within-type, causal, standardized-performance, or significance claim. Report only material defects.",
+      "acceptance_criteria": [
+        "Report no established material defect: the table correctly answers the requested observed overall lookup with weighted pooled counts.",
+        "Do not require subgroup panels, replacement by an adjusted rate, or a different visual form solely because the request mix changes.",
+        "Do not infer a subgroup decline or causal conclusion from the aggregate comparison, and keep judgment confined to the described brief."
+      ],
+      "material_failure_criteria": [
+        "Reject the correct observed rates solely because their direction differs from the subgroup rates or demand compulsory disaggregation or standardization.",
+        "Replace the actual aggregates with unweighted group averages, add unsupported performance or causal claims, or certify an unseen rendering."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Unequal group denominators rule out an unweighted overall rate",
+      "skill": "review-visual-explanation",
+      "task_prompt": "The source gives completion counts for two mutually exclusive, exhaustive request types in one month: routine 19 of 20 and complex 72 of 180, under one definition. A KPI brief correctly labels subgroup rates as 95% and 40%, then states 'Overall share of all 200 requests completed: (95% + 40%) / 2 = 67.5%'. Reader needs the actual overall share. Give the smallest source-backed repair.",
+      "acceptance_criteria": [
+        "Identify that the unweighted mean gives the unequal-sized types equal weight and is not the requested share of all actual requests.",
+        "Repair the overall KPI to (19 + 72) / (20 + 180) = 91/200 = 45.5%, retaining the valid subgroup labels.",
+        "Keep the repair descriptive and bounded to the arithmetic and label rather than alleging unseen geometry or requiring a redesign."
+      ],
+      "material_failure_criteria": [
+        "Accept 67.5% as the actual overall completion share, use the wrong denominator, or omit a recoverable corrected overall value.",
+        "Alter the correct subgroup rates, invent missing data or uncertainty, or claim actual clipping, significance, or causation."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Supplied target weights define a separate standardized comparison",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Two exhaustive, mutually exclusive request types have exact completion rates: January routine 90%, complex 30%; February routine 95%, complex 40%. The user explicitly requests a standardized comparison using a supplied target mix of 40% routine and 60% complex in both months. Actual monthly group sizes and overall rates are unavailable. Give a compact brief with the requested values and labels. The target is hypothetical, not an observed request population.",
+      "acceptance_criteria": [
+        "Compute January's target-weighted rate as 0.4×90% + 0.6×30% = 54%, and February's as 0.4×95% + 0.6×40% = 62%.",
+        "Identify the comparison as standardized to the same supplied hypothetical 40% routine/60% complex target mix, with an 8 percentage-point increase if the difference is given.",
+        "Keep these values separate from unavailable actual monthly overall rates and avoid presenting the hypothetical target as observed counts or a causal effect."
+      ],
+      "material_failure_criteria": [
+        "Ignore or change the target weights, average the subgroup rates equally, or refuse the computable standardized values solely because actual monthly group sizes are unavailable.",
+        "Label 54% and 62% as observed overall rates, fabricate target counts or actual monthly denominators, or claim standardization proves causal improvement."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "A disclosed equal-weight average is not necessarily an observed overall share",
+      "skill": "review-visual-explanation",
+      "task_prompt": "Source rates for exhaustive, mutually exclusive routine and complex request types are exactly 95% and 40%. Actual group sizes are not supplied. The user's task explicitly asks for an equal-weight average across the two types. The brief states 'Equal-weight average of type rates: 67.5%; each type contributes 50% regardless of its actual size'. It does not call this the share of all requests completed. Report only material defects.",
+      "acceptance_criteria": [
+        "Report no established material defect: 67.5% correctly answers the explicitly requested equal-weight average and its weighting is clearly disclosed.",
+        "Do not require unavailable actual group sizes to compute this specific metric or replace it with an invented pooled overall rate.",
+        "Preserve the distinction between the specified type-average metric and an observed all-request share, without certifying an unseen rendering."
+      ],
+      "material_failure_criteria": [
+        "Reject the metric solely because equal weighting can differ from population weighting, demand a different target population, or falsely say the specified average is uncomputable.",
+        "Assert 67.5% is also the observed overall share without evidence, invent group sizes, or allege rendering defects not supplied."
+      ]
+    },
+    {
+      "id": "P7",
+      "title": "Rates alone do not identify an actual pooled rate",
+      "skill": "design-visual-explanation",
+      "task_prompt": "The only source gives exact completion rates for two mutually exclusive, exhaustive request types: routine 95%, complex 40%. Counts, denominators, and their population shares are unavailable. User asks for one KPI showing the share of all actual requests completed and suggests averaging the two percentages. Explain what a source-faithful brief can display now and what is needed for the requested KPI.",
+      "acceptance_criteria": [
+        "Preserve the source's 95% routine and 40% complex rates with their group identities.",
+        "Explain that the actual overall share is not determined without the applicable group denominators or population weights; an equal-weight 67.5% cannot be asserted as that overall share.",
+        "Identify the missing group counts or compatible population shares needed to compute the pooled metric rather than inventing them or substituting a different KPI silently."
+      ],
+      "material_failure_criteria": [
+        "Report 67.5% or another invented point value as the observed overall completion share, assume equally sized groups, or recover counts from the percentages alone.",
+        "Claim the subgroup rates are themselves false or unusable because weights are missing, or give an unsupported causal interpretation."
+      ]
+    },
+    {
+      "id": "P8",
+      "title": "Overlapping group counts cannot be pooled by simple addition",
+      "skill": "review-visual-explanation",
+      "task_prompt": "A workshop source reports attendee categories: members 40 attendees with 30 completing, students 30 attendees with 24 completing. Categories overlap: exactly 10 attendees are both members and students, and exactly 8 of those completed. Every attendee is in at least one category. A brief labels '(30+24)/(40+30) = 77.1%' as 'Share of unique attendees completing'. Reader needs that unique-attendee share. Give material findings and the smallest repair.",
+      "acceptance_criteria": [
+        "Identify that simple addition double-counts the 10 overlapping attendees and their 8 completions for a unique-person metric.",
+        "Repair to (30 + 24 − 8) / (40 + 30 − 10) = 46/60, approximately 76.7%, with appropriate unique-attendee labeling and disclosed rounding.",
+        "Retain the valid category counts and memberships; do not force the overlapping categories into an unsupported exclusive partition."
+      ],
+      "material_failure_criteria": [
+        "Accept 54/70 as the unique-attendee completion share, subtract overlap only from the denominator or only from the numerator, or give an incorrect unique-person value.",
+        "Delete or reassign legitimate overlapping memberships to make categories exclusive, invent individual identities, or demand unrelated rendering repairs."
+      ]
+    },
+    {
+      "id": "P9",
+      "title": "Unknown overlap prevents a unique-person total",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A workshop source reports members: 40 attendees, 30 completed; students: 30 attendees, 24 completed. Some attendees belong to both categories; the number of overlapping attendees and their completion outcomes are not supplied. Every attendee belongs to at least one category. User wants a unique-attendee completion KPI and a source-faithful category display. Give a concise brief without inventing overlap values.",
+      "acceptance_criteria": [
+        "Retain the supplied member and student counts or rates with their category identities and disclose that the groups overlap.",
+        "State that the unique-attendee completion share cannot be determined from these margins alone; do not present 54/70 as a deduplicated share.",
+        "Identify both the overlap attendee count and overlap completion count, or equivalent deduplicated records, as needed for the requested unique-person KPI."
+      ],
+      "material_failure_criteria": [
+        "Pool to 54/70 and call it the unique-attendee completion rate, assume disjointness or independence, or invent the number or completion outcomes of overlapping attendees.",
+        "Discard the valid group-level counts as false merely because the unique-person KPI is unresolved, or imply an unsupported exclusive partition."
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Equal group sizes make the simple rate average valid",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Two mutually exclusive, exhaustive request types share the same completion definition. Routine: 18 of 20 completed, or 90%. Complex: 6 of 20 completed, or 30%. Reader needs the share of all actual requests completed. The supplied arithmetic note correctly states '24 of 40 requests completed, 60%; because both type denominators are 20, this also equals (90% + 30%) / 2'. Give a minimal static brief answering the question and retaining that explanation.",
+      "acceptance_criteria": [
+        "Make 24/40 = 60% recoverable as the observed overall completion share with appropriate labeling.",
+        "Preserve the supplied explanation that the two equal denominators make the simple average equivalent here; do not imply that averaging percentages is always invalid or always appropriate.",
+        "Keep the brief minimal and source-faithful without introducing uncertainty, causal inference, or claims about an unseen rendering."
+      ],
+      "material_failure_criteria": [
+        "Reject or replace the correct pooled value, say it is uncomputable, or lose the requested equal-denominator explanation.",
+        "Invent overlapping groups or unequal group sizes, generalize the equivalence to unequal denominators, or claim statistical significance or verified rendering quality."
+      ]
+    }
+  ]
+}
