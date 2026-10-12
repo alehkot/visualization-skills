@@ -10,10 +10,12 @@ from decimal import Decimal, ROUND_HALF_EVEN, localcontext
 import itertools
 import json
 import math
+import os
 from pathlib import Path
 import re
 import struct
 import sys
+import tempfile
 
 DPI = 100
 FONT = 10.08  # 14 raster pixels at 100 dpi; never reduced for the 360 px view.
@@ -732,11 +734,31 @@ def validate_output_directory(path):
     return output
 
 
+def write_report(path, report):
+    """Publish complete JSON, never a partially serialized final report."""
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8',
+                dir=path.parent, prefix='.validation-results-', suffix='.tmp',
+                delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump(report, stream, indent=2, default=float)
+            stream.write('\n')
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def run_fixtures(output_dir):
     """Eight repaired cases and eleven intentionally broken controls, at real sizes."""
     output_dir=validate_output_directory(output_dir)
     renderer_version=load_renderer()
     output_dir.mkdir(parents=True,exist_ok=True)
+    report_path = output_dir / 'validation_results.json'
+    # Reruns overwrite gallery files in place. Invalidate the old verdict first,
+    # so an interrupted run cannot leave it certifying new or mixed artifacts.
+    report_path.unlink(missing_ok=True)
     (output_dir/'source_data.json').write_text(json.dumps(SOURCE,indent=2)+'\n')
     results=[]
     for width in (640,360):
@@ -756,7 +778,7 @@ def run_fixtures(output_dir):
     report={'scope':'Synthetic implementation fixtures; not model-behavior or comprehension evaluations.',
             'renderer':{'matplotlib':renderer_version,'backend':'Agg','dpi':DPI,'font':'DejaVu Sans'},
             'counts':counts,'results':results}
-    (output_dir/'validation_results.json').write_text(json.dumps(report,indent=2,default=float)+'\n')
+    write_report(report_path, report)
     print(json.dumps(counts,indent=2))
     return results
 
