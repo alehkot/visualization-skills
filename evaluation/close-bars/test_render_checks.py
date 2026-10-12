@@ -636,6 +636,165 @@ class RenderChecks(unittest.TestCase):
             arguments['bars'][0][0].set_alpha(0)
         self.assertIn('bar_not_visible', self.codes_after_mutation(fixtures.positive, transparent_bar))
 
+    def test_transformed_bar_baselines_cannot_pass_with_correct_raw_dimensions(self):
+        from matplotlib.transforms import Affine2D
+        for generator in (fixtures.positive, fixtures.negative, fixtures.rounding, fixtures.dense):
+            for width in (360, 640):
+                with self.subTest(generator=generator.__name__, width=width):
+                    def truncate(arguments):
+                        for bar, axis, orientation, value in arguments['bars']:
+                            # Keep the source endpoint, raw baseline, and raw
+                            # extent unchanged; only the rendered length halves.
+                            transform = (Affine2D().scale(1, .5).translate(0, float(value) / 2)
+                                         if orientation == 'v' else
+                                         Affine2D().scale(.5, 1).translate(float(value) / 2, 0))
+                            bar.set_transform(transform + axis.transData)
+                    codes = self.codes_after_mutation(generator, truncate, width=width)
+                    self.assertIn('bar_baseline_pixel_mismatch', codes)
+                    self.assertFalse({'nonzero_bar_baseline', 'bar_value_mismatch',
+                                      'endpoint_pixel_mismatch', 'bar_extent_pixel_mismatch'} & codes)
+
+    def test_transformed_bar_value_edges_are_checked(self):
+        from matplotlib.transforms import Affine2D
+        for generator in (fixtures.positive, fixtures.negative):
+            with self.subTest(generator=generator.__name__):
+                def shorten(arguments):
+                    for bar, axis, orientation, _ in arguments['bars']:
+                        transform = Affine2D().scale(1, .5) if orientation == 'v' else Affine2D().scale(.5, 1)
+                        bar.set_transform(transform + axis.transData)
+                codes = self.codes_after_mutation(generator, shorten)
+                self.assertIn('bar_extent_pixel_mismatch', codes)
+                self.assertNotIn('bar_baseline_pixel_mismatch', codes)
+
+    def test_bar_fill_must_be_visible_and_have_nonzero_area(self):
+        for generator in (fixtures.positive, fixtures.negative):
+            for mode in ('transparent_face', 'no_fill', 'all_transparent', 'zero_cross_width', 'removed'):
+                with self.subTest(generator=generator.__name__, mode=mode):
+                    def mutate(arguments):
+                        for bar, _, orientation, _ in arguments['bars']:
+                            if mode == 'transparent_face':
+                                bar.set_facecolor((0, 0, 0, 0))
+                            elif mode == 'no_fill':
+                                bar.set_fill(False)
+                            elif mode == 'all_transparent':
+                                bar.set_facecolor('none')
+                                bar.set_edgecolor('none')
+                                bar.set_hatch(None)
+                            elif mode == 'zero_cross_width':
+                                (bar.set_width if orientation == 'v' else bar.set_height)(0)
+                            else:
+                                bar.remove()
+                    expected = 'bar_not_visible' if mode == 'removed' else 'bar_fill_not_visible'
+                    self.assertIn(expected, self.codes_after_mutation(generator, mutate))
+
+    def test_bar_rectangular_clips_and_canvas_are_checked(self):
+        from matplotlib.transforms import Affine2D, Bbox
+        for generator in (fixtures.positive, fixtures.negative):
+            for mode in ('empty_clip', 'partial_clip', 'outside_canvas'):
+                with self.subTest(generator=generator.__name__, mode=mode):
+                    def mutate(arguments):
+                        for bar, axis, orientation, _ in arguments['bars']:
+                            if mode == 'empty_clip':
+                                bar.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+                            elif mode == 'partial_clip':
+                                bounds = bar.get_window_extent()
+                                bar.set_clip_box(Bbox.from_extents(bounds.x0, bounds.y0,
+                                                                  (bounds.x0 + bounds.x1) / 2, bounds.y1))
+                            else:
+                                # Move cross-axis only, keeping numeric endpoints
+                                # intact, and disable artist clipping.
+                                transform = Affine2D().translate(1000, 0) if orientation == 'v' else Affine2D().translate(0, 1000)
+                                bar.set_transform(axis.transData + transform)
+                                bar.set_clip_on(False)
+                    self.assertIn('bar_clipped', self.codes_after_mutation(generator, mutate))
+
+    def test_custom_bar_shapes_and_paint_are_explicitly_unsupported(self):
+        from matplotlib.patches import Circle
+        from matplotlib.path import Path as MplPath
+        from matplotlib.transforms import Affine2D, Transform
+        class NonAffineIdentity(Transform):
+            input_dims = output_dims = 2
+            def transform_non_affine(self, values):
+                return values
+        for generator in (fixtures.positive, fixtures.negative):
+            for mode in ('clip_path', 'rotation', 'shear', 'custom_path', 'nonaffine',
+                         'animated', 'sketch', 'path_effect', 'agg_filter'):
+                with self.subTest(generator=generator.__name__, mode=mode):
+                    def mutate(arguments):
+                        bar, axis, _, _ = arguments['bars'][0]
+                        if mode == 'clip_path':
+                            bar.set_clip_path(Circle((0, 0), 1, transform=arguments['fig'].transFigure))
+                        elif mode == 'rotation':
+                            bar.set_angle(15)
+                        elif mode == 'shear':
+                            bar.set_transform(Affine2D().skew_deg(10, 10) + axis.transData)
+                        elif mode == 'custom_path':
+                            bar.get_path = lambda: MplPath([[0, 0], [1, 0], [.5, 1], [0, 0]], [1, 2, 2, 79])
+                        elif mode == 'nonaffine':
+                            bar.set_transform(NonAffineIdentity() + axis.transData)
+                        elif mode == 'animated':
+                            bar.set_animated(True)
+                        elif mode == 'sketch':
+                            bar.set_sketch_params(scale=15, length=10, randomness=1)
+                        elif mode == 'path_effect':
+                            from matplotlib.patheffects import Stroke
+                            bar.set_path_effects([Stroke(linewidth=10)])
+                        else:
+                            bar.set_agg_filter(lambda image, dpi: (image, 0, 0))
+                    expected = 'bar_clip_path_unsupported' if mode == 'clip_path' else 'bar_artist_unsupported'
+                    self.assertIn(expected, self.codes_after_mutation(generator, mutate))
+
+    def test_equivalent_bar_transforms_styles_and_clips_are_positive_controls(self):
+        from matplotlib.patches import Circle
+        from matplotlib.transforms import Affine2D, Bbox
+        for generator in (fixtures.positive, fixtures.negative, fixtures.rounding, fixtures.dense):
+            for width in (360, 640):
+                for mode in ('equivalent_transform', 'reflected_transform', 'frozen_transform', 'style', 'containing_clip', 'disabled_clip'):
+                    with self.subTest(generator=generator.__name__, width=width, mode=mode):
+                        def mutate(arguments):
+                            for bar, axis, orientation, value in arguments['bars']:
+                                if mode == 'equivalent_transform':
+                                    move = Affine2D().scale(2, 3).translate(7, 9)
+                                    bar.set_transform(move + move.inverted() + axis.transData)
+                                elif mode == 'reflected_transform':
+                                    transform = (Affine2D().scale(1, -1).translate(0, float(value))
+                                                 if orientation == 'v' else
+                                                 Affine2D().scale(-1, 1).translate(float(value), 0))
+                                    bar.set_transform(transform + axis.transData)
+                                elif mode == 'frozen_transform':
+                                    bar.set_transform(axis.transData.frozen())
+                                elif mode == 'style':
+                                    bar.set_facecolor('#654321')
+                                    bar.set_alpha(.6)
+                                    bar.set_edgecolor('none')
+                                    bar.set_linewidth(0)
+                                elif mode == 'containing_clip':
+                                    bar.set_clip_box(arguments['fig'].bbox)
+                                else:
+                                    bar.set_clip_path(Circle((0, 0), 1, transform=arguments['fig'].transFigure))
+                                    bar.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+                                    bar.set_clip_on(False)
+                        self.assertEqual(self.codes_after_mutation(generator, mutate, width=width), set())
+
+    def test_invisible_bars_do_not_produce_phantom_label_collisions(self):
+        from matplotlib.transforms import Bbox
+        for mode in ('visible', 'hidden', 'transparent', 'clipped'):
+            with self.subTest(mode=mode):
+                def mutate(arguments):
+                    bar = arguments['bars'][0][0]
+                    label = arguments['labels'][0][0]
+                    label.set_position((0, -80))  # Deliberately place inside this bar.
+                    if mode == 'hidden':
+                        bar.set_visible(False)
+                    elif mode == 'transparent':
+                        bar.set_facecolor('none')
+                        bar.set_edgecolor('none')
+                        bar.set_hatch(None)
+                    elif mode == 'clipped':
+                        bar.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+                codes = self.codes_after_mutation(fixtures.rounding, mutate)
+                self.assertEqual('label_bar_collision' in codes, mode == 'visible')
+
     @staticmethod
     def make_invisible(artist, mode):
         if mode == 'hidden':

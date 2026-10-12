@@ -26,7 +26,7 @@ NUMBER = re.compile(r'[+−-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+−-]?\d+)?')
 
 def load_renderer():
     """Import only when rendering is explicitly requested, never on module import."""
-    global plt, Text, Bbox, to_rgba, ErrorbarContainer, LineCollection, MarkerStyle, Line2D
+    global plt, Text, Bbox, to_rgba, ErrorbarContainer, LineCollection, MarkerStyle, Line2D, Rectangle
     try:
         import matplotlib
         matplotlib.use('Agg')
@@ -36,6 +36,7 @@ def load_renderer():
         from matplotlib.collections import LineCollection
         from matplotlib.markers import MarkerStyle
         from matplotlib.lines import Line2D
+        from matplotlib.patches import Rectangle
         from matplotlib.colors import to_rgba
         from matplotlib.transforms import Bbox
     except ImportError as exc:
@@ -283,6 +284,90 @@ def artist_visible(artist):
     return True
 
 
+def bar_artist_issues(fig, bar, axis, orientation, source_value):
+    """Audit these fixtures' filled, axis-aligned rectangular bars in display space.
+
+    Raw Rectangle dimensions alone do not establish the rendered baseline or
+    extent. Bounds describe the actual visible fill, not edge strokes, contrast,
+    occlusion, or the semantic association with a category/series.
+    """
+    issues = []
+    detail = {'source': source_value, 'orientation': orientation}
+    def problem(code):
+        issues.append(('bar_' + code, detail))
+
+    attached = (artist_visible(bar) and axis in fig.axes and bar.axes is axis
+                and bar in axis.patches)
+    if not attached:
+        problem('not_visible')
+    if (not isinstance(bar, Rectangle) or bar.get_path_effects() or bar.get_animated()
+            or bar.get_sketch_params() is not None or bar.get_agg_filter() is not None
+            or not bar.get_transform().is_affine):
+        problem('artist_unsupported')
+        return issues, None
+    path = bar.get_path()
+    # Rectangle's standard unit path, before its patch and artist transforms.
+    if (path.vertices.tolist() != [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]
+            or path.codes is None or path.codes.tolist() != [1, 2, 2, 2, 79]):
+        problem('artist_unsupported')
+        return issues, None
+    points = bar.get_transform().transform(path.vertices[:4])
+    if not all(math.isfinite(float(v)) for point in points for v in point):
+        problem('artist_unsupported')
+        return issues, None
+    coordinate = 1 if orientation == 'v' else 0
+    cross = 1 - coordinate
+    base_indices, tip_indices = ((0, 1), (3, 2)) if orientation == 'v' else ((0, 3), (1, 2))
+    base, tip = points[list(base_indices)], points[list(tip_indices)]
+    close = lambda a, b: math.isclose(float(a), float(b), abs_tol=0.1, rel_tol=0)
+    # Fail closed for rotation/shear, rather than interpreting a bounding box as
+    # the rectangle's value edge. Cross-axis position is intentionally not graded.
+    if (not close(base[0][coordinate], base[1][coordinate])
+            or not close(tip[0][coordinate], tip[1][coordinate])
+            or any(not close(a[cross], b[cross]) for a, b in zip(base, tip))):
+        problem('artist_unsupported')
+        return issues, None
+    zero_point = axis.transData.transform((0, 0))[coordinate]
+    value_point = axis.transData.transform((0, float(source_value)) if orientation == 'v'
+                                          else (float(source_value), 0))[coordinate]
+    # A reflection can reverse path winding without changing the filled bar.
+    # Identify the zero/value edges by their numeric direction, not vertex order.
+    if (tip[0][coordinate] - base[0][coordinate]) * (value_point - zero_point) < 0:
+        base, tip = tip, base
+    if any(not close(point[coordinate], zero_point) for point in base):
+        problem('baseline_pixel_mismatch')
+    if any(not close(point[coordinate], value_point) for point in tip):
+        problem('extent_pixel_mismatch')
+    face = bar.get_facecolor()
+    fill_visible = (bar.get_fill() and math.isfinite(float(face[3])) and face[3] > 0
+                    and abs(float(base[0][cross] - base[1][cross])) > 0
+                    and abs(float(base[0][coordinate] - tip[0][coordinate])) > 0)
+    if not fill_visible:
+        problem('fill_not_visible')
+    bounds = Bbox.from_extents(min(p[0] for p in points), min(p[1] for p in points),
+                              max(p[0] for p in points), max(p[1] for p in points))
+    clips = [fig.bbox]  # The canvas clips even when artist clipping is disabled.
+    if bar.get_clip_on():
+        clip_path, _ = bar.get_transformed_clip_path_and_affine()
+        if clip_path is not None:
+            problem('clip_path_unsupported')
+            return issues, None
+        if bar.get_clip_box() is not None:
+            clips.append(bar.get_clip_box())
+    for clip in clips:
+        if (not all(math.isfinite(float(v)) for v in clip.extents)
+                or clip.x1 < clip.x0 or clip.y1 < clip.y0):
+            problem('clip_box_unsupported')
+            return issues, None
+        if not (clip.x0 <= bounds.x0 + 0.5 and clip.y0 <= bounds.y0 + 0.5
+                and clip.x1 >= bounds.x1 - 0.5 and clip.y1 >= bounds.y1 - 0.5):
+            problem('clipped')
+        bounds = Bbox.intersection(bounds, clip)
+        if bounds is None:
+            return issues, None
+    return issues, bounds if attached and fill_visible else None
+
+
 def uncertainty_issues(fig, kind, bars, source):
     """Inspect these fixtures' actual capped, solid, single-segment error bars.
 
@@ -492,10 +577,15 @@ def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=Non
     if len(bars)!=len(source_values): issue('bar_count_mismatch',{'count':len(bars)})
     expected_by_bar={id(record[0]):value for record,value in zip(bars,source_values)}
     max_endpoint_error=0
+    bar_fill_bounds=[]
     for bar,axis,orient,declared_value in bars:
         source_value=expected_by_bar.get(id(bar),declared_value)
         if declared_value!=source_value: issue('bar_source_mismatch',{'declared':declared_value,'source':source_value})
-        if not artist_visible(bar): issue('bar_not_visible',source_value)
+        bar_issues, fill_bounds = bar_artist_issues(fig, bar, axis, orient, source_value)
+        for code, detail in bar_issues:
+            issue(code, detail)
+        if fill_bounds is not None:
+            bar_fill_bounds.append((fill_bounds, source_value))
         actual=bar.get_height() if orient=='v' else bar.get_width()
         base=bar.get_y() if orient=='v' else bar.get_x()
         if not math.isclose(base,0,abs_tol=1e-9): issue('nonzero_bar_baseline',{'baseline':base,'value':source_value})
@@ -562,8 +652,8 @@ def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=Non
         for ib in interval_rects:
             if rect_intersects(lb,ib): issue('label_uncertainty_collision',{'label':artist.get_text(),'source':source_value})
         # Outside labels must also avoid unrelated bars at the inspected size.
-        for bar,axis,orient,value in bars:
-            if rect_intersects(lb,bar.get_window_extent(renderer)):
+        for bounds,value in bar_fill_bounds:
+            if rect_intersects(lb,bounds):
                 issue('label_bar_collision',{'label':artist.get_text(),'bar_source':value})
     for row_index,(row,expected) in enumerate(table):
         for cell_index,artist in enumerate(row):
