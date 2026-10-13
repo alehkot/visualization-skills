@@ -15,11 +15,17 @@ SKILLS = {
     "review-visual-explanation": "quantitative-review.md",
 }
 
+REFERENCE_GROUPS = {
+    "quantitative": SKILLS,
+    "systems": {skill: "systems-and-relationships.md" for skill in SKILLS},
+}
+
 # Explicitly opt curated suites in; ignoring an arbitrary directory is not enough.
 RESULTS_DIRS = (
     "evaluation/close-bars/results",
     "evaluation/missing-data/results",
     "evaluation/mix-effects/results",
+    "evaluation/systems-relationships/results",
 )
 
 
@@ -57,11 +63,21 @@ def text_list(value):
 def load_cases(path):
     raw = Path(path).read_bytes()
     data = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object)
+    if not isinstance(data, dict):
+        raise ValueError("Case file must be an object")
+    version = data.get("schema_version")
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError("Unsupported case schema_version; expected 1 or 2")
     required = {"schema_version", "instructions", "review_instructions", "cases"}
-    if not isinstance(data, dict) or set(data) != required:
+    if version == 2:
+        required.add("reference_group")
+    if set(data) != required:
         raise ValueError(f"Case file must contain exactly: {sorted(required)}")
-    if type(data["schema_version"]) is not int or data["schema_version"] != 1:
-        raise ValueError("Unsupported case schema_version; expected 1")
+    if version == 2 and (
+        not isinstance(data["reference_group"], str)
+        or data["reference_group"] not in REFERENCE_GROUPS
+    ):
+        raise ValueError("Unknown reference_group; expected quantitative or systems")
     if not nonempty_text(data["instructions"]) or not text_list(data["review_instructions"]):
         raise ValueError("Instructions must be nonempty text; review_instructions a text list")
     if not isinstance(data["cases"], list) or not data["cases"]:
@@ -86,10 +102,12 @@ def load_cases(path):
 
 def prepare_bundle(repo, revision, cases_path):
     data, cases_hash = load_cases(cases_path)
+    group = data.get("reference_group", "quantitative")
+    references = REFERENCE_GROUPS[group]
     commit = git(repo, "rev-parse", "--verify", "--end-of-options", revision + "^{commit}").decode().strip()
     sources, contexts = [], {}
     for skill in sorted({case["skill"] for case in data["cases"]}):
-        paths = [f"skills/{skill}/SKILL.md", f"skills/{skill}/references/{SKILLS[skill]}"]
+        paths = [f"skills/{skill}/SKILL.md", f"skills/{skill}/references/{references[skill]}"]
         parts = []
         for path in paths:
             raw = git(repo, "show", f"{commit}:{path}")
@@ -99,7 +117,7 @@ def prepare_bundle(repo, revision, cases_path):
     cases, rubrics = [], []
     for case in data["cases"]:
         prompt = (
-            f"Use the supplied {case['skill']} skill and quantitative reference.\n"
+            f"Use the supplied {case['skill']} skill and {group} reference.\n"
             "Only these two skill files are supplied; do not load other files or links.\n\n"
             f"{contexts[case['skill']]}\n\nTASK\n{data['instructions']}\n\n{case['task_prompt']}"
         )

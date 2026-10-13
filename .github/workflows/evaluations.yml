@@ -36,5 +36,7 @@ jobs:
         run: python -m unittest discover -s evaluation/missing-data -p 'test_*.py' -v
       - name: Check mix-effects evaluation inputs
         run: python -m unittest discover -s evaluation/mix-effects -p 'test_*.py' -v
+      - name: Check systems-relationship evaluation inputs
+        run: python -m unittest discover -s evaluation/systems-relationships -p 'test_*.py' -v
       - name: Require the complete rendering gallery
         run: python evaluation/close-bars/render_fixtures.py --output-dir "${{ runner.temp }}/evaluation-gallery"
