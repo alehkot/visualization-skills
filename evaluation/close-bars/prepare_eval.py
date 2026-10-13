@@ -34,8 +34,9 @@ def sha256(data):
 
 
 def git(repo, *args):
+    # Pin the real object graph, not a checkout-local replacement overlay.
     result = subprocess.run(
-        ["git", "-C", str(repo), *args], capture_output=True, check=False
+        ["git", "--no-replace-objects", "-C", str(repo), *args], capture_output=True, check=False
     )
     if result.returncode:
         raise ValueError(result.stderr.decode("utf-8", errors="replace").strip())

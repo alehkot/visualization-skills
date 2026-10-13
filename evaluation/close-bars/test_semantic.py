@@ -8,6 +8,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -241,6 +242,121 @@ class BundleTests(unittest.TestCase):
             self.assertEqual(retry.returncode, 2)
             self.assertIn("error:", retry.stderr)
             self.assertNotIn("Traceback", retry.stderr)
+
+
+class ReplacementProvenanceTests(unittest.TestCase):
+    """Use real, isolated Git objects; replacement maps never touch the source repo."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.repo = Path(self.directory.name) / "repo"
+        self.repo.mkdir()
+        # Make the test's replacement overlay observable regardless of caller config.
+        self.environment = patch.dict(os.environ)
+        self.environment.start()
+        self.addCleanup(self.environment.stop)
+        for key in ("GIT_NO_REPLACE_OBJECTS", "GIT_REPLACE_REF_BASE", "GIT_DIR",
+                    "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR"):
+            os.environ.pop(key, None)
+        self.run_git("init", "--quiet")
+        self.sources = {}
+        for skill, reference in prepare_eval.SKILLS.items():
+            for relative in (f"skills/{skill}/SKILL.md", f"skills/{skill}/references/{reference}"):
+                raw = f"Original committed source: {relative}\n".encode()
+                self.sources[relative] = raw
+                path = self.repo / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+        self.original = self.commit("Original source")
+        self.expected = prepare_eval.prepare_bundle(self.repo, self.original, CASES)
+        for relative in self.sources:
+            (self.repo / relative).write_text(f"REPLACEMENT source: {relative}\n", encoding="utf-8")
+        self.replacement = self.commit("Replacement source")
+
+    def run_git(self, *args):
+        return subprocess.run(
+            ["git", "-c", "user.name=Evaluation test", "-c", "user.email=test@example.invalid",
+             "-c", "commit.gpgsign=false", "-c", "core.useReplaceRefs=true",
+             "-C", str(self.repo), *args],
+            capture_output=True, check=True,
+        ).stdout.decode().strip()
+
+    def commit(self, message):
+        self.run_git("add", "--all")
+        self.run_git("commit", "--quiet", "-m", message)
+        return self.run_git("rev-parse", "HEAD")
+
+    def assert_original_bundle(self, revision=None):
+        revision = revision or self.original
+        actual = prepare_eval.prepare_bundle(self.repo, revision, CASES)
+        expected = copy.deepcopy(self.expected)
+        expected["provenance"]["requested_revision"] = revision
+        self.assertEqual(actual, expected)
+        for source in actual["provenance"]["skill_files"]:
+            self.assertEqual(source["sha256"], hashlib.sha256(self.sources[source["path"]]).hexdigest())
+
+    def test_commit_replacement_cannot_change_pinned_prompts_or_hashes(self):
+        self.run_git("replace", self.original, self.replacement)
+        relative = next(iter(self.sources))
+        self.assertIn("REPLACEMENT", self.run_git("show", f"{self.original}:{relative}"))
+        self.assert_original_bundle()
+        self.assertEqual(self.run_git("replace", "--list"), self.original)
+        # A caller can still request the actual replacement commit explicitly.
+        actual = prepare_eval.prepare_bundle(self.repo, self.replacement, CASES)
+        self.assertEqual(actual["provenance"]["resolved_commit"], self.replacement)
+        self.assertIn("REPLACEMENT", actual["cases"][0]["model_prompt"])
+
+    def test_tree_replacement_cannot_change_pinned_prompts_or_hashes(self):
+        tree = self.run_git("rev-parse", f"{self.original}^{{tree}}")
+        other_tree = self.run_git("rev-parse", f"{self.replacement}^{{tree}}")
+        self.run_git("replace", tree, other_tree)
+        self.assertIn("REPLACEMENT", self.run_git("show", f"{self.original}:{next(iter(self.sources))}"))
+        self.assert_original_bundle()
+
+    def test_blob_replacements_cannot_change_either_skills_sources(self):
+        for relative in self.sources:
+            original = self.run_git("rev-parse", f"{self.original}:{relative}")
+            replacement = self.run_git("rev-parse", f"{self.replacement}:{relative}")
+            self.run_git("replace", original, replacement)
+        self.assertIn("REPLACEMENT", self.run_git("show", f"{self.original}:{next(iter(self.sources))}"))
+        self.assert_original_bundle()
+
+    def test_replaced_parent_history_cannot_change_revision_resolution(self):
+        # Replace the second commit with the root commit. Normal HEAD^ then fails,
+        # while raw history must still resolve to the original source commit.
+        self.run_git("replace", self.replacement, self.original)
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.run_git("rev-parse", "--verify", "HEAD^")
+        self.assert_original_bundle("HEAD^")
+
+    def test_custom_replacement_namespace_is_ignored_without_mutating_it(self):
+        os.environ["GIT_REPLACE_REF_BASE"] = "refs/evaluation-replacements/"
+        self.run_git("replace", self.original, self.replacement)
+        self.assertIn("REPLACEMENT", self.run_git("show", f"{self.original}:{next(iter(self.sources))}"))
+        self.assert_original_bundle()
+        self.assertEqual(self.run_git("rev-parse", f"refs/evaluation-replacements/{self.original}"), self.replacement)
+
+    def test_overlay_cannot_supply_a_file_absent_from_requested_commit(self):
+        relative = next(iter(self.sources))
+        (self.repo / relative).unlink()
+        missing = self.commit("Missing source")
+        self.run_git("replace", missing, self.original)
+        self.assertIn("Original", self.run_git("show", f"{missing}:{relative}"))
+        with self.assertRaises(ValueError):
+            prepare_eval.prepare_bundle(self.repo, missing, CASES)
+
+    def test_cli_ignores_replacements_and_preserves_overlay(self):
+        self.run_git("replace", self.original, self.replacement)
+        output = Path(self.directory.name) / "bundle.json"
+        result = subprocess.run(
+            [sys.executable, str(HERE / "prepare_eval.py"), "--repo", str(self.repo),
+             "--revision", self.original, "--output", str(output)],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(output.read_text()), self.expected)
+        self.assertEqual(self.run_git("replace", "--list"), self.original)
 
 
 if __name__ == "__main__":
