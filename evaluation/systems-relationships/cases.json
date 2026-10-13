@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "reference_group": "systems",
+  "instructions": "Return a renderer-neutral brief or material findings as requested, in no more than 160 words. Do not edit files or search external sources. Use only the supplied source facts; these are written briefs, not actual renderings.",
+  "review_instructions": [
+    "Review each response semantically against its case. Accept equivalent source-faithful structures, labels, and minimal repairs; do not grade by keywords, require a graph schema, or prescribe a particular diagram notation.",
+    "Record pass only when every acceptance criterion is materially satisfied and no material failure criterion applies. Record fail for an established omission or error, or unclear when judgment is unreliable. Retain response evidence and explain the judgment; this harness does not score responses.",
+    "Reconstruct consequential endpoints, directions, relationship types, conditions, and outcomes before judging presentation. Distinguish necessary prerequisites from sufficient alternatives and complete rules from selected examples. A missing rule or record is not permission to invent it.",
+    "Preserve distinctions between waiting counts, active work, simultaneous capacity, observed processing rates, and established causes of waiting. Preserve failed, deliberately bypassed, not-reached, and unknown execution outcomes. A retry or resume destination must follow the source rather than a presumed restart convention.",
+    "Review partial evidence cautiously: a claim not verified by an incomplete source is not thereby disproved. Positive controls should not acquire queues, branches, internal machinery, or redesigned notation that the task and evidence do not require. Preserving an unchanged valid feature may satisfy a criterion implicitly.",
+    "Honor the 160-word answer limit and the task's scope. No rendering or reader study is supplied, so do not certify actual routing, geometry, legibility, accessibility conformance, or measured comprehension. Do not treat hypothetical confusion as an observed result.",
+    "Keep these instructions and per-case rubrics out of model input. Submit only one selected model_prompt in a fresh context. Retain the exact response, suite and case ID, model/version, settings, tools, date, and bundle provenance for manual comparison."
+  ],
+  "cases": [
+    {
+      "id": "P1",
+      "title": "Waiting count, simultaneous capacity, and observed rate answer different questions",
+      "skill": "design-visual-explanation",
+      "task_prompt": "An invented film-digitization desk reports at 09:00: 9 reels waiting and 2 reels being scanned. Its three stations allow at most 3 reels to be scanned simultaneously. During 08:00–09:00 it completed 12 reels. No service durations, scheduling rules, or diagnosed reason for the current wait are supplied. The reader asks what is waiting, what is active, what capacity and recent throughput mean, and whether these facts explain the delay. Give a compact static brief retaining these distinctions.",
+      "acceptance_criteria": [
+        "Keep the 09:00 snapshot's 9 waiting reels separate from its 2 actively scanned reels; do not describe all 11 as queued or served.",
+        "Identify capacity as at most 3 simultaneous scans, distinct from the 12 completions during 08:00–09:00 or the equivalent observed 12 reels/hour for that interval.",
+        "Make the waiting, active work, and station capacity recoverable in the proposed structure while leaving the cause and duration of the current delay unresolved. Do not treat the observed rate as a future service guarantee."
+      ],
+      "material_failure_criteria": [
+        "Turn three stations into a three-reels-per-hour rate, describe all stations as occupied, merge waiting and active counts, or omit a requested quantity's consequential unit or observation period.",
+        "Assert overload, a particular wait duration, a service order, a staffing cause, or a fixed future completion rate from these facts alone."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "A connectivity map does not need an invented queue",
+      "skill": "review-visual-explanation",
+      "task_prompt": "The source establishes that a rooftop rain gauge and a courtyard rain gauge each send readings to relay R. It supplies no arrival rates, waiting records, capacity, or scheduling facts. The reader asks only which devices send readings to R. A brief names all three devices and gives each gauge an arrow to R labeled 'sends readings'. Its title is 'Reading connections'; it makes no congestion, timing, or causal claim. Report only material defects in this brief.",
+      "acceptance_criteria": [
+        "Report no established material defect: the two correctly directed, labeled transfers answer the requested connectivity question.",
+        "Do not demand queue slots, a service lane, capacity labels, or a waiting explanation solely because two arrows converge on R.",
+        "Keep acceptance limited to the specified content and relationships; do not infer overload or certify an unseen rendering."
+      ],
+      "material_failure_criteria": [
+        "Report a missing queue or scheduling model as an established defect despite the limited task and evidence, or infer congestion from the converging arrows.",
+        "Reverse the transfer direction, demand causal notation for the explicitly labeled transfers, or claim observed visual defects or rendering quality without a rendering."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Aligned execution records retain four distinct non-pass outcomes",
+      "skill": "design-visual-explanation",
+      "task_prompt": "Two festival submission runs use the same ordered checks: file-open, running-time, captions, packaging. Run A: file-open passed; running-time failed; the run stopped, so captions and packaging were not reached. Run B: file-open passed; running-time was deliberately bypassed under a documented commissioned-work rule; the captions result is unknown because its record is missing; packaging passed. The reader wants each recorded outcome and the earliest established difference between the runs. Give a compact comparison brief. No causal analysis or final acceptance decision is supplied.",
+      "acceptance_criteria": [
+        "Align the same four checks across A and B while preserving both file-open passes and B's packaging pass.",
+        "Distinguish A's evaluated running-time failure, B's deliberate running-time bypass, A's two not-reached checks after its stop, and B's unknown captions result. Equivalent concise labels are acceptable.",
+        "Identify running-time as the earliest established difference, after matching file-open passes, without converting that ordering into an unsupported causal explanation or final acceptance decision."
+      ],
+      "material_failure_criteria": [
+        "Collapse failed, bypassed, not reached, or unknown into one outcome; mark A's later checks as failed; or infer B's captions result from its packaging pass.",
+        "Misidentify the earliest established difference, erase the shared check identities, or claim the records prove a causal explanation or overall acceptance."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "A partial log leaves a claimed failure unverified rather than disproved",
+      "skill": "review-visual-explanation",
+      "task_prompt": "A sensor-startup brief states 'Boot passed; radio self-test failed'. The only supplied source is explicitly a partial log: it records the boot pass but has no radio self-test entry. The source does not say whether the radio test ran, was skipped, or failed, and no complete log is available. The reader needs an evidence-based review of those two outcome claims. Give supported findings, verification limits, and the smallest next step; do not invent a corrected test outcome.",
+      "acceptance_criteria": [
+        "Retain the source-supported boot pass and identify the radio-failure claim as unverified by the partial log, not as an established false outcome.",
+        "Do not infer failed, passed, deliberately skipped, or not reached from the missing radio entry, and do not force a replacement actual outcome merely because evidence is incomplete.",
+        "Name the need for a complete radio-test record or equivalent direct evidence to resolve the claim. A qualification of its current verification status is acceptable without redesigning the brief."
+      ],
+      "material_failure_criteria": [
+        "Certify the radio failure from the blank record, declare it disproved, or assert the test was skipped or not reached.",
+        "Require deleting or replacing the radio outcome as an established correction without additional evidence, or overlook the consequential verification limit entirely."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Connection recovery resumes a saved position rather than restarting preparation",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A podcast upload starts with file preparation, then Sending. If the connection drops during Sending, the upload enters Paused and retains its last acknowledged chunk. Reconnection resumes Sending at the next unacknowledged chunk; preparation and acknowledged chunks are not repeated. A user cancellation from Sending or Paused enters Cancelled with no resume. Completed is entered only when every chunk is acknowledged. Give a state-oriented brief helping a producer distinguish a resumable interruption, cancellation, and completion. No durations or automatic timeout behavior are supplied.",
+      "acceptance_criteria": [
+        "Preserve Sending to Paused on connection loss and Paused back to Sending on reconnection, with the saved-position rule: continue at the next unacknowledged chunk without rerunning preparation or acknowledged chunks.",
+        "Keep cancellation from either Sending or Paused distinct from pause, leading to non-resumable Cancelled rather than back into Sending.",
+        "Preserve the all-chunks-acknowledged condition for Completed and suggest a structure that distinguishes these possible transitions rather than only one successful history."
+      ],
+      "material_failure_criteria": [
+        "Turn reconnection into a restart from preparation or the first chunk, lose the resume trigger or destination, or invent a timeout/retry limit.",
+        "Treat cancellation as a resumable pause, treat interruption as completion, or make Completed unconditional upon reconnecting or merely sending the last chunk."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Repair the retry destination without replacing the valid workflow",
+      "skill": "review-visual-explanation",
+      "task_prompt": "An animation job loads assets, composes the scene, then renders tiles. Source policy: after a temporary render interruption, Retry resumes rendering at the first unfinished tile and retains loaded assets, scene composition, and finished tiles. A brief correctly labels that normal sequence and a 'Temporarily interrupted' state, but its Retry arrow returns to 'Load assets' and is labeled 'Restart whole job'. The reader needs to know what work Retry repeats. Give material findings and the smallest repair.",
+      "acceptance_criteria": [
+        "Locate the mismatch in both Retry's return endpoint and its whole-job restart label, which contradict the source's retained work and tile-level continuation.",
+        "Redirect Retry to tile rendering at the first unfinished tile and replace the restart claim with a continuation label that preserves assets, composition, and finished tiles.",
+        "Retain the valid normal sequence and interruption state; a wholesale workflow redesign or a different symbol system is not required."
+      ],
+      "material_failure_criteria": [
+        "Accept the restart route, repair only the label while leaving the wrong endpoint, or repair only the endpoint while retaining the false whole-job restart claim.",
+        "Rerun loading, composition, or finished tiles; invent additional recovery rules; or demand unsupported geometry or notation changes instead of the source-backed relational repair."
+      ]
+    },
+    {
+      "id": "P7",
+      "title": "Necessary gates remain distinct from sufficient alternatives inside one gate",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A radio feed may go on air only if both a producer release and engineering clearance are present. For this procedure, engineering clearance is granted when at least one of a signed equipment checklist or a recorded technician confirmation exists, and withheld when neither exists. Meeting the two on-air prerequisites does not guarantee transmission; scheduling decisions are unspecified. Give a brief that lets readers answer whether one clearance document is enough, whether clearance alone permits transmission, and whether meeting all stated prerequisites guarantees going on air.",
+      "acceptance_criteria": [
+        "Preserve the two necessary on-air prerequisites together: producer release and engineering clearance. Clearance alone does not remove the release requirement.",
+        "Represent the clearance subrule as inclusive alternatives: either listed document suffices, both are allowed, and neither means clearance is withheld. Do not require both documents or treat them as mutually exclusive.",
+        "Keep the only-if restriction distinct from a sufficient on-air rule: meeting both prerequisites does not guarantee transmission, and no scheduling decision or extra operational branch is invented."
+      ],
+      "material_failure_criteria": [
+        "Replace all-required prerequisites with a choice, replace sufficient clearance alternatives with an all-required pair or exclusive choice, or say clearance alone authorizes going on air.",
+        "Make satisfaction of the stated prerequisites an unconditional transmission outcome, reverse the only-if implication, or fabricate a scheduling rule."
+      ]
+    },
+    {
+      "id": "P8",
+      "title": "A deposit exemption does not waive the remaining checkout prerequisite",
+      "skill": "review-visual-explanation",
+      "task_prompt": "An equipment library supplies a complete eligibility rule: camera checkout is eligible exactly when membership is current and the deposit condition is met. Paying the deposit meets that condition; a partner-organization affiliation waives only the deposit. A brief correctly routes ordinary applicants through current membership and paid deposit, but routes anyone with partner affiliation directly to 'Eligible', bypassing membership. Reader asks whether a partner with expired membership is eligible. Give material findings and the smallest source-backed repair.",
+      "acceptance_criteria": [
+        "Identify that the partner route wrongly extends a deposit-only exemption to the independent current-membership prerequisite; a partner with expired membership is not eligible.",
+        "Repair the partner route so affiliation satisfies or bypasses only the deposit condition while current membership is still required before Eligible.",
+        "Preserve the valid ordinary route and the supported deposit waiver. Any equivalent compact structure retaining current membership AND either payment or partner waiver is acceptable."
+      ],
+      "material_failure_criteria": [
+        "Accept direct eligibility for an expired-member partner, remove the membership requirement, or make partner affiliation waive all requirements.",
+        "Repair by demanding a deposit from partners despite the source's waiver, alter the valid ordinary eligibility rule, or invent additional requirements."
+      ]
+    },
+    {
+      "id": "P9",
+      "title": "An expanded component keeps its identity and cross-boundary transfers",
+      "skill": "design-visual-explanation",
+      "task_prompt": "A community heat-monitoring overview has Sensor field sending readings to Collector C7, which sends batches to University store. C7's relevant internal path is Receiver R2 receiving those field readings, R2 passing them to Buffer B5, and B5 sending the batches to University store. The C7 boundary denotes a logical component, not a physical location or ownership claim; the source does not inventory other internals. Give an overview-plus-detail brief that lets a maintainer expand C7 and trace the same incoming and outgoing transfers without changing entity identities.",
+      "acceptance_criteria": [
+        "Keep the overview's Sensor field to Collector C7 to University store transfers and explicitly identify the detailed component as that same Collector C7.",
+        "Make the detailed path recoverable as Sensor field to Receiver R2 to Buffer B5 to University store, with R2 and B5 inside the C7 logical boundary and the field and store outside it.",
+        "Preserve the external endpoints and transfer directions across abstraction levels without treating C7 and its expansion as different collectors, inferring ownership or physical location, or claiming the selected internals are exhaustive."
+      ],
+      "material_failure_criteria": [
+        "Lose the identity link between C7 and its detail, introduce a second collector, move the external store into C7, or change a consequential transfer endpoint or direction.",
+        "Bypass R2 or B5 in the detailed transfer path, turn the logical boundary into an unsupported ownership or location assertion, or invent a complete internal inventory."
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Selected valid histories are not a complete routing policy",
+      "skill": "review-visual-explanation",
+      "task_prompt": "A theater prop workshop source confirms two observed order histories: P had Cut bracket, Paint, Pack; Q had Cut bracket, Pack, with paint intentionally unnecessary for Q's bare finish. Other order histories exist, but no full routing policy is supplied. A training brief reproduces both histories accurately, labels arrows 'happened next', and prominently captions them 'Selected examples, not the full routing policy'. It makes no timing or causal claim. The reader is learning these two examples only. Report only material defects.",
+      "acceptance_criteria": [
+        "Report no established material defect: the brief preserves both supported histories, including Q's intentional absence of painting, within the explicitly limited reader task.",
+        "Respect the selected-examples caption; do not require all possible branches, exceptions, interruptions, or a complete policy model that the source does not provide.",
+        "Accept the labeled arrows as observed sequence rather than automatically alleging causation, mandatory painting, or an exhaustive set of allowed histories. Keep judgment limited to the described brief."
+      ],
+      "material_failure_criteria": [
+        "Demand painting in Q, add unprovided branches as mandatory repairs, or treat omitted histories as forbidden despite the clear non-exhaustive scope.",
+        "Claim the selected histories establish the complete policy or a causal mechanism, reject sequence arrows merely for being directional, or certify an unseen rendering."
+      ]
+    }
+  ]
+}
