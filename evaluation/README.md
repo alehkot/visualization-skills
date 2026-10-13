@@ -2,7 +2,7 @@
 
 These sources are kept outside `skills/` so either skill remains independently installable without evaluation dependencies. Curated suites are explicitly allowed by `.gitignore`; generated outputs and older local research remain ignored.
 
-All quantitative suites use the single [prompt preparer](close-bars/prepare_eval.py). Select a suite with `--cases`; its case manifest and rubrics remain separate. Case IDs are local to a suite: record `close-bars/P1` or `missing-data/P1` or `mix-effects/P1`, not an ambiguous `P1` when combining results.
+All suites use the single [prompt preparer](close-bars/prepare_eval.py). Select a suite with `--cases`; its case manifest and rubrics remain separate. Case IDs are local to a suite: record `close-bars/P1` or `missing-data/P1` or `mix-effects/P1` or `systems-relationships/P1`, not an ambiguous `P1` when combining results.
 
 ## Close-bar comparisons
 
@@ -26,11 +26,11 @@ A reviewer should grade each answer against the case's acceptance and material-f
 
 Record the bundle's resolved commit and content hashes, model/version if available, settings, tool access, run time, raw answer, and reviewer judgment. For comparison, report every case and both denominators rather than selecting favorable examples. Use repeated runs and blinded grading when estimating reliability; a single run is only a smoke check.
 
-The preparer supplies the selected skill entrypoint and quantitative reference inline. It therefore evaluates application of those instructions, not whether an agent autonomously discovers the right reference. The hashes identify the inputs, not a promise that a provider can replay identical outputs.
+The preparer supplies the selected skill entrypoint and the manifest-selected reference inline. It therefore evaluates application of those instructions, not whether an agent autonomously discovers the right reference. The hashes identify the inputs, not a promise that a provider can replay identical outputs.
 
 ### Continuous integration
 
-[Evaluation regressions](../.github/workflows/evaluations.yml) runs on every push and pull request using Python 3.12 on Ubuntu, with the existing pinned optional renderer installed. It invokes all three suite directories explicitly: root-level unittest discovery does not find these tests. It also runs the full rendering CLI, which fails when renderer dependencies are unavailable rather than silently accepting skipped rendering tests.
+[Evaluation regressions](../.github/workflows/evaluations.yml) runs on every push and pull request using Python 3.12 on Ubuntu, with the existing pinned optional renderer installed. It invokes all four suite directories explicitly: root-level unittest discovery does not find these tests. It also runs the full rendering CLI, which fails when renderer dependencies are unavailable rather than silently accepting skipped rendering tests.
 
 The job runs the same checks documented below. It does not run a model, grade written responses, install a skill in a separate agent, or establish reader comprehension. The gallery is generated in the runner's temporary directory; reproduce it locally to inspect the PNGs. Actions are pinned to full commit hashes, the token is read-only, checkout credentials are not persisted, and the job has a ten-minute timeout. No credentials or paid model service are required. This workflow does not configure branch protection or make itself a required check.
 
@@ -57,7 +57,7 @@ python3 evaluation/close-bars/prepare_eval.py --revision 42cbc37 --output evalua
 python3 evaluation/close-bars/prepare_eval.py --revision HEAD --output evaluation/close-bars/results/candidate.json
 ```
 
-`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the explicitly allowed, Git-ignored `evaluation/close-bars/results/`, `evaluation/missing-data/results/`, and `evaluation/mix-effects/results/` directories; an external directory is also allowed. Merely ignoring another repository directory does not allow output there.
+`42cbc37` is the pre-close-bar-guidance baseline; choose the appropriate baseline for a later change. The selected revision must be available in the local Git checkout; the preparer does not fetch history or fall back to working-tree skill files. Each bundle records the resolved skill commit and hashes of the skill files, local case manifest, and preparer. Cases/tooling come from the current checkout, not the selected skill revision. An existing bundle is never overwritten: use a new output filename for another run. Repository output is restricted to the explicitly allowed, Git-ignored `evaluation/close-bars/results/`, `evaluation/missing-data/results/`, `evaluation/mix-effects/results/`, and `evaluation/systems-relationships/results/` directories; an external directory is also allowed. Merely ignoring another repository directory does not allow output there.
 
 The JSON `cases` array contains `id` and `model_prompt`. Submit only that prompt in a fresh model context. The separate `rubric` object contains the review instructions and case criteria. No provider integration, credentials, paid API calls, or automatic semantic grading are included. Preserve the raw responses and per-criterion judgments alongside the bundle; do not quietly replace old runs.
 
@@ -132,6 +132,7 @@ Follow the model-evaluation protocol above: submit only one `model_prompt` per f
 python3 -m unittest discover -s evaluation/close-bars -p 'test_*.py' -v
 python3 -m unittest discover -s evaluation/missing-data -p 'test_*.py' -v
 python3 -m unittest discover -s evaluation/mix-effects -p 'test_*.py' -v
+python3 -m unittest discover -s evaluation/systems-relationships -p 'test_*.py' -v
 ```
 
 The first command includes optional close-bar rendering checks; inspect skips as described above. For standard-library-only checks, replace its pattern with `test_semantic.py`. The missing-data suite requires only Python's standard library and Git. Generated bundles, responses, scores, and reports belong in its ignored `results/` directory or outside the repository, never in either installable skill.
@@ -153,3 +154,30 @@ python3 -m unittest discover -s evaluation/mix-effects -p 'test_*.py' -v
 ```
 
 Choose explicit baseline and candidate revisions when comparing a later skill change, and use new output names. This suite adds no skill change and establishes no before/after model gain. Follow the fresh-context, rubric-withholding and raw-response retention protocol above. Tasks permit 160 words. No model is run or scored by the tests or CI: they check the manifest, its arithmetic fixtures, provenance, rubric separation, and output protections. The tasks are targeted smoke/regression probes, not held-out generalization, rendered-output, causal-inference, or human-comprehension evidence.
+
+
+## Systems and relationships
+
+The [systems-relationships manifest and rubrics](systems-relationships/cases.json) add ten original written tasks, evenly divided between design and review. They exercise existing systems guidance: waiting versus capacity and rate; failure, bypass, non-execution, and missing evidence; pause/resume and retry destinations; required versus sufficient conditions and scoped exceptions; and identity across overview/detail boundaries. Controls preserve adequate connectivity-only explanations and explicitly non-exhaustive examples rather than demanding invented behavior or every possible path.
+
+The research starting point was [diagram-design's semantic patterns](https://github.com/cathrynlavery/diagram-design/blob/41765070ace63009f23c741cedb0c81429710b4f/skills/diagram-design/references/semantic-patterns.md) and [behavior-before-layout routing](https://github.com/cathrynlavery/diagram-design/blob/41765070ace63009f23c741cedb0c81429710b4f/skills/diagram-design/SKILL.md), inspected at that pinned revision. This is practitioner inspiration for testing what a diagram asserts, not evidence that one prescribed drawing form improves understanding. The suite uses original scenarios and rubrics; no upstream text, code, or fixtures are incorporated. It does not adopt fixed item budgets, mandatory queues, or compulsory visual primitives. Existing skill guidance is unchanged.
+
+Prepare the same manifest against explicit baseline and candidate skill revisions:
+
+```sh
+python3 evaluation/close-bars/prepare_eval.py --revision HEAD --cases evaluation/systems-relationships/cases.json --output evaluation/systems-relationships/results/inputs.json
+python3 -m unittest discover -s evaluation/systems-relationships -p 'test_*.py' -v
+```
+
+Follow the fresh-context protocol above: submit only one model-facing prompt, withhold the rubric, retain raw answers, hold model/settings/tool access fixed, and report every case and unclear judgment. Tasks allow 160 words. This suite adds no model runner or diagram renderer. Unit tests check inputs, reference routing, pinned source hashes, rubric isolation, and output safety; they do not judge answers. Passing CI does not establish model compliance, skill improvement, rendered legibility, or reader comprehension. These cases are targeted smoke/regression probes, not held-out generalization evidence.
+
+### Manifest reference selection
+
+Existing schema-version-1 manifests retain their original quantitative references and unchanged model-facing prompts. Schema version 2 adds one required field, `reference_group`, with exactly two supported values:
+
+- `quantitative`: the design quantitative-explanations or review quantitative-review reference, as before.
+- `systems`: each selected skill's own systems-and-relationships reference.
+
+The systems suite uses version 2 and `systems`; routing does not depend on the manifest's filename or directory. No arbitrary paths are accepted. Each prompt still includes only its own skill entrypoint and one reference, read from the requested Git revision. An unknown group or a missing reference at that revision fails instead of falling back to local or quantitative text. The resolved commit and per-file hashes in the bundle identify the actual sources; case and preparer hashes identify the local tooling and manifest. Version 1 must not contain the new field, and version 2 must declare it explicitly.
+
+The output bundle format remains version 1: this manifest-version change does not change the bundle's structure. Only sources and their model-facing reference label vary for the systems group. Record suite-qualified case IDs when combining results. Store generated prompts, answers, and scores under the suite's ignored `results/` directory or outside the repository.

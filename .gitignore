@@ -17,6 +17,8 @@
 /evaluation/missing-data/results/
 !/evaluation/mix-effects/
 /evaluation/mix-effects/results/
+!/evaluation/systems-relationships/
+/evaluation/systems-relationships/results/
 
 # Keep generated files out of runtime folders too.
 __pycache__/
