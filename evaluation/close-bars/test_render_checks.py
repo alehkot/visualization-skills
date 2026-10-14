@@ -294,6 +294,132 @@ class RenderChecks(unittest.TestCase):
             result = generator(width, **options)
         return {issue['code'] for issue in result['issues']}
 
+    def test_endpoint_text_clipping_cannot_pass(self):
+        from matplotlib.transforms import Bbox
+        for generator in (fixtures.positive, fixtures.negative, fixtures.rounding, fixtures.dense):
+            for width in (360, 640):
+                for partial in (False, True):
+                    with self.subTest(fixture=generator.__name__, width=width, partial=partial):
+                        def mutate(arguments):
+                            fig = arguments['fig']
+                            fig.canvas.draw()
+                            for artist, *_ in arguments['labels']:
+                                box = artist.get_window_extent(fig.canvas.get_renderer())
+                                artist.set_clip_on(True)
+                                artist.set_clip_box(Bbox.from_extents(
+                                    box.x0, box.y0, box.x0 + box.width / 2, box.y1)
+                                    if partial else Bbox.from_bounds(0, 0, 1, 1))
+                        self.assertIn('text_clipped', self.codes_after_mutation(generator, mutate, width))
+
+    def test_clipping_required_category_context_delta_table_and_caption_is_detected(self):
+        from matplotlib.transforms import Bbox
+        targets = {
+            'category': (fixtures.positive, lambda a: a['fig'].axes[0].get_xticklabels()[0]),
+            'group': (fixtures.positive, lambda a: a['context'][0]),
+            'delta': (fixtures.positive, lambda a: a['deltas'][0][0]),
+            'table': (fixtures.dense, lambda a: a['table'][0][0][1]),
+            'legend': (fixtures.dense, lambda a: a['context'][0]),
+            'title': (fixtures.positive, lambda a: a['fig'].texts[0]),
+            'caption': (fixtures.negative, lambda a: a['fig'].texts[-1]),
+        }
+        for role, (generator, select) in targets.items():
+            for width in (360, 640):
+                with self.subTest(role=role, width=width):
+                    def mutate(arguments):
+                        artist = select(arguments)
+                        artist.set_clip_on(True)
+                        artist.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+                    self.assertIn('text_clipped', self.codes_after_mutation(generator, mutate, width))
+
+    def test_containing_or_inactive_text_clips_preserve_healthy_fixtures(self):
+        from matplotlib.patches import Circle
+        from matplotlib.transforms import Bbox
+        for generator in (fixtures.positive, fixtures.negative, fixtures.rounding, fixtures.dense):
+            for width in (360, 640):
+                for mode in ('containing', 'disabled_box', 'disabled_path'):
+                    with self.subTest(fixture=generator.__name__, width=width, mode=mode):
+                        def mutate(arguments):
+                            fig = arguments['fig']
+                            fig.canvas.draw()
+                            for artist in fig.findobj(match=fixtures.Text):
+                                box = artist.get_window_extent(fig.canvas.get_renderer())
+                                artist.set_clip_box(Bbox.from_extents(
+                                    box.x0 - 1, box.y0 - 1, box.x1 + 1, box.y1 + 1)
+                                    if mode == 'containing' else Bbox.from_bounds(0, 0, 1, 1))
+                                if mode == 'disabled_path':
+                                    artist.set_clip_path(Circle((0, 0), 1, transform=fig.transFigure))
+                                artist.set_clip_on(mode == 'containing')
+                        self.assertEqual(self.codes_after_mutation(generator, mutate, width), set())
+
+    def test_active_nonrectangular_text_clips_are_explicitly_unsupported(self):
+        from matplotlib.patches import Circle
+        for width in (360, 640):
+            def mutate(arguments):
+                artist = arguments['labels'][0][0]
+                artist.set_clip_path(Circle((0.5, 0.5), 2, transform=arguments['fig'].transFigure))
+                artist.set_clip_on(True)
+            with self.subTest(width=width):
+                self.assertIn('text_clip_path_unsupported',
+                              self.codes_after_mutation(fixtures.positive, mutate, width))
+
+    def test_clipped_away_labels_cannot_supply_phantom_text_collisions(self):
+        from matplotlib.transforms import Bbox
+        for width in (360, 640):
+            def mutate(arguments):
+                for artist, *_ in arguments['labels']:
+                    artist.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+                    artist.set_clip_on(True)
+            with self.subTest(width=width):
+                codes = self.codes_after_mutation(fixtures.dense, mutate, width, bad=True)
+                self.assertIn('text_clipped', codes)
+                self.assertNotIn('text_collision', codes)
+                self.assertNotIn('label_bar_collision', codes)
+                self.assertNotIn('label_uncertainty_collision', codes)
+
+    def test_invalid_active_text_clip_boxes_are_unsupported(self):
+        from matplotlib.transforms import Bbox
+        # Avoid asking the native renderer to draw malformed clip rectangles.
+        # These helper checks exercise the same validation used by the audit.
+        fig = fixtures.plt.figure()
+        try:
+            artist = fig.text(0.5, 0.5, 'Label')
+            fig.canvas.draw()
+            artist.set_clip_on(True)
+            for extents in ((10, 10, 0, 0), (0, 0, float('nan'), 1),
+                            (0, 0, float('inf'), 1)):
+                with self.subTest(extents=extents):
+                    artist.set_clip_box(Bbox.from_extents(*extents))
+                    self.assertIn('clip_box_unsupported',
+                                  fixtures.text_clipping_issues(artist, fig.canvas.get_renderer()))
+                    self.assertIsNone(fixtures.text_collision_bounds(
+                        artist, Bbox.from_bounds(0, 0, 10, 10), fig.bbox))
+        finally:
+            fixtures.plt.close(fig)
+
+    def test_text_collision_bounds_use_only_rectangular_visible_intersection(self):
+        from matplotlib.patches import Circle
+        from matplotlib.transforms import Bbox
+        fig = fixtures.plt.figure()
+        try:
+            artist = fig.text(0.5, 0.5, 'Label')
+            raw = Bbox.from_bounds(10, 10, 20, 20)
+            canvas = Bbox.from_bounds(0, 0, 25, 25)
+            artist.set_clip_box(Bbox.from_bounds(15, 5, 20, 15))
+            artist.set_clip_on(True)
+            self.assertEqual(tuple(fixtures.text_collision_bounds(artist, raw, canvas).extents),
+                             (15, 10, 25, 20))
+            artist.set_clip_box(Bbox.from_bounds(0, 0, 1, 1))
+            self.assertIsNone(fixtures.text_collision_bounds(artist, raw, canvas))
+            artist.set_clip_box(Bbox.from_bounds(10, 10, 0, 0))
+            self.assertIsNone(fixtures.text_collision_bounds(artist, raw, canvas))
+            artist.set_clip_path(Circle((0, 0), 1, transform=fig.transFigure))
+            self.assertIsNone(fixtures.text_collision_bounds(artist, raw, canvas))
+            artist.set_clip_on(False)
+            self.assertEqual(tuple(fixtures.text_collision_bounds(artist, raw, canvas).extents),
+                             (10, 10, 25, 25))
+        finally:
+            fixtures.plt.close(fig)
+
     def test_repaired_and_deliberately_bad_fixtures(self):
         expected_codes = {
             'rounding_bad': {'label_value_mismatch'},

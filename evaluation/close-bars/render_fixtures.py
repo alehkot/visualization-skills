@@ -167,7 +167,9 @@ def text_clipping_issues(artist, renderer):
     issues = []
     bounds = artist.get_window_extent(renderer)
     clip_box = artist.get_clip_box()
-    if clip_box is not None and not (
+    if clip_box is not None and not valid_text_clip_box(clip_box):
+        issues.append('clip_box_unsupported')
+    elif clip_box is not None and not (
             clip_box.x0 <= bounds.x0 + 0.5 and clip_box.y0 <= bounds.y0 + 0.5
             and clip_box.x1 >= bounds.x1 - 0.5 and clip_box.y1 >= bounds.y1 - 0.5):
         issues.append('clipped')
@@ -175,6 +177,29 @@ def text_clipping_issues(artist, renderer):
     if clip_path is not None:
         issues.append('clip_path_unsupported')
     return issues
+
+
+def valid_text_clip_box(box):
+    return (all(math.isfinite(float(value)) for value in box.extents)
+            and box.x0 <= box.x1 and box.y0 <= box.y1)
+
+
+def text_collision_bounds(artist, bounds, canvas):
+    """Conservative visible bounds, not a glyph-coverage or occlusion test."""
+    if artist.get_clip_on():
+        clip_path, _ = artist.get_transformed_clip_path_and_affine()
+        if clip_path is not None:
+            return None  # The audit rejects the path; do not invent visible ink.
+        clip_box = artist.get_clip_box()
+        if clip_box is not None:
+            if not valid_text_clip_box(clip_box):
+                return None
+            bounds = Bbox.intersection(bounds, clip_box)
+    if bounds is not None:
+        bounds = Bbox.intersection(bounds, canvas)
+    if bounds is None or bounds.width <= 0 or bounds.height <= 0:
+        return None
+    return bounds
 
 
 def numeric_axis_issues(axis, orientation, unit, visible_texts, renderer):
@@ -532,6 +557,8 @@ def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=Non
         issue('canvas_dimension_mismatch',{'actual':[W,H],'requested':[width,height]})
     # Rendered, raster-space text bounding boxes include ticks, titles, notes and tables.
     texts=[]
+    text_bounds={}
+    canvas=Bbox.from_bounds(0,0,W,H)
     # Matplotlib retains visible Text objects for out-of-range ticks it does not draw.
     # Exclude those from the raster-space audit rather than alleging off-canvas ink.
     undrawn_tick_labels=set()
@@ -543,7 +570,12 @@ def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=Non
     for t in fig.findobj(match=Text):
         if artist_visible(t) and t not in undrawn_tick_labels:
             box=t.get_window_extent(renderer)
-            texts.append((t,box))
+            for code in text_clipping_issues(t, renderer):
+                issue('text_'+code, {'text':t.get_text()})
+            visible_box=text_collision_bounds(t, box, canvas)
+            if visible_box is not None:
+                texts.append((t,visible_box))
+                text_bounds[t]=visible_box
             if box.x0 < -0.5 or box.y0 < -0.5 or box.x1 > W+0.5 or box.y1 > H+0.5:
                 issue('text_clipped',{'text':t.get_text(),'bbox':list(map(float,box.extents))})
             px=t.get_fontsize()*DPI/72
@@ -648,7 +680,8 @@ def audit(fig,name,width,height,kind,bars,labels,deltas=(),table=(),selected=Non
         issue(code, detail)
     for artist,source_value,unit,associated_bar in labels:
         if not artist_visible(artist): continue
-        lb=artist.get_window_extent(renderer)
+        lb=text_bounds.get(artist)
+        if lb is None: continue
         for ib in interval_rects:
             if rect_intersects(lb,ib): issue('label_uncertainty_collision',{'label':artist.get_text(),'source':source_value})
         # Outside labels must also avoid unrelated bars at the inspected size.
