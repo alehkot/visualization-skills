@@ -22,10 +22,17 @@ def validate_frontmatter(skill_dir: Path) -> None:
     if not path.exists():
         raise ValueError(f"{skill_dir}: missing SKILL.md")
     content = path.read_text(encoding="utf-8")
-    match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+    match = re.match(r"\A---[ \t]*\n(.*?)^---[ \t]*(?:\n|\Z)", content, re.DOTALL | re.MULTILINE)
     if not match:
-        raise ValueError(f"{path}: missing YAML frontmatter")
-    data = yaml.safe_load(match.group(1))
+        raise ValueError(f"{path}: YAML frontmatter must be enclosed by standalone --- lines")
+    try:
+        data = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as error:
+        # PyYAML marks are zero-based within the extracted YAML, after line 1.
+        mark = getattr(error, "problem_mark", None)
+        location = f"{path}:{mark.line + 2}:{mark.column + 1}" if mark else str(path)
+        problem = getattr(error, "problem", None) or str(error)
+        raise ValueError(f"{location}: invalid YAML frontmatter: {problem}") from error
     if not isinstance(data, dict):
         raise ValueError(f"{path}: frontmatter must be a mapping")
     for field in ("name", "description"):
