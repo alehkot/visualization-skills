@@ -42,6 +42,20 @@ If the comparison is left to estimation, suggest source-backed labels near the r
 
 On supplied renderings, check label association, collisions, clipping, and conflicts with uncertainty marks at the intended size. Selective labels or an associated table may avoid crowding. Do not claim placement or legibility defects from an unrendered brief.
 
+## Check histogram height against bin width
+
+For a numeric-axis histogram, inspect the bin boundaries, axis units, and stated meaning of height and area together. On linear axes, count density times bin width should recover the bin count; probability density times bin width should recover its share of the stated population. Unequal-width bins with raw count heights can distort an area-based distribution comparison. Distinguish a wrong geometry or density label from a correct count answering a different question.
+
+Do not reject a density merely because its height exceeds one or its heights do not sum to one. Check the areas and normalization population instead. Equal-width count histograms, clearly categorical interval-count bars, and count tables can be valid for their stated tasks. A wider interval can contain more observations while having lower average concentration per unit; neither fact establishes an individual-level pattern within that interval.
+
+When widths, counts, or the normalization population are unavailable, state the verification limit instead of inventing corrected heights. Do not repair grouped data by assuming how observations divide across new boundaries. Check excluded ranges and endpoint conventions where they affect the claim. For transformed axes, establish the variable and measure being represented before applying an area test; the linear-coordinate rule is not a screen-pixel test on logarithmic axes.
+
+## Worked example: more observations, lower concentration
+
+An invented source gives **10 arrivals in [0, 5) minutes** and **15 in [5, 20] minutes**. A brief specifies a linear-axis histogram with those widths, count heights **10 and 15**, and the headline “Arrivals are more concentrated per minute from 5 to 20 minutes.” The headline is contradicted by the grouped rates: **10/5 = 2** versus **15/15 = 1 arrival per minute**. For a density comparison, use those heights and name the vertical unit. Their areas recover counts **10 and 15**; the second interval still contains more arrivals overall.
+
+A control table headed “Arrivals in each interval” with **10 and 15**, and no concentration claim, needs no density repair. If only grouped counts are known without interval widths, the concentration comparison remains unverified. Without a rendering, inspect the specified numbers and mapping rather than claiming measured bar geometry.
+
 ## Check uncertainty and aggregation without inventing analysis
 
 Identify what an interval means before judging it: spread among observations, uncertainty about a parameter, or predicted future variation. The label should match the source. An unexplained range is not automatically a confidence interval; missing interval metadata is a verification limit unless the artifact makes a conflicting claim.
@@ -92,6 +106,8 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [NIST's histogram guidance](https://www.itl.nist.gov/div898/handbook/eda/section3/eda33e.htm) describes the normalization choices. [NumPy's histogram documentation](https://numpy.org/doc/stable/reference/generated/numpy.histogram.html) distinguishes density's unit integral from the sum of heights and documents explicit bin edges. These support the quantitative checks, not a universal plotting convention or a behavioral evaluation of this skill.
+
 - [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) evaluates missing-data displays and imputation in synthetic time-series tasks. The observed tradeoffs motivate checking what missingness communicates, not prescribing one universally superior encoding.
 - [D3’s line documentation](https://d3js.org/d3-shape/line#line_defined) explains how supplied undefined points can terminate segments; absent rows need separate consideration. This is implementation evidence, not an evaluation of this review skill.
 
@@ -101,4 +117,4 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall, close-bar, visitor, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, visitor, arrival-interval, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.

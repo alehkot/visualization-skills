@@ -43,6 +43,20 @@ Use consistent units and enough supported precision to preserve the relevant dis
 
 At the intended size, reserve room for labels without colliding with neighbors, uncertainty marks, or plot boundaries. For crowded displays, prefer selected comparison labels or an associated value table over tiny text. Preserve needed values in requested static and nonvisual versions. Broad-pattern tasks and displays with adequate associated values do not require every mark labeled.
 
+## Preserve histogram bin widths and density
+
+For a histogram on a linear numeric axis, retain the source's bin boundaries and say whether height represents count, share, or density. With unequal bin widths, raw count heights give wider intervals extra area unrelated to their counts. When area is meant to represent count or share, use count divided by bin width, or count divided by both the represented population size and bin width. Label the vertical units accordingly, such as “observations per minute” or “probability density per minute.” Density height is not the probability of that interval; height times width gives its count or share. A probability density can exceed one.
+
+Keep the distinction between “which interval contains more observations?” and “where are observations more concentrated per unit?” A table or equal-width categorical bars labeled with the original intervals can answer the first without claiming a continuous density shape. Equal-width count histograms are also legitimate. Do not prescribe density for every count comparison or treat these alternatives as defective merely because their heights are counts.
+
+Do not split supplied grouped counts into new bins without evidence for the split. Preserve endpoint inclusion, coverage, excluded observations, and the population used for normalization where relevant. Density calculations require positive finite widths, and probability normalization also requires a nonzero represented total; do not invent values for unknown or open-ended widths. The height-times-width check here assumes linear coordinates; transformed axes need an explicit account of which variable the density describes rather than a screen-area shortcut.
+
+## Worked example: equal counts, unequal intervals
+
+An invented record of **40 waits** reports **20 in [0, 10) minutes** and **20 in [10, 30] minutes**. Brackets include an endpoint and parentheses exclude it. For a numeric-axis histogram whose area represents count, use heights **2 and 1 observations per minute**, respectively. Each rectangle then has area 20. Probability-density heights are **0.05 and 0.025 per minute**, giving shares 0.5 and 0.5 after multiplying by widths 10 and 20. Equal count heights across these unequal widths would give the second interval twice the area despite equal counts.
+
+For “How many waits fell in each reported interval?”, a table showing **20 and 20** is sufficient. Do not invent the counts for 10–20 and 20–30 minutes to force equal-width bins. The grouped record does not reveal that split or the individual wait times.
+
 ## Preserve variation and uncertainty
 
 Determine whether an interval describes variation among observations, uncertainty about a parameter, or a range of future outcomes. These answer different questions. Name the interval type and level when supplied; otherwise retain the source's wording and flag the missing definition. Do not relabel an unexplained range as a confidence interval.
@@ -95,6 +109,8 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [NIST's histogram guidance](https://www.itl.nist.gov/div898/handbook/eda/section3/eda33e.htm) distinguishes count, relative-frequency, and area-normalized displays. [Matplotlib's histogram normalization examples](https://matplotlib.org/stable/gallery/statistics/histogram_normalization.html) illustrate the unequal-bin-width problem. These support the arithmetic and encoding distinction, not a measured improvement in this skill or a required renderer.
+
 - [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) studies missing-data and imputation displays in synthetic time-series averaging and trend tasks. It shows tradeoffs between interpretation and perceived data quality, not a universally best gap treatment or validation of these skills.
 - [Matplotlib’s missing-value example](https://matplotlib.org/stable/gallery/lines_bars_and_markers/masked_demo.html) illustrates that deleting points can leave a continuous line while masked values can break it. This implementation example motivates an explicit semantic handoff; it does not require that renderer or prove reader comprehension.
 
@@ -105,4 +121,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, inspection, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, wait-interval, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
