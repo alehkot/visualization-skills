@@ -7,7 +7,8 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def check_inventory() -> None:
+def check_inventory() -> frozenset[Path]:
+    """Validate the inventory and return its absolute, tracked file paths."""
     allowed = json.loads((ROOT / "public-files.json").read_text())
     if not isinstance(allowed, list) or len(allowed) != len(set(allowed)):
         raise ValueError("The bundle inventory must contain unique file paths")
@@ -38,3 +39,4 @@ def check_inventory() -> None:
             for n in range(1, len(relative.parts) + 1)
         ):
             raise ValueError(f"Expected an ordinary file without symlinks: {name}")
+    return frozenset((ROOT / name).resolve() for name in allowed)

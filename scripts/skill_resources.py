@@ -62,28 +62,42 @@ def markdown_links(text: str) -> list[str]:
     return result
 
 
-def validate_reference_resources(skill_dir: Path) -> None:
-    """Require direct entrypoint links, local targets, and valid anchors."""
+def validate_reference_resources(skill_dir: Path, bundle_files: frozenset[Path]) -> None:
+    """Require relative links to bundled resources and valid anchors."""
     root = skill_dir.resolve()
-    skill_md = skill_dir / "SKILL.md"
-    references = skill_dir / "references"
+    skill_md = root / "SKILL.md"
+    references = root / "references"
     paths = sorted(references.rglob("*.md")) if references.is_dir() else []
     for path in paths:
         if path.parent != references:
             raise ValueError(f"{path}: references must stay one level deep")
     linked: set[Path] = set()
     for path in [skill_md, *paths]:
+        if path not in bundle_files:
+            raise ValueError(f"{path}: resource is not in the tracked bundle inventory")
         for target in markdown_links(path.read_text(encoding="utf-8")):
             parts = urlsplit(target)
+            if parts.scheme == "file" or re.match(r"^[A-Za-z]:[/\\]", unquote(target)):
+                raise ValueError(f"{path}: local link {target!r} must use a relative path")
             if parts.scheme or parts.netloc:
                 continue
-            resolved = (
-                (path.parent / unquote(parts.path)).resolve() if parts.path else path.resolve()
-            )
+            local_path = Path(unquote(parts.path))
+            if local_path.is_absolute():
+                raise ValueError(f"{path}: local link {target!r} must use a relative path")
+            candidate = path.parent / local_path if parts.path else path
+            # Check the spelled path before resolving it: an unshipped symlink
+            # can otherwise make a local-only alias look like a bundled target.
+            if any(part.is_symlink() for part in (candidate, *candidate.parents)):
+                raise ValueError(f"{path}: local link {target!r} uses a symlink")
+            resolved = candidate.resolve()
             if not resolved.is_relative_to(root):
                 raise ValueError(f"{path}: link {target!r} escapes the standalone skill")
             if not resolved.is_file():
                 raise ValueError(f"{path}: broken local link {target!r}")
+            if resolved not in bundle_files:
+                raise ValueError(
+                    f"{path}: local link {target!r} is not in the tracked bundle inventory"
+                )
             if parts.fragment and resolved.suffix == ".md":
                 anchors = {h[3] for h in markdown_headings(resolved.read_text(encoding="utf-8"))}
                 if unquote(parts.fragment) not in anchors:

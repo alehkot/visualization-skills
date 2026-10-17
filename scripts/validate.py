@@ -39,8 +39,8 @@ def validate_frontmatter(skill_dir: Path) -> None:
         raise ValueError(f"{path}: description must be 1024 characters or fewer")
 
 
-def validate_markdown_references(skill_dir: Path) -> None:
-    validate_reference_resources(skill_dir)
+def validate_markdown_references(skill_dir: Path, bundle_files: frozenset[Path]) -> None:
+    validate_reference_resources(skill_dir, bundle_files)
 
 
 def validate_skill_files(skill_dir: Path) -> None:
@@ -55,7 +55,7 @@ def validate_skill_files(skill_dir: Path) -> None:
 
 
 def run_checks() -> int:
-    check_inventory()
+    bundle_files = check_inventory()
     skill_dirs = sorted(
         path for path in SKILLS_DIR.iterdir() if path.is_dir() and not path.name.startswith(".")
     )
@@ -64,7 +64,7 @@ def run_checks() -> int:
     for skill_dir in skill_dirs:
         validate_frontmatter(skill_dir)
         validate_skill_files(skill_dir)
-        validate_markdown_references(skill_dir)
+        validate_markdown_references(skill_dir, bundle_files)
     print(f"Validated {len(skill_dirs)} deployable skills.")
     return 0
 

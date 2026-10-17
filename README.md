@@ -25,3 +25,15 @@ uv run ruff check scripts tests
 ```
 
 The checker validates metadata, local resources, and the tracked bundle inventory. Update `public-files.json` deliberately when adding a distributable file.
+
+Local Markdown links must use relative paths to files inside the same skill and in
+the tracked inventory. An ignored or untracked file can exist in your workspace
+while being absent from a fresh checkout; it must not make the bundle check pass.
+When adding a resource, update the inventory and `.gitignore` allowlist, then stage
+the file before validating. Absolute filesystem paths (including rooted drive-letter
+paths), `file:` URLs, and symlink aliases are rejected so local-only paths cannot
+stand in for distributed resources.
+
+These are offline maintenance checks for the existing inline Markdown link syntax.
+They do not check remote URLs, implement every Markdown form, or measure the
+skills' explanation quality or reader comprehension.
