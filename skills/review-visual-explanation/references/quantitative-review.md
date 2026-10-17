@@ -34,6 +34,20 @@ A nonzero origin can distort magnitude bars even when the tick labels are correc
 
 A break, inset, transformation, or schematic view needs enough disclosure to support its intended use. Disclosure is not a universal cure: a small footnote cannot make a prominently false ratio true.
 
+## Check the inference across independent axes
+
+Identify which series uses each axis, its units and range, and whether the axes are independent or linked by a fixed conversion. Correctly plotted points on their own axes can still invite an invalid cross-series comparison. Check a claim of equality, overtaking, relative magnitude, or faster growth against the actual values and intended measure of change, not screen height, crossings, or line angle. Independent ranges can change those visual relationships. Positive linear rescaling does not change the underlying correlation coefficient; visual overlap alone is not a statistical or causal analysis.
+
+Tie a finding to the affected claim or required reader judgment rather than rejecting every second axis. A shared scale may repair comparable magnitudes; separate aligned panels may preserve timing for distinct quantities. A common-base index can answer relative change if its baseline and ratio interpretation are valid, but cannot preserve the original magnitude question. Explicit units and series-to-axis labels help association; they do not make a contradicted headline true.
+
+Accept a correctly linked conversion axis, such as Celsius/Fahrenheit, when corresponding values occupy the same positions. An independent-axis display scoped to timing can also be legitimate without claims about cross-series height or slope. If source values or axis mappings are unavailable, state what cannot be checked; do not invent ranges or report measured geometry from an unrendered brief.
+
+## Worked example: correct points, false overtaking
+
+An invented brief supplies **A: 40 then 60 orders**, **B: 900 then 700 orders**, linear axes **0–100 for A** and **0–2,000 for B**, and the headline “A overtook B.” The specified fractional heights are **0.40 → 0.60** for A and **0.45 → 0.35** for B. Their connecting segments cross, but **40 < 900** and **60 < 700**: the headline is contradicted at the supplied observations. With B's maximum instead **1,000**, its heights are **0.90 → 0.70** and the segments no longer cross. Identify the scale-dependent inference; do not claim the underlying observations or correlation changed.
+
+A repair can use a shared order scale and source-backed values for the magnitude comparison. The control claim “A rose while B fell” is supported by these two observations. Neither version establishes intermediate-month values. Another control is one temperature series with correctly matched **0–100°C** and **32–212°F** scales, including **50°C = 122°F**. Its second axis is a conversion, not an independent-scale defect. With no rendering, these are checks of the supplied specification, not evidence of actual tick placement or legibility.
+
 ## Check whether a close comparison can be read
 
 For values or small differences the task requires, check whether labels, ticks, or associated content let the reader recover them. Coarse ticks and absent direct labels are not intrinsically defective: broad-pattern reading or an adequate table may need no repair.
@@ -127,6 +141,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [ONS's dual-axis critique](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) motivates checking claims separately from faithful point plotting. [Datawrapper's guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses alternatives and valid uses; [Matplotlib's secondary-axis examples](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) show linked conversions. These are guidance and implementation examples, not a behavioral evaluation of this reviewer. The order-series and temperature controls are original arithmetic illustrations.
 
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) motivates keeping association reversal separate from causal interpretation. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates explicitly weighted standardization. The support-record example is original; these sources do not validate this reviewer or make disaggregation a universal repair.
 

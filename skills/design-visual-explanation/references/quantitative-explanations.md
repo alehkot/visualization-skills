@@ -35,6 +35,20 @@ When bar length encodes magnitude, define a meaningful zero baseline. A truncate
 
 Do not use area, volume, or width casually for emphasis when it also appears to encode a number. If area carries value, doubling a symbol's radius quadruples its area. A qualitative flow should not acquire unsupported quantitative widths. Keep decorative emphasis separate from measured magnitude.
 
+## Keep independent axes from implying a common comparison
+
+Before overlaying quantities, identify each series' unit and axis. Independently chosen ranges can change which line appears higher, where connecting segments cross, and their apparent slopes without changing the data. Do not use those screen relationships to establish equality, overtaking, relative magnitude, or faster growth. Define whether growth means an absolute change or a relative change over the same period, and calculate it from compatible values.
+
+Match the repair to the question: a shared scale for comparable magnitudes, aligned separate panels for distinct quantities, or a stated common-base index for relative change. An index removes original magnitude information; retain the base period and do not index a zero baseline or a measure for which ratios have no useful meaning. Do not silently change the question to make the lines comparable.
+
+A secondary axis can be legitimate. A fixed unit conversion of one measure, such as Celsius to Fahrenheit, must map corresponding values to the same positions across the displayed range. For independent quantities retained to show timing, make series-to-axis association and units explicit and keep the conclusion within that task. Merely adding axis labels does not repair a false magnitude headline. Visual alignment alone establishes neither a statistical association nor causation; changing a positive linear display scale does not change the data's correlation coefficient.
+
+## Worked example: a crossover made by the scale
+
+An invented record gives **A: 40 then 60 orders** and **B: 900 then 700 orders**, over the same two months. With linear ranges **0–100 for A** and **0–1,000 for B**, their fractional heights above the bottom are **0.40 → 0.60** and **0.90 → 0.70**. Change only B's range to **0–2,000** and its heights become **0.45 → 0.35**: the connecting segments now cross, although A has fewer orders at both observations. Do not headline this “A overtook B.” A shared order scale or an explicit value comparison preserves the magnitude question; “A rose while B fell” describes the recorded changes. The segments do not establish what happened between the observations.
+
+As a control, one temperature series with matched **0–100°C** and **32–212°F** axes has a fixed conversion, **°F = 1.8 × °C + 32**. Corresponding ticks, including **50°C = 122°F**, occupy the same positions. This is not two independently scaled series and does not need to be rejected for having a second axis.
+
 ## Make close comparisons readable
 
 When close bars and coarse ticks leave needed values or differences to estimation, specify source-backed labels near the relevant bar ends, clearly associated with category and series. Keep the zero baseline for magnitude bars; finer ticks alone may not resolve the task.
@@ -133,6 +147,8 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [ONS's dual-axis examples](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) demonstrate misleading magnitude and growth readings. [Datawrapper's dual-axis guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses task-sensitive alternatives and legitimate uses. [Matplotlib's secondary-axis documentation](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) distinguishes linked conversions from independent scales. These motivate the checks; they do not evaluate this skill or require a plotting library.
+
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) separates association reversal from causal interpretation; it does not license automatic subgroup adjustment. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates a common reference distribution and why standardized rates must be distinguished from observed rates. The delivery example is an original arithmetic illustration, not a causal or reader-comprehension study.
 
 - [NIST's histogram guidance](https://www.itl.nist.gov/div898/handbook/eda/section3/eda33e.htm) distinguishes count, relative-frequency, and area-normalized displays. [Matplotlib's histogram normalization examples](https://matplotlib.org/stable/gallery/statistics/histogram_normalization.html) illustrate the unequal-bin-width problem. These support the arithmetic and encoding distinction, not a measured improvement in this skill or a required renderer.
@@ -147,4 +163,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, inspection, delivery, wait-interval, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, delivery, wait-interval, daily-record, order-series, and temperature examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
