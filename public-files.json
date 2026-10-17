@@ -23,6 +23,7 @@
   "skills/review-visual-explanation/references/illustration-review.md",
   "skills/review-visual-explanation/references/quantitative-review.md",
   "skills/review-visual-explanation/references/systems-and-relationships.md",
+  "tests/test_frontmatter.py",
   "tests/test_inventory.py",
   "tests/test_resource_inventory.py",
   "uv.lock"
