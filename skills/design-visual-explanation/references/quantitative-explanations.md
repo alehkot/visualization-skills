@@ -43,6 +43,30 @@ Use consistent units and enough supported precision to preserve the relevant dis
 
 At the intended size, reserve room for labels without colliding with neighbors, uncertainty marks, or plot boundaries. For crowded displays, prefer selected comparison labels or an associated value table over tiny text. Preserve needed values in requested static and nonvisual versions. Broad-pattern tasks and displays with adequate associated values do not require every mark labeled.
 
+## Separate subgroup performance from population mix
+
+When a comparison could depend on changing subgroup composition, keep three questions separate: what happened across the observed population, what happened within comparable subgroups, and what a comparison under a specified common mix would show. A higher overall rate need not mean higher rates in each subgroup; a subgroup advantage need not imply a higher observed overall rate.
+
+For compatible, mutually exclusive groups covering the stated population, recover the overall proportion as total events divided by total eligible observations. Retain supplied subgroup numerators and denominators alongside their percentages. The denominator shares are the weights; an unweighted mean of subgroup percentages answers a different question unless the denominators are equal. Check that group definitions and coverage match across the compared periods or options. Compatible subgroup proportions and their denominator shares can also determine the pooled proportion without absolute counts. Overlapping groups, missing weights, or rounded rates alone may prevent reconstructing a precise total.
+
+When the task needs the explanation for an aggregate/subgroup disagreement, align the same subgroup rows across the compared options, retain their counts and rates, and show the overall row separately. Make unequal denominator shares visible with labeled counts, a companion composition view, or another explicit cue. Do not silently replace the reported overall rate with the average subgroup rate. A correctly scoped overall summary remains valid for its own question; do not force subgroup detail into every summary.
+
+A common-mix comparison is optional and requires stated, justified weights applied to the same groups on both sides. Label it as standardized to that mix, distinct from observed totals. Do not invent a missing subgroup rate or give an empty subgroup a zero rate. A numerical reversal does not establish cause, and splitting by more variables is not automatically a better causal analysis. Explain the descriptive pattern; defer causal attribution when the source does not justify the grouping or adjustment.
+
+## Worked example: higher in each group, lower overall
+
+An invented delivery record compares two services during the same period. “On time” uses the same definition, and the two route groups partition each service's deliveries.
+
+| Route group | Service A on time / deliveries | Service B on time / deliveries |
+| --- | ---: | ---: |
+| Local | 9/10 = 90% | 80/100 = 80% |
+| Remote | 60/100 = 60% | 5/10 = 50% |
+| Overall | 69/110 ≈ 62.7% | 85/110 ≈ 77.3% |
+
+A has the higher rate in both route groups, but most of A's deliveries are remote while most of B's are local. For “Why do the rankings disagree?”, propose aligned subgroup rows with the counts above, plus an overall row and the contrasting route mix. The overall percentages are weighted by **10/110 and 100/110** for A, in the opposite order for B. Averaging the two subgroup rates would give **75% and 65%**, not the observed overall percentages.
+
+For a specifically requested illustrative 50/50 local/remote mix, those **75% and 65%** are valid standardized comparisons; label the assumed mix rather than claiming either was observed. For “What share of each service's actual deliveries arrived on time?”, **62.7% versus 77.3%** is the relevant descriptive answer. Neither view alone proves that changing service would cause a delivery to be on time.
+
 ## Preserve histogram bin widths and density
 
 For a histogram on a linear numeric axis, retain the source's bin boundaries and say whether height represents count, share, or density. With unequal bin widths, raw count heights give wider intervals extra area unrelated to their counts. When area is meant to represent count or share, use count divided by bin width, or count divided by both the represented population size and bin width. Label the vertical units accordingly, such as “observations per minute” or “probability density per minute.” Density height is not the probability of that interval; height times width gives its count or share. A probability density can exceed one.
@@ -109,6 +133,8 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) separates association reversal from causal interpretation; it does not license automatic subgroup adjustment. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates a common reference distribution and why standardized rates must be distinguished from observed rates. The delivery example is an original arithmetic illustration, not a causal or reader-comprehension study.
+
 - [NIST's histogram guidance](https://www.itl.nist.gov/div898/handbook/eda/section3/eda33e.htm) distinguishes count, relative-frequency, and area-normalized displays. [Matplotlib's histogram normalization examples](https://matplotlib.org/stable/gallery/statistics/histogram_normalization.html) illustrate the unequal-bin-width problem. These support the arithmetic and encoding distinction, not a measured improvement in this skill or a required renderer.
 
 - [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) studies missing-data and imputation displays in synthetic time-series averaging and trend tasks. It shows tradeoffs between interpretation and perceived data quality, not a universally best gap treatment or validation of these skills.
@@ -121,4 +147,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, inspection, wait-interval, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, delivery, wait-interval, and daily-record examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.

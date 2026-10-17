@@ -42,6 +42,28 @@ If the comparison is left to estimation, suggest source-backed labels near the r
 
 On supplied renderings, check label association, collisions, clipping, and conflicts with uncertainty marks at the intended size. Selective labels or an associated table may avoid crowding. Do not claim placement or legibility defects from an unrendered brief.
 
+## Check subgroup comparisons and the overall mix
+
+When the headline crosses between overall and subgroup rates, compare like-defined groups and recover the reported overall proportions where compatible counts, or subgroup proportions with denominator shares, permit it. For mutually exclusive groups covering the stated population, the overall proportion is the sum of events divided by the sum of eligible observations. Its weights are denominator shares, not equal weights by default. Check excluded groups, overlapping membership, changed definitions, and incompatible periods before declaring a total wrong.
+
+Inspect both subgroup rates and their denominator shares when explaining an aggregate/subgroup reversal. A true overall increase can coexist with decreases in every subgroup; a truthful overall summary is not an arithmetic error just because its subgroup ranking differs. Flag the unsupported leap, such as “each group improved” or “the service caused the improvement,” rather than replacing a correct total or requiring disaggregation for an unrelated lookup task.
+
+For a common-mix comparison, verify that both sides use the same stated, justified weights and that the chart distinguishes standardized values from observed rates. Missing required weights or subgroup rates are verification limits, not permission to invent weights, impute an empty group's rate as zero, or calculate a precise replacement from rounded labels. A reversal alone does not determine which grouping supports a causal claim. Do not prescribe automatic adjustment for every available variable.
+
+## Worked example: an increase that no subgroup shares
+
+An invented support record uses the same two exhaustive request types and the same resolution definition in both weeks:
+
+| Request type | Week 1 resolved / requests | Week 2 resolved / requests |
+| --- | ---: | ---: |
+| Routine | 9/10 = 90% | 80/100 = 80% |
+| Complex | 60/100 = 60% | 5/10 = 50% |
+| Overall | 69/110 ≈ 62.7% | 85/110 ≈ 77.3% |
+
+A brief labels the overall rates correctly but headlines them “Resolution improved for both request types.” That headline is contradicted: both type-specific rates fell by **10 percentage points**, while the mix shifted toward routine requests. A repair preserves the actual overall increase, aligns the two request-type rows and their denominators, and states the distinction. Without a rendering, do not claim measured mark or layout defects.
+
+A control headline, “A larger share of this week's actual requests was resolved,” with the correct overall values and no subgroup or causal claim, is supported. If the request is to compare at a stated illustrative 50/50 mix, **75% then 65%** is valid only as a separately labeled standardized comparison. If only the overall rates are supplied, a reversal within subgroups is not established and must not be invented.
+
 ## Check histogram height against bin width
 
 For a numeric-axis histogram, inspect the bin boundaries, axis units, and stated meaning of height and area together. On linear axes, count density times bin width should recover the bin count; probability density times bin width should recover its share of the stated population. Unequal-width bins with raw count heights can distort an area-based distribution comparison. Distinguish a wrong geometry or density label from a correct count answering a different question.
@@ -106,6 +128,8 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) motivates keeping association reversal separate from causal interpretation. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates explicitly weighted standardization. The support-record example is original; these sources do not validate this reviewer or make disaggregation a universal repair.
+
 - [NIST's histogram guidance](https://www.itl.nist.gov/div898/handbook/eda/section3/eda33e.htm) describes the normalization choices. [NumPy's histogram documentation](https://numpy.org/doc/stable/reference/generated/numpy.histogram.html) distinguishes density's unit integral from the sum of heights and documents explicit bin edges. These support the quantitative checks, not a universal plotting convention or a behavioral evaluation of this skill.
 
 - [Song and Szafir, Where’s My Data?](https://cmci.colorado.edu/visualab/papers/song_VIS_2018.pdf) evaluates missing-data displays and imputation in synthetic time-series tasks. The observed tradeoffs motivate checking what missingness communicates, not prescribing one universally superior encoding.
@@ -117,4 +141,4 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall, close-bar, visitor, arrival-interval, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, visitor, support-record, arrival-interval, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
