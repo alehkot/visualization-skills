@@ -118,3 +118,41 @@ def test_accepts_valid_frontmatter_and_ignores_body_yaml(bundle, content):
 def test_yaml_reader_error_still_has_filename_and_no_traceback(bundle):
     result = validate(bundle, "---\nname: example\ndescription: bad\x00text\n---\n")
     assert_rejected(result, "invalid YAML frontmatter")
+
+
+@pytest.mark.parametrize("header,key", [
+    ("name: other\nname: example\ndescription: Fine\n", "name"),
+    (HEADER + "description: Replacement\n", "description"),
+    (HEADER + "description: A test skill.\n", "description"),
+    (HEADER + '"descr\\u0069ption": Replacement\n', "description"),
+    (HEADER + '"description": Replacement\n', "description"),
+    (HEADER + "metadata:\n  author: First\n  author: Second\n", "author"),
+    (HEADER + "metadata: {author: First, author: Second}\n", "author"),
+    (HEADER + "metadata:\n  examples:\n    - {label: First, label: Second}\n", "label"),
+    (HEADER + "metadata: &defaults {author: First, author: Second}\nextra: *defaults\n", "author"),
+    (HEADER + "metadata:\n  <<: {author: First, author: Second}\n", "author"),
+])
+def test_rejects_duplicate_frontmatter_string_fields(bundle, header, key):
+    result = validate(bundle, f"---\n{header}---\n")
+    assert_rejected(result, f"duplicate field {key!r}")
+
+
+def test_duplicate_field_diagnostic_points_to_repeated_field(bundle):
+    result = validate(bundle, "---\n" + HEADER + "description: Replacement\n---\n")
+    assert_rejected(result, "SKILL.md:4:1: invalid YAML frontmatter: duplicate field 'description'")
+
+
+@pytest.mark.parametrize("header", [
+    HEADER + "metadata: {author: First}\nextra: {author: Second}\n",
+    HEADER + "metadata: &defaults {author: First}\nextra: *defaults\n",
+    HEADER + "metadata: &recursive {self: *recursive}\n",
+    HEADER + "metadata: {<<: {author: First}, author: Second}\n",
+    HEADER + "metadata: &defaults {author: First}\nextra: {<<: *defaults, author: Second}\n",
+    HEADER + "metadata: {<<: [{author: First}, {author: Second}]}\n",
+    HEADER + "metadata: {1: Number, '1': String}\n",
+])
+def test_preserves_separate_mappings_aliases_and_merge_overrides(bundle, header):
+    result = validate(bundle, f"---\n{header}---\n")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout == "Validated 1 deployable skills.\n"
+    assert result.stderr == ""

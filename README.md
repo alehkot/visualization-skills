@@ -20,9 +20,13 @@ npx skills add alehkot/visualization-skills --skill '*'
 Frontmatter must start at the beginning of `SKILL.md`, between standalone `---`
 lines (trailing spaces or tabs are allowed). Prefixes such as `---oops` and `----`
 are not closing delimiters. Invalid YAML is reported with the skill filename and,
-when available, a one-based line and column. The checker uses PyYAML's safe loader;
-it does not enforce every optional Agent Skills field or replace a full Markdown
-parser. These maintenance checks do not measure explanation quality.
+when available, a one-based line and column. The checker uses PyYAML's safe loader
+and rejects repeated explicit string fields in the same mapping, including nested
+metadata, rather than silently keeping the last value. Quoted and unquoted spellings of the same string field count as a
+repeat. Anchors, aliases, and deliberate YAML merge overrides remain supported.
+This check targets string field names, not every possible YAML key type; it does
+not enforce every optional Agent Skills field or replace a full Markdown parser.
+These maintenance checks do not measure explanation quality.
 
 ```sh
 uv sync --dev
