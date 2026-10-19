@@ -25,6 +25,18 @@ Use the smallest relevant probe, not an exhaustive simulation of the whole domai
 
 Check exact scope words before alleging an error. “Usually,” “only if,” “at least,” and “after approval” have different consequences. A shortened title can contradict correctly specified branch logic; correct detail does not rescue a false summary.
 
+## Check concurrent branches and their rejoin
+
+Establish whether branches represent alternatives or independently proceeding work, then check the condition for continuing beyond them. Probe a case where one required branch is complete and another is unfinished. Does the artifact permit continuation too early? For exclusive alternatives, check whether it instead waits for a branch that was never selected. Convergence alone establishes neither an all-branches wait nor an either-branch release; inspect labels and source-supported conventions together.
+
+Distinguish completion from success or approval wherever the source does. Do not infer simultaneous starts, physical parallel execution, durations, or speedup from independent branches. Check consequential failure, cancellation, and timeout handling only against supplied evidence; absent policy is a verification limit. An ordered list need not impose execution order if accompanying wording preserves independence. Report a contradicted relationship, not the absence of a preferred gateway symbol.
+
+## Worked example: an early continuation
+
+An invented source says copyediting and illustration may proceed independently after intake, and both must finish before layout may begin. A brief labels their convergence **start layout when either finishes**. With copyediting complete and illustration unfinished, that instruction permits what the source excludes. Repair the label to **both complete before layout may start**; do not add immediate commencement or successful approval. A separate statement that illustration must await copyediting would invent a dependency and should be removed.
+
+A control brief lists copyediting first but explicitly permits either order or overlap and retains the both-complete rule. Accept it without requiring a branching diagram. Another source selects exactly one delivery route, email or post, and permits archiving after the selected route finishes. A brief requiring both routes to finish adds an unsupported wait; a rejoin preserving the selected-route condition is valid. If the source only names tasks without their continuation rule, neither all-complete nor either-complete is verified. Without a rendering, inspect these specified relationships rather than claiming unseen connector defects.
+
 ## Check waiting and execution outcomes
 
 For an explanation of delay, inspect whether the artifact distinguishes waiting work, active work, and any established constraint on progress. Compare counts, occupancy limits, and processing rates with their stated units and source. Do not infer overload from convergence alone or a waiting time from a backlog count alone. Flag a missing queue only when the source and reader's question make waiting consequential; a connectivity map need not describe scheduling.
@@ -57,8 +69,9 @@ State a repair in terms of the actual affected relationship: relabel a link, res
 
 ## Basis and limits
 
+- [Camunda’s parallel-gateway](https://docs.camunda.io/docs/components/modeler/bpmn/parallel-gateways/) and [exclusive-gateway documentation](https://docs.camunda.io/docs/components/modeler/bpmn/exclusive-gateways/) illustrate synchronization versus alternative-path rejoining. These execution conventions inform the distinction, not a required notation or a measured comprehension benefit.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) explains how marks and arrangement contribute meanings; that does not make every possible interpretation an observed reader error.
 - [C4 notation guidance](https://c4model.com/diagrams/notation) and [arc42's building block view](https://docs.arc42.org/section-5/) illustrate explicit labels and scoped architectural views. Their domain conventions are not mandatory for other diagrams.
 - [Cascade Institute's causal-loop handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) explains qualitative loop conventions, not empirical validation of the reviewed causal account.
 
-The probes and catalog contrast are original examples of source-based review, not a validated comprehension test.
+The probes, publication and delivery contrasts, and catalog contrast are original examples of source-based review, not a validated comprehension test.
