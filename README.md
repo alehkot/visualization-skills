@@ -45,6 +45,11 @@ the file before validating. Absolute filesystem paths (including rooted drive-le
 paths), `file:` URLs, and symlink aliases are rejected so local-only paths cannot
 stand in for distributed resources.
 
-These are offline maintenance checks for the existing inline Markdown link syntax.
-They do not check remote URLs, implement every Markdown form, or measure the
-skills' explanation quality or reader comprehension.
+These are offline maintenance checks for single-line inline Markdown links and
+images. They retain balanced parentheses in destinations (such as
+`assets/chart(1).svg`), angle-bracket destinations, backslash-escaped punctuation,
+and balanced brackets in labels. Optional single-line titles are separate from
+the resource path. These forms follow the [CommonMark link syntax](https://spec.commonmark.org/0.31.2/#links).
+The checker is not a complete Markdown parser: it does not validate remote URLs
+or cover every Markdown form, such as reference-style or multiline links. It
+does not measure the skills' explanation quality or reader comprehension.

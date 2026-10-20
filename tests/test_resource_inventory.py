@@ -199,3 +199,94 @@ def test_packaged_links_survive_copy_without_ignored_files(bundle, tmp_path_fact
     assert not (destination / SKILL / "assets/unused.txt").exists()
     result = validate(destination)
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize("name,markup", [
+    ("assets/chart(1).svg", "[Chart](assets/chart(1).svg)"),
+    ("assets/chart(1).svg", "[Chart](<assets/chart(1).svg>)"),
+    ("assets/chart(1).svg", r"[Chart](assets/chart\(1\).svg)"),
+    ("assets/chart((1)).svg", "[Chart](assets/chart((1)).svg)"),
+    ("assets/chart(1.svg", "[Chart](<assets/chart(1.svg>)"),
+    ("assets/chart(1.svg", r"[Chart](assets/chart\(1.svg)"),
+    ("assets/chart (1).svg", "[Chart](<assets/chart (1).svg>)"),
+    ("assets/chart(1).svg", '[Chart](assets/chart(1).svg "Draft (1)")'),
+    ("assets/chart(1).svg", "[Chart](assets/chart(1).svg 'Draft (1)')"),
+    ("assets/chart(1).svg", "[Chart](assets/chart(1).svg (Draft))"),
+    ("assets/chart(1).svg", r'[Chart](assets/chart(1).svg "A \"draft\"")'),
+    ("assets/chart.svg", "[Chart [draft]](assets/chart.svg)"),
+    ("assets/chart.svg", r"[Chart \[draft\]](assets/chart.svg)"),
+    ("assets/chart.svg", "![Chart [draft]](assets/chart.svg)"),
+])
+def test_accepts_packaged_inline_links_with_balanced_syntax(bundle, name, markup):
+    add_resource(bundle, name, "<svg/>\n")
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup,expected", [
+    ("[Chart [draft]](assets/missing.svg)", "broken local link"),
+    ("![Chart [draft]](assets/missing.svg)", "broken local link"),
+    (r"[Chart \[draft\]](assets/missing.svg)", "broken local link"),
+    ("[Chart](assets/local(1).svg)", "not in the tracked bundle inventory"),
+    ("[Chart](<assets/local(1).svg>)", "not in the tracked bundle inventory"),
+    (r"[Chart](assets/local\(1\).svg)", "not in the tracked bundle inventory"),
+    ("[Chart [draft]](../../public-files.json)", "escapes the standalone skill"),
+    ("[Context [draft]](references/context.md#absent)", "incorrect anchor"),
+])
+def test_balanced_inline_syntax_preserves_resource_safeguards(bundle, markup, expected):
+    add_resource(bundle, "assets/local(1).svg", declare=False, stage=False)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert expected in result.stderr
+
+
+def test_balanced_labels_count_as_direct_reference_links(bundle):
+    entry = bundle / SKILL / "SKILL.md"
+    entry.write_text(FRONTMATTER + "\n[Context [details]](references/context.md#details)\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_inline_parser_ignores_examples_titles_and_malformed_destinations(bundle):
+    entry = bundle / SKILL / "SKILL.md"
+    with entry.open("a", encoding="utf-8") as stream:
+        stream.write(r'''
+`[Example [draft]](assets/missing(1).svg)`
+
+```md
+[Example [draft]](assets/missing(1).svg)
+```
+
+~~~md
+[Example](<assets/missing(1).svg>)
+~~~
+
+\[Example](assets/missing.svg)
+[Broken](assets/unbalanced(1.svg)
+[Broken](<assets/missing.svg)
+[Broken](assets/missing.svg "unclosed)
+[Context](references/context.md "[Example](missing.svg)")
+''')
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_inline_parser_handles_multiple_links_and_linked_images(bundle):
+    add_resource(bundle, "assets/chart(1).svg", "<svg/>\n")
+    entry = bundle / SKILL / "SKILL.md"
+    with entry.open("a", encoding="utf-8") as stream:
+        stream.write(
+            '\n[![Chart [draft]](assets/chart(1).svg)](references/context.md#details) '
+            '[Context](references/context.md "Details (1)")\n'
+        )
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    # An ordinary link nested in another ordinary link only renders the inner link.
+    with entry.open("a", encoding="utf-8") as stream:
+        stream.write('\n[Outer [Context](references/context.md)](missing.md)\n')
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr

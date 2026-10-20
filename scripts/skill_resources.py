@@ -1,6 +1,7 @@
 """Validate contained local reference links."""
 from pathlib import Path
 import re
+import string
 import unicodedata
 from urllib.parse import unquote, urlsplit
 
@@ -46,19 +47,101 @@ def markdown_headings(text: str) -> list[tuple[int, int, str, str]]:
     return result
 
 
+def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
+    """Read a single-line inline destination and its optional title."""
+    index = start
+    while index < len(line) and line[index] in " \t":
+        index += 1
+    angle = index < len(line) and line[index] == "<"
+    if angle:
+        index += 1
+    target = []
+    depth = 0
+    while index < len(line):
+        char = line[index]
+        if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
+            target.append(line[index + 1])
+            index += 2
+            continue
+        if angle:
+            if char == ">":
+                index += 1
+                break
+            if char == "<":
+                return None
+        else:
+            if char in " \t" or (char == ")" and depth == 0):
+                break
+            if ord(char) < 32 or ord(char) == 127:
+                return None
+            if char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+        target.append(char)
+        index += 1
+    else:
+        return None
+    if depth:
+        return None
+    before_space = index
+    while index < len(line) and line[index] in " \t":
+        index += 1
+    if index < len(line) and line[index] == ")":
+        return "".join(target), index + 1
+    # A title must be separated from the destination by whitespace.
+    if index == before_space or index >= len(line) or line[index] not in "\"'(":
+        return None
+    opener = line[index]
+    closer = ")" if opener == "(" else opener
+    index += 1
+    while index < len(line):
+        char = line[index]
+        if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
+            index += 2
+            continue
+        if char == closer:
+            index += 1
+            break
+        if opener == "(" and char == "(":
+            return None
+        index += 1
+    else:
+        return None
+    while index < len(line) and line[index] in " \t":
+        index += 1
+    if index < len(line) and line[index] == ")":
+        return "".join(target), index + 1
+    return None
+
+
 def markdown_links(text: str) -> list[str]:
-    """Read inline link destinations outside fenced examples and inline code."""
+    """Read single-line inline links, including balanced labels/destinations."""
     result = []
     for _, line in unfenced_lines(text):
         # Code spans are examples, not resource links.
         line = re.sub(r"(`+)(.*?)\1", lambda m: " " * len(m[0]), line)
-        for match in re.finditer(r"\[[^\]\n]*\]\(([^)\n]+)\)", line):
-            target = match[1].strip()
-            if target.startswith("<"):
-                target = target[1:].split(">", 1)[0]
-            else:
-                target = target.split(' "', 1)[0].split(" '", 1)[0]
-            result.append(target)
+        brackets: list[tuple[bool, bool]] = []
+        index = 0
+        while index < len(line):
+            char = line[index]
+            if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
+                index += 2
+                continue
+            if char == "[":
+                brackets.append((index > 0 and line[index - 1] == "!", False))
+            elif char == "]" and brackets:
+                image, contains_link = brackets.pop()
+                if (image or not contains_link) and line[index + 1:index + 2] == "(":
+                    parsed = _inline_destination(line, index + 2)
+                    if parsed is not None:
+                        target, index = parsed
+                        result.append(target)
+                        if not image:
+                            # Ordinary links cannot contain another link; images can.
+                            brackets = [(is_image, True) for is_image, _ in brackets]
+                        continue
+            index += 1
     return result
 
 
