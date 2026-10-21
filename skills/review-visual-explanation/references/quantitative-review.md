@@ -100,6 +100,20 @@ Do not infer significance solely from whether two separate error bars overlap. E
 
 Check whether aggregation hides information required for the question: changing subgroup composition, paired changes, skew, or a relevant tail. Do not demand raw data on every summary chart. A faithful summary can be sufficient for a summary question; detailed analysis may be needed for a different inference.
 
+## Check cumulative and period claims separately
+
+Determine what each timestamp means: activity in an interval, a running total from a stated start, a rolling-window summary, or a point-in-time balance. Compare that definition with the headline and requested judgment. A correctly rising running total can accompany falling additions; flag an unsupported daily-growth claim, not the cumulative form itself. A valid total-to-date lookup need not also display daily activity.
+
+When compatible boundary values permit it, subtract consecutive running totals to check the amount added over the intervening interval. Do not sum snapshots as disjoint contributions or assume the first displayed total started at zero. Keep actual interval durations: dividing a multi-day addition by its duration gives an average, not evidence of equal daily amounts. Compare like-defined intervals or supported rates when judging pace, and distinguish a partial period from a complete one.
+
+Check source resets, revisions, and coverage changes before calling a difference new activity. Do not replace a negative change with zero merely because the series is called cumulative; signed net amounts and corrections may be legitimate. Differences between overlapping rolling windows do not directly give new period counts, and a balance change does not identify gross arrivals. Missing definitions or boundaries leave that reconstruction unverified, rather than proving the source's separately reported period values wrong.
+
+## Worked example: higher total, lower daily activity
+
+An invented, unrevised campaign source gives registrations accumulated since launch at the same daily closing time: **Monday: 100, Tuesday: 180, Wednesday: 220**. A brief reproduces those values and headlines them “New registrations increased each day.” That headline is contradicted for Tuesday versus Wednesday: the daily additions are **80 then 40**. Repair the daily comparison with those source-derived values, or retain the cumulative view with a headline scoped to the supported increase in the total. Monday's new registrations cannot be recovered without the preceding boundary value; it is not automatically 100.
+
+The control statement “220 registrations accumulated by Wednesday” needs no daily repair. If Tuesday's snapshot is absent, **120 registrations over the two days** is supported, not a specific Tuesday/Wednesday split. If a later snapshot falls because the source explicitly removes duplicate registrations, preserve that correction rather than depicting negative new people or silently replacing it with zero. Without a rendering, these are checks of the supplied meanings and arithmetic, not measured slopes, spacing, or legibility.
+
 ## Check missingness without inventing observations
 
 Compare the artifact’s coverage with source-established categories and observation schedules. Check both empty values and entirely absent records. A missing timestamp can disappear when remaining points are connected or equally spaced, and an omitted bar can look like an observed zero. Report the specific loss of meaning when the task needs that distinction; preserve true zero values and the source’s status definitions. Unknown blank codes are a verification limit, not automatically zero or missing. Irregular observation dates alone do not establish missing scheduled readings, and an unspecified cause remains unknown.
@@ -142,6 +156,8 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
+
 - [ONS's dual-axis critique](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) motivates checking claims separately from faithful point plotting. [Datawrapper's guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses alternatives and valid uses; [Matplotlib's secondary-axis examples](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) show linked conversions. These are guidance and implementation examples, not a behavioral evaluation of this reviewer. The order-series and temperature controls are original arithmetic illustrations.
 
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) motivates keeping association reversal separate from causal interpretation. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates explicitly weighted standardization. The support-record example is original; these sources do not validate this reviewer or make disaggregation a universal repair.
@@ -157,4 +173,4 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall, close-bar, visitor, support-record, arrival-interval, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, visitor, support-record, arrival-interval, campaign-registration, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.

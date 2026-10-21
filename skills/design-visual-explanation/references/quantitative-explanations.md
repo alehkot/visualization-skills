@@ -105,6 +105,20 @@ When comparing estimates, a visually larger center is not by itself an establish
 
 If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
 
+## Separate totals to date from activity in each period
+
+Establish whether a time series records activity during each interval, a running total since a stated start, a rolling-window summary, or a point-in-time balance. Preserve that meaning in labels and the headline. A rising cumulative total does not establish rising daily activity: positive additions can shrink while the total continues upward. Use totals to date for accumulated progress and period amounts or rates for the pace question; neither view is universally preferable.
+
+For a compatible running total, subtract the earlier boundary value from the later one to recover the amount added over that interval. Retain the start boundary, end boundary, and source definition. Do not assume the first displayed value began at zero, add cumulative snapshots together as if they were disjoint periods, or treat a multi-day difference as one day's activity. When the question concerns pace across unequal durations, a supported amount divided by elapsed time gives an interval-average rate, not the unobserved daily pattern.
+
+Check resets, corrections, and changes in coverage before interpreting differences as new events. A negative difference can reflect a revision or a legitimately signed net measure; do not silently clamp it to zero. A changing rolling-window total is not a running total, and a balance change is not necessarily gross inflow. If the definitions or required boundary values are missing, state what cannot be recovered rather than inventing period values.
+
+## Worked example: a rising total with slowing additions
+
+An invented campaign records cumulative registrations since launch at the same daily closing time: **day 0: 0, day 1: 60, day 2: 100, day 3: 120**. The compatible, unrevised record implies **60, 40, and 20 new registrations** in the three daily intervals. For “Is daily registration increasing?”, show those interval values and say it decreased over these days. The fact that the cumulative curve rises does not by itself answer that question. Summing its four snapshots to **280** would count earlier registrations repeatedly, not recover campaign registrations.
+
+For “How many registrations have accumulated by day 3?”, the correctly labeled **120 since launch** is sufficient; do not force a daily view. If only day 1's **60** and day 3's **120** are available, the difference establishes **60 over two days**, averaging **30 per day**, but does not establish **30 on each day**. If the series instead reports current active members or the last seven days' registrations, do not apply the running-total interpretation without the relevant accounting or window definition.
+
 ## Preserve missingness as part of the evidence
 
 Keep observed zero, unavailable observations, and source-supplied estimates distinct. Preserve the source’s meaning for blanks or status codes; do not assign one when it is unknown. Establish the relevant categories or expected observation schedule from the source; missing records may omit a category or timestamp altogether, not merely contain an empty value. Retain their place in a requested complete comparison instead of silently closing the gap. Do not infer a failed observation from irregular spacing alone: event-driven sampling and periods outside the stated coverage can be legitimate. Preserve actual time spacing when elapsed time matters.
@@ -147,6 +161,8 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
+
 - [ONS's dual-axis examples](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) demonstrate misleading magnitude and growth readings. [Datawrapper's dual-axis guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses task-sensitive alternatives and legitimate uses. [Matplotlib's secondary-axis documentation](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) distinguishes linked conversions from independent scales. These motivate the checks; they do not evaluate this skill or require a plotting library.
 
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) separates association reversal from causal interpretation; it does not license automatic subgroup adjustment. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates a common reference distribution and why standardized rates must be distinguished from observed rates. The delivery example is an original arithmetic illustration, not a causal or reader-comprehension study.
@@ -163,4 +179,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, inspection, delivery, wait-interval, daily-record, order-series, and temperature examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, delivery, wait-interval, daily-record, campaign-registration, order-series, and temperature examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
