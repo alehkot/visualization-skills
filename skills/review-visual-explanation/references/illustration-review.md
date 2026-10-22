@@ -15,13 +15,19 @@ Source absence is not proof that an unseen interior feature is fabricated. If un
 | Depiction | Check | Avoid mistaking convention for error |
 | --- | --- | --- |
 | Cutaway or section | Removed surfaces, retained context, identity of exposed parts | Missing visible material may be intentionally removed for explanation. |
-| Exploded view | Part correspondence, assembled order, actual versus displaced position | Gaps need not represent operating clearances. |
+| Exploded view | Part correspondence, assembled spatial relationships, actual versus displaced position | Gaps need not represent operating clearances. |
 | Transparent overlay | Whether surfaces and connections can be distinguished | Transparency can be conceptual rather than a material property. |
 | Magnified inset | What region is enlarged and how it corresponds to the main view | A larger inset part need not imply a larger real part. |
 | Motion sequence | Stable identity, viewpoint, direction, and stated timing | Selected frames need not depict equally spaced moments. |
 | Reconstruction | Observed, restored, inferred, and unknown portions | A hypothetical restoration can be legitimate when clearly identified. |
 
 Disclosure does not excuse every mismatch. “Not to scale” does not repair an incorrect connection or reversed layer order. “Simplified” does not authorize adding a source-contradicting part. Establish which relationship the task relies on before assigning materiality.
+
+## Check whether an exploded view claims a procedure
+
+Separate part identity and assembled spatial relationships from assembly or disassembly sequence. A displaced arrangement or numbered parts list alone does not establish temporal order. If the artifact claims a procedure, compare its action order with supplied procedural evidence; do not infer that evidence from increasing part numbers or separation distance. A static exploded view with source-supported step labels can legitimately explain assembly.
+
+For an invented stand, the supplied catalog identifies **panel 1, bracket 2, and base 3** as part IDs, with the bracket connecting panel and base. A brief derives “assemble 1, then 2, then 3” solely from those IDs. That derivation is unsupported; retain the identifiers and connections, but remove the inferred order or obtain the procedure. If a supplied procedure separately requires bracket-to-base attachment before panel attachment, check that precedence instead. A parts-lookup view need not add assembly steps. If the underlying procedure is unavailable, an existing sequence is unverified, not proven wrong; do not invent its replacement.
 
 ## Distinguish arrows and paths
 
@@ -51,7 +57,9 @@ Separate fidelity from production quality. A low-resolution view can prevent ins
 
 ## Basis and limits
 
+- [Autodesk's presentation documentation](https://help.autodesk.com/cloudhelp/2026/ENU/Inventor-Help/files/GUID-2A480981-2E53-4408-BFA9-290C14F03C95.htm) distinguishes independent snapshots from timeline-linked views. Its [exploded-view tutorial](https://www.autodesk.com/learn/ondemand/curated/inventor-quick-start-guide/5Y0SLFXxRTkT0pd7mIzYp2/) separately adjusts the animation's assembly sequence. These illustrate the spatial/procedural distinction, not a required tool or evidence that an arbitrary sequence is physically feasible.
+
 - [Agrawala, Li, and Berthouzoz, Design Principles for Visual Communication](https://sites.astro.caltech.edu/~george/aybi199/ACM_Viz.pdf) examines technical-illustration conventions and their domain-specific purposes. Those conventions motivate checks, not universal verdicts.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how visual marks and spatial arrangement affect expressed meaning.
 
-The vessel example and review procedure are original guidance. Neither an accurate-looking image nor a passed checklist establishes measured reader understanding.
+The vessel and stand examples and review procedure are original guidance. Neither an accurate-looking image nor a passed checklist establishes measured reader understanding.

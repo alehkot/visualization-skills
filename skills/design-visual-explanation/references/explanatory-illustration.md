@@ -16,7 +16,7 @@ Name the operation the reader needs to perform: identify a part, trace a force o
 | --- | --- | --- |
 | Exterior annotated view | Part identity, location, orientation | Labels associated with the correct visible part; relevant landmarks. |
 | Cutaway or section | Hidden structure or interior relationships | Where material is removed, remaining shape, and what the section represents. |
-| Exploded view | Assembly order and relationships between parts | Correspondence to the assembled object; displacement distinguished from actual spacing. |
+| Exploded view | Part relationships and fit in the assembled object | Part correspondence; displacement distinguished from actual spacing and from procedural order. |
 | Transparent overlay | Interior and exterior context together | Which surfaces are conceptual overlays, with enough distinction to trace the subject. |
 | Sequence of states | Movement, deformation, or operation | Stable part identity and orientation; what changes between frames. |
 | Schematic diagram | Functional connection independent of exact geometry | Which connections are physical, causal, or merely explanatory. |
@@ -24,6 +24,12 @@ Name the operation the reader needs to perform: identify a part, trace a force o
 Select the least transformation that exposes the needed relation. A cutaway that removes the only landmark for orientation may need a small exterior view. An exploded view can clarify assembly while making actual operating position harder to infer. These are tradeoffs, not reasons to prohibit either convention.
 
 Do not invent the hidden structure merely because a cutaway would be appealing. If the source supports function but not geometry, use a functional schematic and identify that limit.
+
+## Keep exploded arrangement distinct from assembly sequence
+
+An exploded view separates parts to expose their relationships. Separation distance, drawing order, and part-number callouts do not by themselves specify which assembly operation comes first. For a procedure, preserve source-supported precedence and distinguish step numbers from part identifiers. A labeled exploded view can carry that procedure; animation or separate panels are not mandatory. When only the finished arrangement is known, do not invent an assembly or disassembly sequence.
+
+For example, an invented stand catalog identifies **panel 1, bracket 2, and base 3** and says the bracket connects the panel to the base. Those numbers are part IDs, not steps. A parts-lookup brief can retain them and show the connections without instructing “assemble 1, then 2, then 3.” If a separate procedure says to attach the bracket to the base before attaching the panel, preserve that stated order, using explicit action labels rather than silently renumbering the parts.
 
 ## Specify motion, scale, and reconstruction
 
@@ -51,7 +57,9 @@ List the supported parts, the view or sequence, the important relationship each 
 
 ## Basis and limits
 
+- [Autodesk's presentation documentation](https://help.autodesk.com/cloudhelp/2026/ENU/Inventor-Help/files/GUID-2A480981-2E53-4408-BFA9-290C14F03C95.htm) distinguishes independent snapshots from timeline-linked views. Its [exploded-view tutorial](https://www.autodesk.com/learn/ondemand/curated/inventor-quick-start-guide/5Y0SLFXxRTkT0pd7mIzYp2/) separately adjusts the animation's assembly sequence. These illustrate the spatial/procedural distinction, not a required tool or evidence that an arbitrary sequence is physically feasible.
+
 - [Agrawala, Li, and Berthouzoz, Design Principles for Visual Communication](https://sites.astro.caltech.edu/~george/aybi199/ACM_Viz.pdf) examines domain-specific principles, including technical illustration and maps. Its examples motivate visibility and spatial reasoning; they do not validate every proposed cutaway or analogy.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses the meanings carried by marks, arrows, and spatial arrangements.
 
-The procedures and music-box example are original adaptations. They support a faithful brief; finished visual clarity and reader understanding require their own inspection or study.
+The procedures, music-box example, and stand example are original adaptations. They support a faithful brief; finished visual clarity and reader understanding require their own inspection or study.
