@@ -78,6 +78,18 @@ A brief labels the overall rates correctly but headlines them “Resolution impr
 
 A control headline, “A larger share of this week's actual requests was resolved,” with the correct overall values and no subgroup or causal claim, is supported. If the request is to compare at a stated illustrative 50/50 mix, **75% then 65%** is valid only as a separately labeled standardized comparison. If only the overall rates are supplied, a reversal within subgroups is not established and must not be invented.
 
+## Check pooled medians and percentiles
+
+When an overall median or percentile appears beside group values, inspect how it was obtained if that evidence is available. Averaging group percentiles, even with group-count weights, does not generally give the percentile of all observations. This is different from reconstructing a pooled proportion using compatible numerators and denominators. Check the population, units, period, overlap, and percentile definition before comparing or recomputing values.
+
+Use supplied underlying observations or a compatible combined distribution when available; label histogram-derived estimates with appropriate precision rather than treating grouped data as exact individual values. If only group percentiles and counts are known, the pooled value may remain unverified. Do not fabricate a corrected number or declare an independently reported overall value wrong merely because it cannot be reconstructed. A correctly labeled comparison of group medians, or an explicitly requested average of those medians, need not be replaced with a pooled statistic.
+
+## Worked example: an average of medians mislabeled as the overall median
+
+An invented source provides all waits from nonoverlapping desks in one period: **A: 1, 2, 3 minutes** and **B: 10, 20, 30, 40, 50 minutes**. It defines the median as the middle ordered value, averaging the two central values for an even count. A brief headlines **“Median across all eight waits: 19.5 minutes”**, calculated as **(3 × 2 + 5 × 30) / 8** from desk medians. The arithmetic computes a count-weighted average of medians, not the claimed statistic. The pooled ordered observations have central values **10 and 20**, so repair the headline to **15 minutes** for that all-waits question.
+
+A control showing **“Desk medians: A 2 minutes; B 30 minutes”** is supported and needs no pooled-value repair. If only those medians and counts are supplied, 15 is not justified: replacing B's waits with **4, 5, 30, 40, 50** preserves its median and count but changes the pooled median to **4.5**. Flag the unsupported derivation, not a guessed replacement. Coincidental equality between a weighted average and a true pooled percentile does not make averaging a generally valid method. Without a rendering, these are source and arithmetic checks, not measured mark or layout defects.
+
 ## Check histogram height against bin width
 
 For a numeric-axis histogram, inspect the bin boundaries, axis units, and stated meaning of height and area together. On linear axes, count density times bin width should recover the bin count; probability density times bin width should recover its share of the stated population. Unequal-width bins with raw count heights can distort an area-based distribution comparison. Distinguish a wrong geometry or density label from a correct count answering a different question.
@@ -155,6 +167,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
 
 - [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
 

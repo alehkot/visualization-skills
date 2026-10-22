@@ -81,6 +81,18 @@ A has the higher rate in both route groups, but most of A's deliveries are remot
 
 For a specifically requested illustrative 50/50 local/remote mix, those **75% and 65%** are valid standardized comparisons; label the assumed mix rather than claiming either was observed. For “What share of each service's actual deliveries arrived on time?”, **62.7% versus 77.3%** is the relevant descriptive answer. Neither view alone proves that changing service would cause a delivery to be on time.
 
+## Do not pool medians or percentiles by averaging them
+
+Distinguish a percentile of all observations from a summary of group percentiles. A median or 95th percentile is a position in an ordered distribution, not an additive quantity. Neither an unweighted average nor an average weighted by group counts generally recovers the pooled percentile. The denominator-weighting rule for proportions above must not be transferred to percentiles.
+
+For a requested overall percentile, use compatible underlying observations or a distribution representation that supports combining them. Preserve units, coverage, observation weights, and the source's percentile definition; do not double-count overlapping groups. A combined histogram can support an estimate, but its resolution and estimation method limit precision. When only group percentiles and counts are supplied, do not invent a pooled value. Show the available group values with their scope, or identify the distribution data needed for the requested total. A separately supplied overall percentile need not be discarded merely because its raw data is unavailable.
+
+## Worked example: medians do not combine like means
+
+An invented record supplies all waits in minutes from two nonoverlapping desks in the same period: **A: 1, 2, 3** and **B: 10, 20, 30, 40, 50**. Define the median as the middle ordered value, averaging the two central values for an even count. The desk medians are **2 and 30**. Their unweighted average is **16**; weighting by counts gives **(3 × 2 + 5 × 30) / 8 = 19.5**. Neither is the pooled median: the eight ordered waits have central values **10 and 20**, giving **15 minutes**. For an all-waits question, label that pooled value and its population, optionally retaining the desk values separately.
+
+A control chart comparing **each desk's median** can validly show 2 and 30 without an overall value. An explicitly requested average of desk medians is also a different, legitimate summary, not the median across all waits. If B instead had waits **4, 5, 30, 40, 50**, its count and median would be unchanged, but the pooled median would be **4.5 minutes**. Counts and medians alone therefore do not determine the answer. Keep the stated median convention; do not impose it on every source's percentile calculation.
+
 ## Preserve histogram bin widths and density
 
 For a histogram on a linear numeric axis, retain the source's bin boundaries and say whether height represents count, share, or density. With unequal bin widths, raw count heights give wider intervals extra area unrelated to their counts. When area is meant to represent count or share, use count divided by bin width, or count divided by both the represented population size and bin width. Label the vertical units accordingly, such as “observations per minute” or “probability density per minute.” Density height is not the probability of that interval; height times width gives its count or share. A probability density can exceed one.
@@ -160,6 +172,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
 
 - [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
 
