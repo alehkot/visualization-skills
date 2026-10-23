@@ -49,6 +49,14 @@ An invented record gives **A: 40 then 60 orders** and **B: 900 then 700 orders**
 
 As a control, one temperature series with matched **0–100°C** and **32–212°F** axes has a fixed conversion, **°F = 1.8 × °C + 32**. Corresponding ticks, including **50°C = 122°F**, occupy the same positions. This is not two independently scaled series and does not need to be rejected for having a second axis.
 
+## Keep successive percentage changes on their own bases
+
+For a first-to-last change, distinguish consecutive period growth rates from additive contributions. When each rate describes the same comparable quantity relative to its immediately preceding value, combine the growth factors: **(1 + r₁) × (1 + r₂) × … − 1**, with rates written as fractions. Adding the percentages generally gives the wrong net change because their bases differ. For an ordinary unadjusted series, compatible first and last values also give **last / first − 1**, with a nonzero first value and a meaningful ratio interpretation.
+
+Retain each rate's period and definition. Do not chain overlapping year-over-year rates or treat annualized rates as actual changes over their shorter reporting intervals. Missing periods, changed definitions, and rounded rates can prevent an exact reconstruction. Source-adjusted growth may deliberately differ from raw endpoint change; preserve that distinction rather than overriding the source method.
+
+For an invented comparable activity index, **100 → 120 → 96** gives successive changes of **+20% and −20%**, but the last observation is **4% below the first**, not unchanged. A level view can show those three readings. An additive waterfall can instead use the **+20 and −24 index-point changes**; stacking +20% and −20% as if they shared the original base would give a false endpoint. A chart only comparing the two period rates may keep both correct labels without adding a net summary. Percentage-point changes in a percentage-valued series are additive differences, not these relative growth factors. Explicit contributions on a common reference can also add; retain that definition instead of relabeling them as consecutive growth rates.
+
 ## Make close comparisons readable
 
 When close bars and coarse ticks leave needed values or differences to estimation, specify source-backed labels near the relevant bar ends, clearly associated with category and series. Keep the zero baseline for magnitude bars; finer ticks alone may not resolve the task.
@@ -172,6 +180,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
 
 - [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
 

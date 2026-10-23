@@ -78,6 +78,14 @@ A brief labels the overall rates correctly but headlines them “Resolution impr
 
 A control headline, “A larger share of this week's actual requests was resolved,” with the correct overall values and no subgroup or causal claim, is supported. If the request is to compare at a stated illustrative 50/50 mix, **75% then 65%** is valid only as a separately labeled standardized comparison. If only the overall rates are supplied, a reversal within subgroups is not established and must not be invented.
 
+## Check successive percentage changes against their bases
+
+If a headline or additive display combines period growth rates, establish whether each rate uses the immediately preceding value of the same comparable quantity. Such relative changes compound through **(1 + r₁) × (1 + r₂) × … − 1**, with fractional rates; their sum generally does not give the first-to-last change. Check compatible endpoints when they measure the same unadjusted change. Preserve source adjustments, precision, and the exact periods: overlapping year-over-year rates and annualized short-period rates are not consecutive actual-period factors.
+
+For an invented comparable activity index **100 → 120 → 96**, correct period labels **+20% and −20%** do not support “back to the starting level.” The last value is **4% below the first**. Repair that headline or a percentage waterfall that adds the rates to zero; a level view or additive **+20 and −24 index-point changes** can preserve the endpoint question. Do not reject a chart that correctly compares only the two period rates. Likewise, percentage-point differences in a percentage-valued series and explicit contributions on a common reference can legitimately add; do not compound them as consecutive relative changes.
+
+When the required rates, compatible endpoints, or source method are unavailable, report the unsupported derivation or verification limit rather than inventing a corrected net figure. An independently reported total is not proven wrong merely because its calculation cannot be reconstructed. Without a rendering, these are arithmetic and claim checks, not measured geometry findings.
+
 ## Check pooled medians and percentiles
 
 When an overall median or percentile appears beside group values, inspect how it was obtained if that evidence is available. Averaging group percentiles, even with group-count weights, does not generally give the percentile of all observations. This is different from reconstructing a pooled proportion using compatible numerators and denominators. Check the population, units, period, overlap, and percentile definition before comparing or recomputing values.
@@ -167,6 +175,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
 
 - [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
 
