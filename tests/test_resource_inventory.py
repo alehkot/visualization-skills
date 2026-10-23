@@ -290,3 +290,67 @@ def test_inline_parser_handles_multiple_links_and_linked_images(bundle):
         stream.write('\n[Outer [Context](references/context.md)](missing.md)\n')
     result = validate(bundle)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("heading,anchor", [
+    ("An _important_ detail", "an-important-detail"),
+    ("__Important__ detail", "important-detail"),
+    ("___Important___ detail", "important-detail"),
+    ("**An _important_ detail**", "an-important-detail"),
+    ("_An **important** detail_", "an-important-detail"),
+    ("[_Important_ detail](https://example.com)", "important-detail"),
+    ("![An _important_ diagram](https://example.com/diagram.svg)", "an-important-diagram"),
+    ("<em>_Important_</em> detail", "important-detail"),
+    ("~~_Old_~~ detail", "old-detail"),
+    ("A &amp; B", "a--b"),
+    ("read_csv settings", "read_csv-settings"),
+    ("`_literal_` settings", "_literal_-settings"),
+    (r"\_literal\_ settings", "_literal_-settings"),
+    ("_unclosed settings", "_unclosed-settings"),
+    ("a_b_c settings", "a_b_c-settings"),
+    ("_read_csv_ settings", "read_csv-settings"),
+])
+def test_accepts_anchors_from_heading_text_not_emphasis_markup(bundle, heading, anchor):
+    reference = bundle / SKILL / "references/context.md"
+    with reference.open("a", encoding="utf-8") as stream:
+        stream.write(f"\n## {heading}\n")
+    append_link(bundle, f"references/context.md#{anchor}")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("heading,wrong_anchor", [
+    ("An _important_ detail", "an-_important_-detail"),
+    ("__Important__ detail", "__important__-detail"),
+    ("___Important___ detail", "___important___-detail"),
+    ("[_Important_ detail](https://example.com)", "_important_-detail"),
+    ("read_csv settings", "readcsv-settings"),
+    ("`_literal_` settings", "literal-settings"),
+    (r"\_literal\_ settings", "literal-settings"),
+    ("_unclosed settings", "unclosed-settings"),
+])
+def test_rejects_nonexistent_formatted_or_literal_heading_anchors(bundle, heading, wrong_anchor):
+    reference = bundle / SKILL / "references/context.md"
+    with reference.open("a", encoding="utf-8") as stream:
+        stream.write(f"\n## {heading}\n")
+    append_link(bundle, f"references/context.md#{wrong_anchor}")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "incorrect anchor" in result.stderr
+
+
+def test_formatted_headings_share_duplicate_anchor_namespace(bundle):
+    reference = bundle / SKILL / "references/context.md"
+    reference.write_text(
+        "# Context\n\n## _Details_\n\n## Details\n\n## __Details__\n"
+        "\n## Details-1\n\n## `Details`\n",
+        encoding="utf-8",
+    )
+    for anchor in ("details", "details-1", "details-2", "details-1-1", "details-3"):
+        append_link(bundle, f"references/context.md#{anchor}")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    append_link(bundle, "references/context.md#details-4")
+    result = validate(bundle)
+    assert result.returncode == 1
+    assert "incorrect anchor" in result.stderr

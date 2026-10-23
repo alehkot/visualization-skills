@@ -5,6 +5,24 @@ import string
 import unicodedata
 from urllib.parse import unquote, urlsplit
 
+from markdown_it import MarkdownIt
+
+
+_HEADING_MARKDOWN = MarkdownIt("commonmark").enable("strikethrough")
+
+
+def _heading_text(title: str) -> str:
+    """Read inline text without confusing emphasis with literal underscores."""
+    def collect(tokens):
+        return "".join(
+            collect(token.children) if token.children else token.content
+            for token in tokens
+            if token.type in {"text", "code_inline", "image"}
+        )
+
+    return collect(_HEADING_MARKDOWN.parseInline(title)[0].children or [])
+
+
 def unfenced_lines(text: str) -> list[tuple[int, str]]:
     """Return numbered Markdown lines outside backtick and tilde fences."""
     result = []
@@ -32,8 +50,7 @@ def markdown_headings(text: str) -> list[tuple[int, int, str, str]]:
         if not match:
             continue
         marks, title = match.groups()
-        plain = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", title)
-        plain = re.sub(r"<[^>]+>", "", plain).lower()
+        plain = _heading_text(title).lower()
         base = "".join(
             char for char in plain if char in "-_ " or unicodedata.category(char)[0] in {"L", "N"}
         ).replace(" ", "-")

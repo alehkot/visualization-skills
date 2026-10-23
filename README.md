@@ -53,3 +53,11 @@ the resource path. These forms follow the [CommonMark link syntax](https://spec.
 The checker is not a complete Markdown parser: it does not validate remote URLs
 or cover every Markdown form, such as reference-style or multiline links. It
 does not measure the skills' explanation quality or reader comprehension.
+
+For ATX heading anchors, the checker reads inline text before generating the
+fragment: `_Important_` contributes `important`, while literal underscores in
+`read_csv`, escaped text, and code spans remain meaningful. Formatted and plain
+headings with the same resulting fragment share the duplicate-heading suffix
+sequence. Inline heading parsing uses `markdown-it-py`; this does not extend the
+resource-link checker to all Markdown syntax or certify every GitHub extension.
+See [GitHub's section-link rules](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links).
