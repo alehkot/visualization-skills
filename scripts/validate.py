@@ -17,6 +17,38 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 
 
+def load_frontmatter(text: str):
+    """Safely load YAML without silently replacing explicit string fields."""
+    loader = yaml.SafeLoader(text)
+    try:
+        root = loader.get_single_node()
+        pending = [root] if root is not None else []
+        visited = set()
+        # Inspect original nodes before SafeLoader expands YAML merge keys.
+        # Aliases may share nodes or form cycles; inspect each node only once.
+        while pending:
+            node = pending.pop()
+            if node in visited:
+                continue
+            visited.add(node)
+            if isinstance(node, yaml.MappingNode):
+                fields = set()
+                for key, value in node.value:
+                    if isinstance(key, yaml.ScalarNode) and key.tag == "tag:yaml.org,2002:str":
+                        if key.value in fields:
+                            raise yaml.constructor.ConstructorError(
+                                "while reading frontmatter", node.start_mark,
+                                f"duplicate field {key.value!r}", key.start_mark,
+                            )
+                        fields.add(key.value)
+                    pending.extend((key, value))
+            elif isinstance(node, yaml.SequenceNode):
+                pending.extend(node.value)
+        return loader.construct_document(root) if root is not None else None
+    finally:
+        loader.dispose()
+
+
 def validate_frontmatter(skill_dir: Path) -> None:
     path = skill_dir / "SKILL.md"
     if not path.exists():
@@ -26,7 +58,7 @@ def validate_frontmatter(skill_dir: Path) -> None:
     if not match:
         raise ValueError(f"{path}: YAML frontmatter must be enclosed by standalone --- lines")
     try:
-        data = yaml.safe_load(match.group(1))
+        data = load_frontmatter(match.group(1))
     except yaml.YAMLError as error:
         # PyYAML marks are zero-based within the extracted YAML, after line 1.
         mark = getattr(error, "problem_mark", None)

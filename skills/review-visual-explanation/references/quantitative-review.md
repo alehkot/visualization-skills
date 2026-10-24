@@ -34,6 +34,14 @@ A nonzero origin can distort magnitude bars even when the tick labels are correc
 
 A break, inset, transformation, or schematic view needs enough disclosure to support its intended use. Disclosure is not a universal cure: a small footnote cannot make a prominently false ratio true.
 
+## Check stacked claims against component boundaries
+
+For an ordinary nonnegative additive stack, trace a named component to both its lower and upper boundaries. Their difference in axis units gives that component's amount; the upper edge alone also includes components below it. Check component-change headlines against the component values, not merely the upper edge's slope or height. In a zero-based stack covering the whole, the outer top edge gives the total, while interior boundaries give partial totals. A displaced component baseline is not by itself an invalid truncated bar.
+
+For an invented two-period count, **A: 30 → 80** and **B: 50 → 40**, with A below B, B's upper edge rises **80 → 120**. A headline “B grew 50%” contradicts B's **20% decrease**; “The total grew 50%” remains valid. Correct the component claim without changing correct data. If its values are hard to recover for the requested comparison, suggest associated labels or a separate comparison view. Do not reject a stack whose total/composition task or existing labels already resolves the concern.
+
+Check the encoding before applying this test. A 100% stack carries shares rather than original amounts; centered or diverging stacks have different offset and sign conventions, so their top edge need not be the net total. Convert readable boundaries through the stated scale instead of subtracting screen pixels on a nonlinear axis. If the source or rendering cannot establish the component values, report that inspection limit rather than an invented exact change.
+
 ## Check the inference across independent axes
 
 Identify which series uses each axis, its units and range, and whether the axes are independent or linked by a fixed conversion. Correctly plotted points on their own axes can still invite an invalid cross-series comparison. Check a claim of equality, overtaking, relative magnitude, or faster growth against the actual values and intended measure of change, not screen height, crossings, or line angle. Independent ranges can change those visual relationships. Positive linear rescaling does not change the underlying correlation coefficient; visual overlap alone is not a statistical or causal analysis.
@@ -78,6 +86,26 @@ A brief labels the overall rates correctly but headlines them “Resolution impr
 
 A control headline, “A larger share of this week's actual requests was resolved,” with the correct overall values and no subgroup or causal claim, is supported. If the request is to compare at a stated illustrative 50/50 mix, **75% then 65%** is valid only as a separately labeled standardized comparison. If only the overall rates are supplied, a reversal within subgroups is not established and must not be invented.
 
+## Check successive percentage changes against their bases
+
+If a headline or additive display combines period growth rates, establish whether each rate uses the immediately preceding value of the same comparable quantity. Such relative changes compound through **(1 + r₁) × (1 + r₂) × … − 1**, with fractional rates; their sum generally does not give the first-to-last change. Check compatible endpoints when they measure the same unadjusted change. Preserve source adjustments, precision, and the exact periods: overlapping year-over-year rates and annualized short-period rates are not consecutive actual-period factors.
+
+For an invented comparable activity index **100 → 120 → 96**, correct period labels **+20% and −20%** do not support “back to the starting level.” The last value is **4% below the first**. Repair that headline or a percentage waterfall that adds the rates to zero; a level view or additive **+20 and −24 index-point changes** can preserve the endpoint question. Do not reject a chart that correctly compares only the two period rates. Likewise, percentage-point differences in a percentage-valued series and explicit contributions on a common reference can legitimately add; do not compound them as consecutive relative changes.
+
+When the required rates, compatible endpoints, or source method are unavailable, report the unsupported derivation or verification limit rather than inventing a corrected net figure. An independently reported total is not proven wrong merely because its calculation cannot be reconstructed. Without a rendering, these are arithmetic and claim checks, not measured geometry findings.
+
+## Check pooled medians and percentiles
+
+When an overall median or percentile appears beside group values, inspect how it was obtained if that evidence is available. Averaging group percentiles, even with group-count weights, does not generally give the percentile of all observations. This is different from reconstructing a pooled proportion using compatible numerators and denominators. Check the population, units, period, overlap, and percentile definition before comparing or recomputing values.
+
+Use supplied underlying observations or a compatible combined distribution when available; label histogram-derived estimates with appropriate precision rather than treating grouped data as exact individual values. If only group percentiles and counts are known, the pooled value may remain unverified. Do not fabricate a corrected number or declare an independently reported overall value wrong merely because it cannot be reconstructed. A correctly labeled comparison of group medians, or an explicitly requested average of those medians, need not be replaced with a pooled statistic.
+
+## Worked example: an average of medians mislabeled as the overall median
+
+An invented source provides all waits from nonoverlapping desks in one period: **A: 1, 2, 3 minutes** and **B: 10, 20, 30, 40, 50 minutes**. It defines the median as the middle ordered value, averaging the two central values for an even count. A brief headlines **“Median across all eight waits: 19.5 minutes”**, calculated as **(3 × 2 + 5 × 30) / 8** from desk medians. The arithmetic computes a count-weighted average of medians, not the claimed statistic. The pooled ordered observations have central values **10 and 20**, so repair the headline to **15 minutes** for that all-waits question.
+
+A control showing **“Desk medians: A 2 minutes; B 30 minutes”** is supported and needs no pooled-value repair. If only those medians and counts are supplied, 15 is not justified: replacing B's waits with **4, 5, 30, 40, 50** preserves its median and count but changes the pooled median to **4.5**. Flag the unsupported derivation, not a guessed replacement. Coincidental equality between a weighted average and a true pooled percentile does not make averaging a generally valid method. Without a rendering, these are source and arithmetic checks, not measured mark or layout defects.
+
 ## Check histogram height against bin width
 
 For a numeric-axis histogram, inspect the bin boundaries, axis units, and stated meaning of height and area together. On linear axes, count density times bin width should recover the bin count; probability density times bin width should recover its share of the stated population. Unequal-width bins with raw count heights can distort an area-based distribution comparison. Distinguish a wrong geometry or density label from a correct count answering a different question.
@@ -99,6 +127,20 @@ Identify what an interval means before judging it: spread among observations, un
 Do not infer significance solely from whether two separate error bars overlap. Evaluate the comparison the source actually supplies. If a forecast is displayed as an observed outcome, or a best estimate as a guarantee, identify that overstatement directly.
 
 Check whether aggregation hides information required for the question: changing subgroup composition, paired changes, skew, or a relevant tail. Do not demand raw data on every summary chart. A faithful summary can be sufficient for a summary question; detailed analysis may be needed for a different inference.
+
+## Check cumulative and period claims separately
+
+Determine what each timestamp means: activity in an interval, a running total from a stated start, a rolling-window summary, or a point-in-time balance. Compare that definition with the headline and requested judgment. A correctly rising running total can accompany falling additions; flag an unsupported daily-growth claim, not the cumulative form itself. A valid total-to-date lookup need not also display daily activity.
+
+When compatible boundary values permit it, subtract consecutive running totals to check the amount added over the intervening interval. Do not sum snapshots as disjoint contributions or assume the first displayed total started at zero. Keep actual interval durations: dividing a multi-day addition by its duration gives an average, not evidence of equal daily amounts. Compare like-defined intervals or supported rates when judging pace, and distinguish a partial period from a complete one.
+
+Check source resets, revisions, and coverage changes before calling a difference new activity. Do not replace a negative change with zero merely because the series is called cumulative; signed net amounts and corrections may be legitimate. Differences between overlapping rolling windows do not directly give new period counts, and a balance change does not identify gross arrivals. Missing definitions or boundaries leave that reconstruction unverified, rather than proving the source's separately reported period values wrong.
+
+## Worked example: higher total, lower daily activity
+
+An invented, unrevised campaign source gives registrations accumulated since launch at the same daily closing time: **Monday: 100, Tuesday: 180, Wednesday: 220**. A brief reproduces those values and headlines them “New registrations increased each day.” That headline is contradicted for Tuesday versus Wednesday: the daily additions are **80 then 40**. Repair the daily comparison with those source-derived values, or retain the cumulative view with a headline scoped to the supported increase in the total. Monday's new registrations cannot be recovered without the preceding boundary value; it is not automatically 100.
+
+The control statement “220 registrations accumulated by Wednesday” needs no daily repair. If Tuesday's snapshot is absent, **120 registrations over the two days** is supported, not a specific Tuesday/Wednesday split. If a later snapshot falls because the source explicitly removes duplicate registrations, preserve that correction rather than depicting negative new people or silently replacing it with zero. Without a rendering, these are checks of the supplied meanings and arithmetic, not measured slopes, spacing, or legibility.
 
 ## Check missingness without inventing observations
 
@@ -142,6 +184,14 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
+
+- [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
+
+- [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
+
+- [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
+
 - [ONS's dual-axis critique](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) motivates checking claims separately from faithful point plotting. [Datawrapper's guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses alternatives and valid uses; [Matplotlib's secondary-axis examples](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) show linked conversions. These are guidance and implementation examples, not a behavioral evaluation of this reviewer. The order-series and temperature controls are original arithmetic illustrations.
 
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) motivates keeping association reversal separate from causal interpretation. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates explicitly weighted standardization. The support-record example is original; these sources do not validate this reviewer or make disaggregation a universal repair.
@@ -157,4 +207,4 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 - [Munzner's nested validation model](https://www.cs.ubc.ca/labs/imager/tr/2009/NestedModel/) motivates separating data/task assumptions from representation and implementation checks.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) studies visual representations of sets and subsets in undergraduate calculation tasks. It informs the reference-group check, not a requirement to use one chart type or a measured benefit of this review skill.
 
-The inspection procedures, rainfall, close-bar, visitor, support-record, arrival-interval, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.
+The inspection procedures, rainfall, close-bar, visitor, support-record, arrival-interval, campaign-registration, and missing-month examples are original applications. A passed inspection does not establish statistical validity of an unavailable analysis or measured reader comprehension.

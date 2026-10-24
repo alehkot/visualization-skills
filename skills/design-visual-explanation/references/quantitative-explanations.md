@@ -35,6 +35,14 @@ When bar length encodes magnitude, define a meaningful zero baseline. A truncate
 
 Do not use area, volume, or width casually for emphasis when it also appears to encode a number. If area carries value, doubling a symbol's radius quadruples its area. A qualitative flow should not acquire unsupported quantitative widths. Keep decorative emphasis separate from measured magnitude.
 
+## Read stacked components between their boundaries
+
+In an ordinary nonnegative additive stack, a component's amount is the difference between its upper and lower boundaries in axis units, not its upper boundary's value. An upper edge can rise while that component shrinks because the components below it grew. Identify the layer and both boundaries before describing its trend. For a zero-based stack covering the whole, the outer top edge represents the total; an interior boundary represents only the subtotal below it. Do not transfer either reading to one component.
+
+For an invented two-period count, **A: 30 → 80** and **B: 50 → 40**, with A below B, B's upper edge rises **80 → 120**. Yet B falls **50 → 40**, or **20%**. “The total grew 50%” is true; “B grew 50%” is not. To explain B's change, use its component values, with associated labels, a separate series view, or another suitable comparison. Keep the stack when total and composition are the task; a shared baseline for every layer is not mandatory.
+
+Preserve what thickness represents: a 100% stack shows shares, not original amounts, and cannot recover those amounts without totals. Centered or diverging stacks need their own stated offset and sign conventions; do not assume their top edge is the net total. Read calibrated values rather than treating raw pixel distances on a transformed axis as amounts. When source values or boundaries are unavailable, retain that limit instead of inventing a component change.
+
 ## Keep independent axes from implying a common comparison
 
 Before overlaying quantities, identify each series' unit and axis. Independently chosen ranges can change which line appears higher, where connecting segments cross, and their apparent slopes without changing the data. Do not use those screen relationships to establish equality, overtaking, relative magnitude, or faster growth. Define whether growth means an absolute change or a relative change over the same period, and calculate it from compatible values.
@@ -48,6 +56,14 @@ A secondary axis can be legitimate. A fixed unit conversion of one measure, such
 An invented record gives **A: 40 then 60 orders** and **B: 900 then 700 orders**, over the same two months. With linear ranges **0–100 for A** and **0–1,000 for B**, their fractional heights above the bottom are **0.40 → 0.60** and **0.90 → 0.70**. Change only B's range to **0–2,000** and its heights become **0.45 → 0.35**: the connecting segments now cross, although A has fewer orders at both observations. Do not headline this “A overtook B.” A shared order scale or an explicit value comparison preserves the magnitude question; “A rose while B fell” describes the recorded changes. The segments do not establish what happened between the observations.
 
 As a control, one temperature series with matched **0–100°C** and **32–212°F** axes has a fixed conversion, **°F = 1.8 × °C + 32**. Corresponding ticks, including **50°C = 122°F**, occupy the same positions. This is not two independently scaled series and does not need to be rejected for having a second axis.
+
+## Keep successive percentage changes on their own bases
+
+For a first-to-last change, distinguish consecutive period growth rates from additive contributions. When each rate describes the same comparable quantity relative to its immediately preceding value, combine the growth factors: **(1 + r₁) × (1 + r₂) × … − 1**, with rates written as fractions. Adding the percentages generally gives the wrong net change because their bases differ. For an ordinary unadjusted series, compatible first and last values also give **last / first − 1**, with a nonzero first value and a meaningful ratio interpretation.
+
+Retain each rate's period and definition. Do not chain overlapping year-over-year rates or treat annualized rates as actual changes over their shorter reporting intervals. Missing periods, changed definitions, and rounded rates can prevent an exact reconstruction. Source-adjusted growth may deliberately differ from raw endpoint change; preserve that distinction rather than overriding the source method.
+
+For an invented comparable activity index, **100 → 120 → 96** gives successive changes of **+20% and −20%**, but the last observation is **4% below the first**, not unchanged. A level view can show those three readings. An additive waterfall can instead use the **+20 and −24 index-point changes**; stacking +20% and −20% as if they shared the original base would give a false endpoint. A chart only comparing the two period rates may keep both correct labels without adding a net summary. Percentage-point changes in a percentage-valued series are additive differences, not these relative growth factors. Explicit contributions on a common reference can also add; retain that definition instead of relabeling them as consecutive growth rates.
 
 ## Make close comparisons readable
 
@@ -81,6 +97,18 @@ A has the higher rate in both route groups, but most of A's deliveries are remot
 
 For a specifically requested illustrative 50/50 local/remote mix, those **75% and 65%** are valid standardized comparisons; label the assumed mix rather than claiming either was observed. For “What share of each service's actual deliveries arrived on time?”, **62.7% versus 77.3%** is the relevant descriptive answer. Neither view alone proves that changing service would cause a delivery to be on time.
 
+## Do not pool medians or percentiles by averaging them
+
+Distinguish a percentile of all observations from a summary of group percentiles. A median or 95th percentile is a position in an ordered distribution, not an additive quantity. Neither an unweighted average nor an average weighted by group counts generally recovers the pooled percentile. The denominator-weighting rule for proportions above must not be transferred to percentiles.
+
+For a requested overall percentile, use compatible underlying observations or a distribution representation that supports combining them. Preserve units, coverage, observation weights, and the source's percentile definition; do not double-count overlapping groups. A combined histogram can support an estimate, but its resolution and estimation method limit precision. When only group percentiles and counts are supplied, do not invent a pooled value. Show the available group values with their scope, or identify the distribution data needed for the requested total. A separately supplied overall percentile need not be discarded merely because its raw data is unavailable.
+
+## Worked example: medians do not combine like means
+
+An invented record supplies all waits in minutes from two nonoverlapping desks in the same period: **A: 1, 2, 3** and **B: 10, 20, 30, 40, 50**. Define the median as the middle ordered value, averaging the two central values for an even count. The desk medians are **2 and 30**. Their unweighted average is **16**; weighting by counts gives **(3 × 2 + 5 × 30) / 8 = 19.5**. Neither is the pooled median: the eight ordered waits have central values **10 and 20**, giving **15 minutes**. For an all-waits question, label that pooled value and its population, optionally retaining the desk values separately.
+
+A control chart comparing **each desk's median** can validly show 2 and 30 without an overall value. An explicitly requested average of desk medians is also a different, legitimate summary, not the median across all waits. If B instead had waits **4, 5, 30, 40, 50**, its count and median would be unchanged, but the pooled median would be **4.5 minutes**. Counts and medians alone therefore do not determine the answer. Keep the stated median convention; do not impose it on every source's percentile calculation.
+
 ## Preserve histogram bin widths and density
 
 For a histogram on a linear numeric axis, retain the source's bin boundaries and say whether height represents count, share, or density. With unequal bin widths, raw count heights give wider intervals extra area unrelated to their counts. When area is meant to represent count or share, use count divided by bin width, or count divided by both the represented population size and bin width. Label the vertical units accordingly, such as “observations per minute” or “probability density per minute.” Density height is not the probability of that interval; height times width gives its count or share. A probability density can exceed one.
@@ -104,6 +132,20 @@ Show the distribution when its shape, tails, or subgroups are necessary to the q
 When comparing estimates, a visually larger center is not by itself an established difference in the underlying populations. An interval-overlap shortcut is not a substitute for the relevant comparison or statistical analysis. Keep limitations near a headline that would otherwise imply certainty.
 
 If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
+
+## Separate totals to date from activity in each period
+
+Establish whether a time series records activity during each interval, a running total since a stated start, a rolling-window summary, or a point-in-time balance. Preserve that meaning in labels and the headline. A rising cumulative total does not establish rising daily activity: positive additions can shrink while the total continues upward. Use totals to date for accumulated progress and period amounts or rates for the pace question; neither view is universally preferable.
+
+For a compatible running total, subtract the earlier boundary value from the later one to recover the amount added over that interval. Retain the start boundary, end boundary, and source definition. Do not assume the first displayed value began at zero, add cumulative snapshots together as if they were disjoint periods, or treat a multi-day difference as one day's activity. When the question concerns pace across unequal durations, a supported amount divided by elapsed time gives an interval-average rate, not the unobserved daily pattern.
+
+Check resets, corrections, and changes in coverage before interpreting differences as new events. A negative difference can reflect a revision or a legitimately signed net measure; do not silently clamp it to zero. A changing rolling-window total is not a running total, and a balance change is not necessarily gross inflow. If the definitions or required boundary values are missing, state what cannot be recovered rather than inventing period values.
+
+## Worked example: a rising total with slowing additions
+
+An invented campaign records cumulative registrations since launch at the same daily closing time: **day 0: 0, day 1: 60, day 2: 100, day 3: 120**. The compatible, unrevised record implies **60, 40, and 20 new registrations** in the three daily intervals. For “Is daily registration increasing?”, show those interval values and say it decreased over these days. The fact that the cumulative curve rises does not by itself answer that question. Summing its four snapshots to **280** would count earlier registrations repeatedly, not recover campaign registrations.
+
+For “How many registrations have accumulated by day 3?”, the correctly labeled **120 since launch** is sufficient; do not force a daily view. If only day 1's **60** and day 3's **120** are available, the difference establishes **60 over two days**, averaging **30 per day**, but does not establish **30 on each day**. If the series instead reports current active members or the last seven days' registrations, do not apply the running-total interpretation without the relevant accounting or window definition.
 
 ## Preserve missingness as part of the evidence
 
@@ -147,6 +189,14 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
+
+- [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
+
+- [Prometheus histogram and summary guidance](https://prometheus.io/docs/practices/histograms/) documents why averaging precomputed quantiles does not generally recover a service-wide percentile and distinguishes histogram estimates. [NIST's percentile reference](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm) describes ordered observations and differing percentile conventions. The desk-wait counterexamples are original arithmetic controls, not a model-behavior or reader-comprehension evaluation.
+
+- [ONS's December 2025 public-finance bulletin](https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/december2025) distinguishes a month's borrowing from the cumulative financial-year amount and compares matched periods. [WHO's case-dashboard notes](https://data.who.int/dashboards/COVID19/cases?n=c) document reporting intervals and retrospective corrections that can produce spikes or negative values. These are real reporting examples motivating the distinction, not evaluations of this skill or a requirement to use either domain's chart format.
+
 - [ONS's dual-axis examples](https://digitalblog.ons.gov.uk/2019/07/03/dueling-with-axis-the-problems-with-dual-axis-charts/) demonstrate misleading magnitude and growth readings. [Datawrapper's dual-axis guide](https://www.datawrapper.de/blog/dual-axis-charts-guide) discusses task-sensitive alternatives and legitimate uses. [Matplotlib's secondary-axis documentation](https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html) distinguishes linked conversions from independent scales. These motivate the checks; they do not evaluate this skill or require a plotting library.
 
 - [Pearl, Understanding Simpson's Paradox](https://ftp.cs.ucla.edu/pub/stat_ser/r414.pdf) separates association reversal from causal interpretation; it does not license automatic subgroup adjustment. [CDC's age-adjustment definition](https://www.cdc.gov/nchs/hus/sources-definitions/age-adjustment.htm) illustrates a common reference distribution and why standardized rates must be distinguished from observed rates. The delivery example is an original arithmetic illustration, not a causal or reader-comprehension study.
@@ -163,4 +213,4 @@ A correctly labeled explanation of the first question need not also teach the se
 - [Hullman, Why Authors Don't Visualize Uncertainty](https://mucollective.northwestern.edu/project/2019-value-of-uncertainty-vis) investigates practitioner reasoning and barriers; it does not establish that every chart needs the same uncertainty display.
 - [Böcherer-Linder and Eichler, How to Improve Performance in Bayesian Inference Tasks](https://pmc.ncbi.nlm.nih.gov/articles/PMC6401595/) compares five visualizations in calculation tasks with undergraduate students. It motivates exposing the relevant sets and subsets; it does not establish a universally best format or validate this skill.
 
-The survey, close-bar, inspection, delivery, wait-interval, daily-record, order-series, and temperature examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.
+The survey, close-bar, inspection, delivery, wait-interval, daily-record, campaign-registration, order-series, and temperature examples, and decision procedures are original teaching material. They do not replace statistical analysis when a requested inference requires it.

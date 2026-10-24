@@ -29,6 +29,18 @@ Check a normal case and a case at the boundary of the rule. Ask what the depicte
 
 For a process, identify the actor responsible for a step only if responsibility matters and is known. For a state model, distinguish stable states from actions. For a dependency map, do not impose chronological order merely to make a left-to-right story.
 
+## Preserve concurrent work and continuation rules
+
+When a process branches, establish whether the paths are alternatives or work that can proceed independently. At a later meeting point, preserve what permits continuation: all required branches completing, the selected alternative completing, or another source-defined condition. Converging arrows alone do not specify that rule. Keep completion distinct from success or approval; use the source's actual condition rather than treating every finished task as successful.
+
+Do not turn independent work into a required sequence for a simpler drawing. Conversely, permission to overlap does not establish simultaneous starts, physical parallel execution, equal durations, or a completion-time saving. Preserve supplied failure, cancellation, and timeout behavior when consequential; leave it unresolved when absent. A labeled branch-and-join view or a dependency table can carry these meanings without a particular notation.
+
+## Worked example: both tasks, either order
+
+An invented publication procedure says: “After intake, copyediting and illustration may proceed independently. Both must finish before layout may begin.” Show both tasks following intake, with **both complete before layout may start** at their continuation point. Copyediting complete while illustration is unfinished does not meet that condition. Do not replace it with “either complete,” require copyediting to finish before illustration starts, or promise that layout starts immediately. The procedure supplies no task durations or failure policy.
+
+A control brief can list the tasks in either order if it explicitly preserves their independence and the both-complete condition; it needs no mandatory fork/join symbol. A different source says each request selects exactly one delivery route, email or post, and may be archived after that selected route finishes. Its rejoin must not wait for the unselected route. If a source merely lists two tasks without explaining their relationship, name that gap rather than inventing concurrency or synchronization.
+
 ## Explain waiting and incomplete execution
 
 When the question is why work waits, preserve the stated condition for proceeding or leave the cause unresolved. Waiting may depend on a date, an approval, or missing information rather than resource contention. Where competition for a shared resource is established, identify the competing arrivals, that resource, and what can wait. Distinguish work waiting from work being served. A count of queued items, a simultaneous occupancy limit, and a processing rate describe different quantities; retain their units and observation periods. Converging arrows alone establish neither overload nor a particular waiting time. Show rejection, expiry, or priority only when supported; do not invent an ordered queue where service order is unknown.
@@ -59,8 +71,9 @@ Counterexample to drawing every dependency: a study-room access explanation need
 
 ## Basis and limits
 
+- [Camunda’s parallel-gateway](https://docs.camunda.io/docs/components/modeler/bpmn/parallel-gateways/) and [exclusive-gateway documentation](https://docs.camunda.io/docs/components/modeler/bpmn/exclusive-gateways/) illustrate synchronization versus alternative-path rejoining. These execution conventions inform the distinction, not a required notation or a measured comprehension benefit.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how spatial arrangement and marks convey meaning, including the ambiguity of arrows. It does not prescribe one notation for all relationships.
 - [Cascade Institute, Causal Loop Diagrams handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) supplies conventions for qualitative causal-loop modeling. Those conventions do not prove the links in an arbitrary source.
 - [arc42, Building block view](https://docs.arc42.org/section-5/) illustrates scoped decomposition and selective detail; [C4 notation guidance](https://c4model.com/diagrams/notation) remains notation independent. These are software-architecture practices, adapted here only where their structural reasoning fits.
 
-The condition checks and archive example are original operational guidance, not a claim of measured comprehension improvement.
+The condition checks, publication and delivery examples, and archive example are original operational guidance, not a claim of measured comprehension improvement.
