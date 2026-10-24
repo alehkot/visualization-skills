@@ -35,6 +35,14 @@ When bar length encodes magnitude, define a meaningful zero baseline. A truncate
 
 Do not use area, volume, or width casually for emphasis when it also appears to encode a number. If area carries value, doubling a symbol's radius quadruples its area. A qualitative flow should not acquire unsupported quantitative widths. Keep decorative emphasis separate from measured magnitude.
 
+## Read stacked components between their boundaries
+
+In an ordinary nonnegative additive stack, a component's amount is the difference between its upper and lower boundaries in axis units, not its upper boundary's value. An upper edge can rise while that component shrinks because the components below it grew. Identify the layer and both boundaries before describing its trend. For a zero-based stack covering the whole, the outer top edge represents the total; an interior boundary represents only the subtotal below it. Do not transfer either reading to one component.
+
+For an invented two-period count, **A: 30 → 80** and **B: 50 → 40**, with A below B, B's upper edge rises **80 → 120**. Yet B falls **50 → 40**, or **20%**. “The total grew 50%” is true; “B grew 50%” is not. To explain B's change, use its component values, with associated labels, a separate series view, or another suitable comparison. Keep the stack when total and composition are the task; a shared baseline for every layer is not mandatory.
+
+Preserve what thickness represents: a 100% stack shows shares, not original amounts, and cannot recover those amounts without totals. Centered or diverging stacks need their own stated offset and sign conventions; do not assume their top edge is the net total. Read calibrated values rather than treating raw pixel distances on a transformed axis as amounts. When source values or boundaries are unavailable, retain that limit instead of inventing a component change.
+
 ## Keep independent axes from implying a common comparison
 
 Before overlaying quantities, identify each series' unit and axis. Independently chosen ranges can change which line appears higher, where connecting segments cross, and their apparent slopes without changing the data. Do not use those screen relationships to establish equality, overtaking, relative magnitude, or faster growth. Define whether growth means an absolute change or a relative change over the same period, and calculate it from compatible values.
@@ -180,6 +188,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 
 - [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
 

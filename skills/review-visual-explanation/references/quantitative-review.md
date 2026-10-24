@@ -34,6 +34,14 @@ A nonzero origin can distort magnitude bars even when the tick labels are correc
 
 A break, inset, transformation, or schematic view needs enough disclosure to support its intended use. Disclosure is not a universal cure: a small footnote cannot make a prominently false ratio true.
 
+## Check stacked claims against component boundaries
+
+For an ordinary nonnegative additive stack, trace a named component to both its lower and upper boundaries. Their difference in axis units gives that component's amount; the upper edge alone also includes components below it. Check component-change headlines against the component values, not merely the upper edge's slope or height. In a zero-based stack covering the whole, the outer top edge gives the total, while interior boundaries give partial totals. A displaced component baseline is not by itself an invalid truncated bar.
+
+For an invented two-period count, **A: 30 → 80** and **B: 50 → 40**, with A below B, B's upper edge rises **80 → 120**. A headline “B grew 50%” contradicts B's **20% decrease**; “The total grew 50%” remains valid. Correct the component claim without changing correct data. If its values are hard to recover for the requested comparison, suggest associated labels or a separate comparison view. Do not reject a stack whose total/composition task or existing labels already resolves the concern.
+
+Check the encoding before applying this test. A 100% stack carries shares rather than original amounts; centered or diverging stacks have different offset and sign conventions, so their top edge need not be the net total. Convert readable boundaries through the stated scale instead of subtracting screen pixels on a nonlinear axis. If the source or rendering cannot establish the component values, report that inspection limit rather than an invented exact change.
+
 ## Check the inference across independent axes
 
 Identify which series uses each axis, its units and range, and whether the axes are independent or linked by a fixed conversion. Correctly plotted points on their own axes can still invite an invalid cross-series comparison. Check a claim of equality, overtaking, relative magnitude, or faster growth against the actual values and intended measure of change, not screen height, crossings, or line angle. Independent ranges can change those visual relationships. Positive linear rescaling does not change the underlying correlation coefficient; visual overlap alone is not a statistical or causal analysis.
@@ -175,6 +183,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 
 - [BLS percent-change guidance](https://www.bls.gov/cpi/factsheets/calculating-percent-changes.htm) distinguishes endpoint change from the sum of monthly rates. [Bank of England growth-rate documentation](https://www.bankofengland.co.uk/statistics/details/further-details-about-changes-flows-growth-rates-data) compounds successive rates and explains why adjusted growth can differ from raw endpoint changes. The activity-index example is original arithmetic, not a model or reader-comprehension evaluation.
 
