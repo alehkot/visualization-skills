@@ -17,7 +17,7 @@ Use the core workflow for straightforward requests. Read the relevant reference 
 | Choosing between forms, reconciling several reader questions, or deciding whether a visual helps | [Task and representation](references/task-and-representation.md) |
 | Processes, conditions, concurrent branches and joins, waiting, execution outcomes, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
 | Quantitative comparisons, close values, label precision, conditional percentages, successive percentage changes, cumulative versus period activity, missing observations, scales and dual axes, stacked component boundaries, histogram bin widths and density, aggregation, pooled medians and percentiles, subgroup rates and population mix, distributions, or uncertainty | [Quantitative explanations](references/quantitative-explanations.md) |
-| Reading and lookup paths, competing accounts, grouping, multiple views, or before/after comparisons | [Composition and multiple views](references/composition-and-multiple-views.md) |
+| Reading and lookup paths, competing accounts, grouping, multiple views, before/after comparisons, or aggregate snapshots versus member transitions | [Composition and multiple views](references/composition-and-multiple-views.md) |
 | Physical structure, motion, viewpoint, cutaways, reconstructions, or analogy | [Explanatory illustration](references/explanatory-illustration.md) |
 | Text alternatives, non-color meaning, interaction, or requested print/narrow variants | [Accessibility and delivery](references/accessibility-and-delivery.md) |
 

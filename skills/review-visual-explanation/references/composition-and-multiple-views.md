@@ -41,6 +41,14 @@ Match any change summary against the views in both directions: is each stated ch
 
 Treat rearrangement as a finding only when it contradicts the declared encoding or obstructs a necessary match. Two independently arranged panels with clear identities can be valid. Conversely, a legend that defines position as physical location makes an unexplained position change consequential. A before/after comparison alone cannot verify a claimed transition sequence or uninterrupted operation between the snapshots.
 
+## Check whether snapshot totals support member flows
+
+For a Sankey, alluvial view, or switching claim, trace consequential links to joint evidence connecting the categories: matched observations, a transition table, or supported origin–destination amounts. Correct category totals at both ends generally do not verify each band; accept a flow uniquely determined by the supplied constraints rather than demanding more data automatically. Net change is not gross movement; unchanged totals do not prove unchanged membership. Check population and category correspondence, including entrants, exits, and unmatched records when relevant. Do not force unrelated cross-sectional samples into a tracked cohort.
+
+If separate snapshot totals leave a flow unresolved, flag a claim that this flow was observed as unsupported rather than asserting a particular alternative flow is true. A smaller repair may retain the valid totals in a composition comparison and remove the unsupported switching claim. A visibly labeled modeled scenario may be legitimate when its assumptions and purpose are supported; do not mislabel its estimates as observations or reject it merely for being estimated. Joint aggregate counts can validate flows without exposing individual identities. A snapshot-only chart does not need transition data for a snapshot-only question.
+
+An invented fixed cohort has **100 members** in mutually exclusive, exhaustive categories A and B, with **A: 60, B: 40** initially and **A: 40, B: 60** later. A brief draws **20 A→B** and all other members staying, claiming “Only 20 members switched.” Those totals also permit **60 A→B and 40 B→A**, with nobody staying. Thus the claimed flow is not determined by the supplied margins; the correct statement is that B's net count increased by 20, not that exactly 20 people switched. Do not replace the drawn flows with the second possible table as a correction. If the source separately supplies **40 A→A, 20 A→B, 0 B→A, 40 B→B**, the original flow and switching claim are supported. Without a rendering, these are evidence checks, not measured band-width or layout defects.
+
 ## Worked example: position loses identity
 
 An invented soil-pit explanation shows **P** on the left and **Q** on the right in an overview. A detail panel sorts the same pits by depth, with **Q** on the left and **P** on the right. The caption says “The left pit contains the ash layer,” but provides no panel name or pit identifier. The source assigns the ash layer to **Q**.
@@ -58,6 +66,8 @@ Keep a boundary if it carries membership. Keep a repeated identifier if it ancho
 Prefer a local change—an explicit label, aligned comparison, moved qualification, or restored relationship—when it addresses the problem. Suggest a new form only when the current structure cannot support the task with a smaller change. For material-only reviews, omit speculative improvements and stylistic alternatives.
 
 ## Basis and limits
+
+- [ggalluvial’s data-format documentation](https://corybrunson.github.io/ggalluvial/articles/ggalluvial.html) describes joint/cohort data for alluvial paths. [D3 Sankey’s link contract](https://github.com/d3/d3-sankey#sankey_links) specifies each flow’s source, target, and quantity. These motivate evidence checks, not a mandated tool or an evaluation of this skill. The two transition possibilities are original arithmetic controls.
 
 - [Green and Blackwell, Cognitive Dimensions tutorial](https://www.cl.cam.ac.uk/~afb21/CognitiveDimensions/CDtutorial.pdf) treats visibility and other properties as activity-dependent tradeoffs, not automatic defects.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how arrangement and marks convey meanings.

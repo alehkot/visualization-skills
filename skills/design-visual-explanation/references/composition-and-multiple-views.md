@@ -42,6 +42,14 @@ For example, an invented lending network retains branches East and West, but red
 
 Even when snapshots establish a change, they do not by themselves establish the intermediate steps, migration order, downtime, or reason for it. Supply those only when the task needs them and the source supports them.
 
+## Do not invent flows from snapshot totals
+
+Separate a change in category totals from movement of the members within them. Before specifying Sankey bands, alluvial paths, or a count of people who switched groups, establish the joint information connecting the observations: matched records, a transition table, or other supported origin–destination quantities, including flows uniquely determined by explicit constraints. Separate totals at each date generally do not determine those flows, even when both dates cover the same people. Equal totals do not establish that nobody moved, and a net increase is not the gross number entering a group.
+
+When only snapshots are supported, compare their composition with aligned bars or a table and keep member transitions unresolved. Do not create proportional, minimal-change, or maximum-retention links as if observed. If the task legitimately calls for a modeled scenario, distinguish its assumptions and estimated flows from the observed totals. Check whether populations, categories, and observation windows correspond; arrivals, departures, or unmatched records may require explicit accounting rather than invented transfers. Aggregated joint counts can suffice; individual identities are not required.
+
+For an invented fixed cohort of **100 members** in mutually exclusive, exhaustive categories A and B, the first snapshot has **A: 60, B: 40** and the second **A: 40, B: 60**. One possible transition table has **40 A→A, 20 A→B, 0 B→A, 40 B→B**. Another has **0 A→A, 60 A→B, 40 B→A, 0 B→B**. Both fit the snapshots, but the number switching is **20 versus 100**. Neither table is established by the totals alone. “B increased by 20 members” is supported; “exactly 20 members switched from A to B” needs additional evidence. If a supplied transition table verifies the first case, its bands are justified without demanding raw records. A valid snapshot comparison needs no added flow view.
+
 ## Worked example: two incompatible accounts
 
 Two invented records describe the same manuscript. **Catalog A** says it was donated in 1930. **Letter B** says it was purchased in 1934. The supplied material does not reconcile them.
@@ -59,6 +67,8 @@ Specify what each view answers, how readers identify the same entity across view
 For a requested narrow or static version, describe how the information relationship survives the changed arrangement. Reflow may turn columns into sections; it must preserve which evidence supports which claim. Whether actual typography and geometry succeed belongs to rendered inspection.
 
 ## Basis and limits
+
+- [ggalluvial’s data-format documentation](https://corybrunson.github.io/ggalluvial/articles/ggalluvial.html) documents categorical joint/cohort data for alluvial paths. [D3 Sankey’s link contract](https://github.com/d3/d3-sankey#sankey_links) requires source, target, and quantity for each flow. These support the information requirements, not a required plotting tool. The two transition tables are an original arithmetic counterexample, not a model-behavior or comprehension evaluation.
 
 - [Larkin and Simon](https://onlinelibrary.wiley.com/doi/10.1111/j.1551-6708.1987.tb00863.x) analyze locality and information search in computational representations; this is not a measured cognitive-load score for a proposed layout.
 - [Green and Blackwell's Cognitive Dimensions tutorial](https://www.cl.cam.ac.uk/~afb21/CognitiveDimensions/CDtutorial.pdf) discusses visibility, juxtaposition, and tradeoffs among activities.

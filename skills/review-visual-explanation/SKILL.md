@@ -17,7 +17,7 @@ For straightforward checks, use the core workflow. Read the relevant reference w
 | Uncertain readings, partial sources, competing interpretations, finding severity, or acceptance with limits | [Evidence and judgment](references/evidence-and-judgment.md) |
 | Conditional logic, concurrent branches and joins, waiting, execution outcomes, states, dependencies, membership, causality, or feedback | [Systems and relationships](references/systems-and-relationships.md) |
 | Quantitative marks, close values, label precision, conditional percentages, successive percentage changes, cumulative versus period activity, missing observations, scales and dual axes, stacked component boundaries, histogram bin widths and density, aggregation, pooled medians and percentiles, subgroup rates and population mix, denominators, or uncertainty | [Quantitative review](references/quantitative-review.md) |
-| Reading or lookup obstacles, grouping, comparison, or correspondence and claimed changes across views | [Composition and multiple views](references/composition-and-multiple-views.md) |
+| Reading or lookup obstacles, grouping, comparison, correspondence and claimed changes across views, or aggregate snapshots versus member transitions | [Composition and multiple views](references/composition-and-multiple-views.md) |
 | Physical depictions, motion, reconstruction, cutaways, schematic scale, or analogy | [Illustration review](references/illustration-review.md) |
 | Non-color meaning, text alternatives, interaction, or supplied delivery variants | [Accessibility and variants](references/accessibility-and-variants.md) |
 
