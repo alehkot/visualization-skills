@@ -59,6 +59,16 @@ Only use feedback notation if the evidence supports a causal account. A static o
 
 Across overview and detail views, keep the identity of an expanded entity explicit and preserve any connection crossing its boundary that matters to the question. A higher-level summary can omit internal detail, but should not change who connects to whom. Omit irrelevant machinery without claiming that the visible elements are the entire real system.
 
+## Keep state summaries faithful
+
+When several underlying states share a displayed label, check the distinction the reader is using that label to judge. If some satisfy a rule and others violate it, label the group as mixed or split it; do not mark the entire group as safe or failing. “Some represented states violate this rule” is different from uncertainty about whether a particular state violates it. If the question is where a failure first occurs, retain that point and the relevant path through it rather than coarsening it into an undifferentiated phase. Keep different violated rules attributable to their actual states.
+
+A simplified transition view should not imply that a nonterminal state is terminal, that a conditional action is unconditional, or that an important event cannot occur because it leaves the displayed label unchanged. Retain a relevant self-transition, split the label, or state the event and its effect directly. Disclose consequential omissions in the view itself; a non-exhaustive overview may legitimately omit transitions, but its labels and claims must still match its scope. Do not add every reset, loop, or internal state merely to make a complete machine.
+
+For an invented cancellation explanation, the source records **working, no result → cancelled, no result → cancelled, late result stored**. The last transition violates “no result is stored after cancellation”; the first cancelled state does not. A single node labeled **Cancelled: safe** is false, and **Cancelled: rule violated** makes the earlier state falsely failing. For a question about where cancellation protection fails, show the late-result transition and its resulting state. For a phase-only overview, **Cancelled: includes states with and without a late stored result; see failure detail** can be appropriate if the detail supplies the relevant distinction. An internal bookkeeping update unrelated to the question need not appear.
+
+A second invented source says **Paused → Working on resume**, and a **refresh** event can occur in Paused without changing its phase but extending a deadline. Do not call Paused **finished; no further action** because the resume arrow was hidden. When explaining deadline changes, retain refresh and its effect even if both endpoints are called Paused. A phase-only overview explicitly labeled **selected phase changes; internal deadline updates omitted**, with resume preserved, need not show refresh. In contrast, a source-defined completed terminal state needs no invented outgoing arrow.
+
 ## Worked example: a one-way condition
 
 In an invented archive, the source says: “A visitor may enter the study room only if their booking is confirmed and a steward is present. A confirmed booking alone does not guarantee entry.”
@@ -71,6 +81,7 @@ Counterexample to drawing every dependency: a study-room access explanation need
 
 ## Basis and limits
 
+- [Cursor pstack’s statechart skill](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/statechart/SKILL.md) distinguishes mixed failure groups and consequential hidden transitions. This practitioner implementation inspired the state-summary checks; its model checker, renderer, colors, and graph-size limits are not requirements here. The cancellation and pause contrasts are original regression examples, not measured model or reader outcomes.
 - [Camunda’s parallel-gateway](https://docs.camunda.io/docs/components/modeler/bpmn/parallel-gateways/) and [exclusive-gateway documentation](https://docs.camunda.io/docs/components/modeler/bpmn/exclusive-gateways/) illustrate synchronization versus alternative-path rejoining. These execution conventions inform the distinction, not a required notation or a measured comprehension benefit.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how spatial arrangement and marks convey meaning, including the ambiguity of arrows. It does not prescribe one notation for all relationships.
 - [Cascade Institute, Causal Loop Diagrams handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) supplies conventions for qualitative causal-loop modeling. Those conventions do not prove the links in an arbitrary source.
