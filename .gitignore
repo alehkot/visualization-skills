@@ -46,3 +46,12 @@
 !/tests/test_inventory.py
 !/tests/test_resource_inventory.py
 !/uv.lock
+
+# Woodpecker build logs and test artifacts
+/.ci-output/
+
+# Explicitly distributed CI configuration and helpers
+!/.woodpecker.yaml
+!/.ci/
+/.ci/*
+!/.ci/check.sh

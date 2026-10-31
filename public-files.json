@@ -1,6 +1,8 @@
 [
+  ".ci/check.sh",
   ".github/workflows/checks.yml",
   ".gitignore",
+  ".woodpecker.yaml",
   "AGENTS.md",
   "LICENSE",
   "README.md",
