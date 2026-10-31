@@ -1,6 +1,10 @@
 [
+  ".ci/check.sh",
+  ".ci/report.py",
+  ".ci/test_report.py",
   ".github/workflows/checks.yml",
   ".gitignore",
+  ".woodpecker.yaml",
   "AGENTS.md",
   "LICENSE",
   "README.md",
