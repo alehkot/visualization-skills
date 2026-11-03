@@ -128,6 +128,18 @@ Do not infer significance solely from whether two separate error bars overlap. E
 
 Check whether aggregation hides information required for the question: changing subgroup composition, paired changes, skew, or a relevant tail. Do not demand raw data on every summary chart. A faithful summary can be sufficient for a summary question; detailed analysis may be needed for a different inference.
 
+## Check “no difference” and “equivalent” claims
+
+When an artifact labels an estimated comparison “equal,” “no effect,” or “negligible,” inspect the source's actual claim and analysis. A difference interval containing 0, or a ratio interval containing 1, does not by itself establish any of those conclusions. Preserve the reported estimate, interval type, level, units and direction when repairing the wording. Do not replace an inconclusive estimate with zero or declare the populations different merely because equality was unsupported.
+
+For a practical-smallness claim, check whether the source supplies a meaningful-difference band and whether the displayed comparison uses its units and direction. Do not invent a band, assume every non-significant finding is small, or perform an equivalence test by visual inspection. A valid supplied equivalence analysis may support a bounded equivalence claim; preserve its criterion, method and assumptions rather than rejecting it just because exact equality is unproved. Equal observed values, or equal rounded labels accurately identified as such, need not imply equal population quantities.
+
+## Worked example: a neutral badge hiding uncertainty
+
+An invented source reports **new − old mean waiting time: +2 minutes**, with a **95% confidence interval of −3 to +7 minutes**. A comparison card replaces these with **“No effect: 0 minutes”**, based only on the interval crossing zero. Restore the source estimate and interval and describe the direction as unresolved under that analysis. The card lost both the observed estimate and potentially consequential changes in either direction; a neutral color alone would not repair it.
+
+If the source defines a practical-smallness band of **±1 minute**, the interval extends outside it, so “negligible difference” is also unsupported. As a control, a source 95% confidence interval **−0.2 to +0.4 minute** lies inside that band: “The reported interval is inside the source's ±1-minute band” is a valid bounded statement, not exact equality. It does not need a contradictory “anything could happen” warning, nor should the reviewer promote it to formal equivalence without the relevant analysis. A ratio example with a reported confidence interval **0.8 to 1.3** must use **1**, not 0, as its no-difference reference. Without a rendering, these are source/claim checks, not measured mark or layout findings.
+
 ## Check cumulative and period claims separately
 
 Determine what each timestamp means: activity in an interval, a running total from a stated start, a rolling-window summary, or a point-in-time balance. Compare that definition with the headline and requested judgment. A correctly rising running total can accompany falling additions; flag an unsupported daily-growth claim, not the cumulative form itself. A valid total-to-date lookup need not also display daily activity.
@@ -183,6 +195,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [U.S. Census reporting standard E2](https://www.census.gov/about/policies/quality/standards/standarde2.html) distinguishes an inconclusive comparison from equality of estimated population quantities. [Greenland et al.'s interpretation guide](https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/) discusses null compatibility, practical size and confidence-interval assumptions. These support the claim checks, not a universal confidence level, a new equivalence analysis, or measured review effectiveness. The queue and ratio controls are original teaching material.
 
 - [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 

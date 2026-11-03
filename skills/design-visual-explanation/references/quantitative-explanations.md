@@ -133,6 +133,18 @@ When comparing estimates, a visually larger center is not by itself an establish
 
 If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
 
+## Distinguish an unresolved difference from equality
+
+For an estimated comparison, preserve the direction, units, interval type and level, and the value meaning no difference: usually 0 for a difference and 1 for a ratio. An interval containing that value does not establish exact equality, no effect, or a practically negligible difference. Keep the point estimate and uncertainty visible rather than replacing them with a zero mark or an “equal” badge. A faithful account of equal observed values is different from a claim about the underlying populations.
+
+If practical importance is the question, use a meaningful-difference threshold or band only when the source supplies and justifies it. Show the interval in relation to that band with the same units and comparison direction. Do not invent a threshold, relabel a non-significant result as formal equivalence, or recompute a test from separate error bars. Preserve a supplied equivalence analysis within its stated method and assumptions. Lack of a direction claim must not obscure what the interval does or does not exclude.
+
+## Worked example: an inconclusive queue comparison
+
+An invented analysis estimates **new − old mean waiting time: +2 minutes**, with a **95% confidence interval from −3 to +7 minutes**. A proposed headline “The queues have equal waiting times” goes beyond that result. A difference mark with the reported interval and zero reference can instead say “Estimated wait is 2 minutes longer; the interval spans shorter and longer waits.” This is not a probability statement that the true difference has a 95% chance of lying in this particular interval.
+
+If the source also defines differences within **±1 minute** as practically small, this wide interval extends beyond that band in both directions. It does not support calling the difference negligible. A separate source analysis reporting **+0.1 minute, 95% confidence interval −0.2 to +0.4**, wholly inside the same band, can be described as “The reported interval lies within the source's ±1-minute practical band.” Keep its interval level and method; this geometric statement alone is not a new formal-equivalence test or proof of exact zero. If no practical band is supplied, show the estimate and interval without inventing one.
+
 ## Separate totals to date from activity in each period
 
 Establish whether a time series records activity during each interval, a running total since a stated start, a rolling-window summary, or a point-in-time balance. Preserve that meaning in labels and the headline. A rising cumulative total does not establish rising daily activity: positive additions can shrink while the total continues upward. Use totals to date for accumulated progress and period amounts or rates for the pace question; neither view is universally preferable.
@@ -188,6 +200,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [U.S. Census reporting standard E2](https://www.census.gov/about/policies/quality/standards/standarde2.html) distinguishes an inconclusive comparison from equality of estimated population quantities. [Greenland et al.'s interpretation guide](https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/) distinguishes null compatibility, effect size, and uncertainty under the analysis assumptions. These support careful claim wording, not a universal confidence level, equivalence procedure, or measured benefit of this skill. The queue examples and proposed display are original teaching material.
 
 - [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 
