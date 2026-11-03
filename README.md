@@ -50,6 +50,8 @@ images. They retain balanced parentheses in destinations (such as
 `assets/chart(1).svg`), angle-bracket destinations, backslash-escaped punctuation,
 and balanced brackets in labels. Optional single-line titles are separate from
 the resource path. These forms follow the [CommonMark link syntax](https://spec.commonmark.org/0.31.2/#links).
+Single-line code examples are ignored only when backtick delimiter runs match;
+escaped or unmatched backticks do not hide live resource links.
 The checker is not a complete Markdown parser: it does not validate remote URLs
 or cover every Markdown form, such as reference-style or multiline links. It
 does not measure the skills' explanation quality or reader comprehension.

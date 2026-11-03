@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import pytest
+from markdown_it import MarkdownIt
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -354,3 +355,39 @@ def test_formatted_headings_share_duplicate_anchor_namespace(bundle):
     result = validate(bundle)
     assert result.returncode == 1
     assert "incorrect anchor" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    r"\`[Resource](assets/missing.svg)\`",
+    "`[Resource](assets/missing.svg)``",
+    "``[Resource](assets/missing.svg)`",
+    "`example` [Resource](assets/missing.svg)",
+    r"`example \` [Resource](assets/missing.svg) `",
+    r"\\\`[Resource](assets/missing.svg)\\\`",
+])
+def test_backtick_text_does_not_hide_live_resource_links(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(token.type == "link_open" and token.attrGet("href") == "assets/missing.svg"
+               for token in tokens)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "`` `[Example](assets/missing.svg)` ``",
+    "`` a ``` [Example](assets/missing.svg) ``",
+    r"\\`[Example](assets/missing.svg)`",
+    "`` [Example](assets/missing.svg) `` [Context](references/context.md#details)",
+    "`unmatched ``[Example](assets/missing.svg)``",
+])
+def test_exact_backtick_spans_hide_only_code_examples(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert not any(token.type == "link_open" and token.attrGet("href") == "assets/missing.svg"
+                   for token in tokens)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
