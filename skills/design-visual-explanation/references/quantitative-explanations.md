@@ -145,6 +145,18 @@ An invented analysis estimates **new − old mean waiting time: +2 minutes**, wi
 
 If the source also defines differences within **±1 minute** as practically small, this wide interval extends beyond that band in both directions. It does not support calling the difference negligible. A separate source analysis reporting **+0.1 minute, 95% confidence interval −0.2 to +0.4**, wholly inside the same band, can be described as “The reported interval lies within the source's ±1-minute practical band.” Keep its interval level and method; this geometric statement alone is not a new formal-equivalence test or proof of exact zero. If no practical band is supplied, show the estimate and interval without inventing one.
 
+## Compare effects, not their significance badges
+
+A result crossing a significance threshold in one group or study and not another does not by itself establish that the effects differ. Keep each estimate's own comparison with its null separate from the comparison between estimates. Different precision can produce different significance labels even when the point estimates are identical. Matching significance labels likewise do not establish equal effects or a successful replication.
+
+When a headline claims a stronger effect in one group, a change in the effect, or a contradiction between studies, look for the source's direct contrast or relevant interaction analysis. Preserve its units, direction, uncertainty and scope. Do not construct that analysis from badges, interval overlap, or an unsupported independence assumption: estimates can share participants or a control group. If the needed comparison is absent, show the available estimates and name that limit rather than inventing a between-group conclusion. A descriptive comparison of reported point estimates, or a faithful listing of each source's significance result, need not become a new inferential analysis.
+
+## Worked example: same estimates, different badges
+
+An invented report gives two studies' estimated mean time saved: **A: +6 minutes, 95% confidence interval 2 to 10**, and **B: +6 minutes, 95% confidence interval −2 to 14**. Its stated decision rule labels a result significant when that interval excludes zero. Only A meets the rule. A green “works” badge for A and a grey “no effect” badge for B would imply more than the report supports; “A has the stronger effect” is not established by those labels either.
+
+Use comparable estimate rows or another suitable form retaining both intervals and the same time-saving direction. The reported point estimates match, but that does not establish equal underlying effects. A narrowly worded “Only A met the report's significance criterion” can be accurate without claiming only A has an effect. If the reader asks whether the effects differ, preserve a supplied direct comparison or state that the badges do not answer it. Do not replace this uncertainty with an automatic claim that the studies agree or conflict.
+
 ## Separate totals to date from activity in each period
 
 Establish whether a time series records activity during each interval, a running total since a stated start, a rolling-window summary, or a point-in-time balance. Preserve that meaning in labels and the headline. A rising cumulative total does not establish rising daily activity: positive additions can shrink while the total continues upward. Use totals to date for accumulated progress and period amounts or rates for the pace question; neither view is universally preferable.
@@ -200,6 +212,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
 
 - [U.S. Census reporting standard E2](https://www.census.gov/about/policies/quality/standards/standarde2.html) distinguishes an inconclusive comparison from equality of estimated population quantities. [Greenland et al.'s interpretation guide](https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/) distinguishes null compatibility, effect size, and uncertainty under the analysis assumptions. These support careful claim wording, not a universal confidence level, equivalence procedure, or measured benefit of this skill. The queue examples and proposed display are original teaching material.
 
