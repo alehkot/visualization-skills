@@ -18,6 +18,18 @@ When supplied joint counts or compatible rates determine the requested ratio, re
 
 Do not assume that the reverse conditional determines the requested share. If the evidence leaves that share unresolved, identify the missing support and distinguish an unverified value from one the evidence rules out. A known empty intersection can refute a claimed positive share; replacing it with 0% also requires a known nonempty denominator. Otherwise, do not invent a replacement percentage or declare an independently supported label false. An explicitly hypothetical “per 1,000” population is a legitimate explanatory device when the supplied rates support it. It must not be presented as an observed sample or add unsupported precision. A correctly scoped conditional percentage does not need its reverse displayed unless the reader's task requires it.
 
+## Check whether odds have become risk in the headline
+
+Identify whether a displayed estimate is an odds ratio (OR), risk ratio (RR), probability or risk difference. Risk is the event proportion **p**; odds are **p / (1 − p)**. An OR compares odds, not probabilities. Check headlines, captions and scales for an OR relabeled as “times as likely,” a percentage increase in risk, or an event probability. Preserve the source's event, comparator, time horizon, adjustment and uncertainty. A correct odds-only forest plot or estimate table needs no automatic conversion to risk.
+
+When probabilities are requested, check the supplied group risks or the source's conversion and compatible comparator baseline. An assumed baseline makes a scenario, not an observed event rate. Do not combine an adjusted OR with an unrelated overall risk or treat sampled case/control fractions as population risks. Retain a supported design-specific interpretation or model-based probability comparison within its stated population. If required baseline or model information is missing, report that limit rather than inventing a probability or rejecting the OR itself. An interval obtained by transforming endpoints at a fixed baseline does not capture that baseline's uncertainty.
+
+## Worked example: an odds ratio on a probability headline
+
+An invented same-month source records delayed deliveries: **A: 20/100**, **B: 40/100**. A brief reports **B versus A OR = 2.67**, then headlines “B is 2.67 times as likely to be delayed.” The rounded OR is consistent with **(40/60) / (20/80) = 8/3**; the headline is not. The observed probability ratio is **(40/100) / (20/100) = 2**, with a **20-percentage-point** difference. Repair the probability headline or retain the odds interpretation, without changing correct source data or claiming a causal effect.
+
+A control brief stating “B had about 2.67 times A's odds of recorded delay” is valid for these counts. A separately supplied adjusted OR with its interval can also remain an odds-only row when no compatible baseline supports probabilities. Use **1** as the reference for ratio values, or **0** for explicitly plotted log-ratio values. Without a rendering, these are source/claim checks, not measured mark or legibility findings.
+
 ## Inspect marks independently of labels
 
 For an actual rendering, compare mark positions and extents with the stated scale. Use a clear view or available geometry when needed. Do not invent exact pixel measurements from a fuzzy screenshot.
@@ -207,6 +219,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
 
 - [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
 

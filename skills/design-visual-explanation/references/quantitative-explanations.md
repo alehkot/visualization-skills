@@ -18,6 +18,18 @@ When the requested direction differs from a supplied percentage, identify the in
 
 If the supplied information does not determine the requested ratio, name the missing information rather than reusing the reverse percentage. Do not combine incompatible populations, periods, or category definitions to fill the gap. When rates support an illustrative “per 1,000” explanation, label that population as hypothetical, preserve source precision, and do not present it as an observed sample size. A zero denominator makes the conditional share undefined, not zero.
 
+## Keep odds ratios distinct from risk ratios
+
+For a binary event, risk is the proportion with the event, **p**; odds are **p / (1 − p)**. A risk ratio (RR) compares probabilities, while an odds ratio (OR) compares odds. An OR of 2 does not generally mean “twice as likely” or “100% higher risk.” Keep the source's measure, event, comparison direction, period, adjustment and uncertainty explicit in headlines, labels and estimate rows. An odds-only forest plot can be valid; do not replace its measure merely because risks may be more familiar.
+
+If the reader needs event probabilities, use supported group risks or an applicable conversion. For a simple two-group comparison with an estimable OR and a compatible comparator risk **0 < p₀ < 1**, use **p₁ = OR × p₀ / (1 − p₀ + OR × p₀)**; **RR = p₁ / p₀** when p₀ is nonzero. Preserve whether the baseline is observed or assumed, and its population and time horizon. An adjusted OR and an overall event rate are not automatically compatible. Do not infer population risks from sampled case/control fractions; retain the source's study-design and model-based interpretation. Missing baseline or method leaves that probability view unresolved, not permission to invent one. Transforming interval endpoints with a fixed baseline does not include uncertainty in that baseline.
+
+## Worked example: larger odds are not the same risk multiplier
+
+An invented same-month record reports delays on **20 of 100 A deliveries** and **40 of 100 B deliveries**. The observed risks are **A: 20%, B: 40%**, and the corresponding odds are **20/80 = 1/4** and **40/60 = 2/3**. For B versus A, **OR = (2/3) / (1/4) = 8/3 ≈ 2.67**. The observed **RR is 2**, and the risk difference is **20 percentage points**. “B deliveries were 2.67 times as likely to be delayed” misreads the OR.
+
+For the probability question, show **40% versus 20%**, with the corresponding groups and period. For the odds question, “B had about 2.67 times A's odds of recorded delay” preserves the measure. Retain supplied uncertainty and use **1** as the no-difference reference on a ratio-valued axis; do not put an OR on a percentage-probability scale. Neither description establishes that choosing B causes delays.
+
 ## Choose an encoding for the required judgment
 
 | Reader needs to see | Candidate structure | Preserve or check |
@@ -212,6 +224,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
 
 - [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
 
