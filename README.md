@@ -52,6 +52,8 @@ and balanced brackets in labels. Optional single-line titles are separate from
 the resource path. These forms follow the [CommonMark link syntax](https://spec.commonmark.org/0.31.2/#links).
 Single-line code examples are ignored only when backtick delimiter runs match;
 escaped or unmatched backticks do not hide live resource links.
+Backticks inside a link destination or optional title stay literal; they cannot
+turn the destination or a later resource link into a code example.
 A backtick run with more backticks in its info string does not open a fenced
 code block, so it cannot hide later resource links or headings. Tilde-fence info
 strings may contain backticks. See the [CommonMark fenced-code rules](https://spec.commonmark.org/0.31.2/#fenced-code-blocks).

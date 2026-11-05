@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from urllib.parse import unquote
 
 import pytest
 from markdown_it import MarkdownIt
@@ -387,6 +388,81 @@ def test_exact_backtick_spans_hide_only_code_examples(bundle, markup):
     tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
     assert not any(token.type == "link_open" and token.attrGet("href") == "assets/missing.svg"
                    for token in tokens)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Resource](assets/missing`draft`.svg)",
+    "[Resource](<assets/missing`draft`.svg>)",
+    r"[Resource](assets/missing\`draft\`.svg)",
+    "![Resource](assets/missing`draft`.svg)",
+    "[Resource `label`](assets/missing`draft`.svg)",
+    '[Resource](assets/missing`draft`.svg "Literal `title`")',
+])
+def test_backticks_in_destinations_preserve_resource_checks(bundle, markup):
+    target = "assets/missing`draft`.svg"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == target
+        for token in tokens
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert f"broken local link {target!r}" in result.stderr
+
+
+@pytest.mark.parametrize("title", ['"Use `"', "'Use `'", "(Use `)"])
+def test_title_backticks_do_not_hide_following_live_links(bundle, title):
+    markup = f"[Context](references/context.md {title}) [Resource](assets/missing.svg) `"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert [token.attrGet("href") for token in tokens if token.type == "link_open"] == [
+        "references/context.md", "assets/missing.svg",
+    ]
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Resource](assets/local`draft`.svg)",
+    "[Resource](<assets/local`draft`.svg>)",
+    "![Resource](assets/local`draft`.svg)",
+    '[Resource](assets/local`draft`.svg "Use ` [Example](missing.svg)") `',
+    '[![Resource](assets/local`draft`.svg)](references/context.md "Use `") `',
+])
+def test_accepts_packaged_backtick_destinations_and_literal_titles(bundle, markup):
+    add_resource(bundle, "assets/local`draft`.svg", "<svg/>\n")
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_backtick_reference_name_counts_as_direct_entrypoint_link(bundle):
+    add_resource(bundle, "references/code`example`.md", "# Example\n")
+    append_link(bundle, "references/code`example`.md#example")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Not a `link](assets/missing.svg`)",
+    "``[Example](assets/missing`draft`.svg)``",
+    '[Context `literal ](missing.svg)`](references/context.md "`title`")',
+])
+def test_code_spans_still_take_precedence_inside_labels(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert not any(
+        token.type == "link_open" and "missing" in (token.attrGet("href") or "")
+        for token in tokens
+    )
     with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
         stream.write("\n" + markup + "\n")
     result = validate(bundle)

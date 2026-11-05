@@ -136,47 +136,35 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     return None
 
 
-def _mask_code_spans(line: str) -> str:
-    """Hide single-line code spans with complete, equal-length backtick runs."""
-    masked = list(line)
-    index = 0
-    while index < len(line):
-        if line[index] == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
-            index += 2
-            continue
-        if line[index] != "`":
-            index += 1
-            continue
-        end = index + 1
-        while end < len(line) and line[end] == "`":
-            end += 1
-        width = end - index
-        # Inside code, backslashes do not escape a closing delimiter. Search
-        # complete runs so a longer run cannot masquerade as a matching one.
-        for closer in re.finditer(r"`+", line[end:]):
-            if len(closer[0]) == width:
-                stop = end + closer.end()
-                masked[index:stop] = " " * (stop - index)
-                index = stop
-                break
-        else:
-            # An unmatched run is literal text, not the start of code.
-            index = end
-    return "".join(masked)
+def _skip_code_span(line: str, start: int) -> int:
+    """Skip a single-line code span, or just an unmatched opening backtick run."""
+    end = start + 1
+    while end < len(line) and line[end] == "`":
+        end += 1
+    width = end - start
+    # Inside code, backslashes do not escape a closing delimiter. Search
+    # complete runs so a longer run cannot masquerade as a matching one.
+    for closer in re.finditer(r"`+", line[end:]):
+        if len(closer[0]) == width:
+            return end + closer.end()
+    return end
 
 
 def markdown_links(text: str) -> list[str]:
     """Read single-line inline links, including balanced labels/destinations."""
     result = []
     for _, line in unfenced_lines(text):
-        # Code spans are examples, not resource links.
-        line = _mask_code_spans(line)
         brackets: list[tuple[bool, bool]] = []
         index = 0
         while index < len(line):
             char = line[index]
             if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
                 index += 2
+                continue
+            if char == "`":
+                # Skip code only in inline text/labels. A parsed destination
+                # and title are consumed together below, with backticks literal.
+                index = _skip_code_span(line, index)
                 continue
             if char == "[":
                 brackets.append((index > 0 and line[index - 1] == "!", False))
