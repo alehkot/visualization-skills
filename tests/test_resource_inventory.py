@@ -391,3 +391,118 @@ def test_exact_backtick_spans_hide_only_code_examples(bundle, markup):
         stream.write("\n" + markup + "\n")
     result = validate(bundle)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "```literal code```\n\n[Resource](assets/missing.svg)",
+    "```language`extra\n[Resource](assets/missing.svg)",
+    "```language\\`extra\n[Resource](assets/missing.svg)",
+    "   ```literal code```\n\n[Resource](assets/missing.svg)",
+    "````literal ``` code```` [Resource](assets/missing.svg)",
+    "```literal code``` [Resource](assets/missing.svg)",
+    "```literal code``` ![Resource](assets/missing.svg)",
+])
+def test_invalid_backtick_fence_info_does_not_hide_live_resources(bundle, markup):
+    # Parse blocks too: parseInline cannot distinguish a fence from inline code.
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(
+        (child.type == "link_open" and child.attrGet("href") == "assets/missing.svg")
+        or (child.type == "image" and child.attrGet("src") == "assets/missing.svg")
+        for token in tokens for child in token.children or []
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("prefix", [
+    "```literal code```",
+    "```language`extra",
+    "```language\\`extra",
+    "   ````literal code````",
+])
+def test_invalid_backtick_fence_info_keeps_live_heading_anchors(bundle, prefix):
+    markup = f"# Context\n\n{prefix}\n\n## Details\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(token.type == "heading_open" and token.tag == "h2" for token in tokens)
+    (bundle / SKILL / "references/context.md").write_text(markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("opener,closer", [
+    ("```", "```"),
+    ("```md", "```"),
+    ("   ```md", "  ```` \t"),
+    ("```md ~~~", "```"),
+    ("~~~md", "~~~"),
+    ("~~~md ``` ~~~", "~~~"),
+    ("   ~~~~md `extra`", " ~~~~~ \t"),
+])
+def test_valid_fences_hide_examples_and_exclude_heading_anchors(bundle, opener, closer):
+    markup = (
+        f"# Context\n\n{opener}\n[Example](missing.md)\n## Details\n"
+        f"{closer}\n\n## Details\n"
+    )
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert sum(token.type == "fence" for token in tokens) == 1
+    assert sum(token.type == "heading_open" and token.tag == "h2" for token in tokens) == 1
+    (bundle / SKILL / "references/context.md").write_text(markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    append_link(bundle, "references/context.md#details-1")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "incorrect anchor" in result.stderr
+
+
+@pytest.mark.parametrize("opener,non_closer,closer", [
+    ("````md", "```", "````"),
+    ("```md", "~~~", "```"),
+    ("```md", "``` extra", "```"),
+    ("```md", "```literal`info", "```"),
+    ("```md", "    ```", "```"),
+    ("~~~md", "~~~ extra", "~~~"),
+    ("~~~md", "```", "~~~"),
+    ("~~~~md", "~~~", "~~~~"),
+])
+def test_only_matching_bare_fences_end_code_blocks(bundle, opener, non_closer, closer):
+    markup = f"{opener}\n{non_closer}\n[Example](missing.md)\n{closer}\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert len(tokens) == 1 and tokens[0].type == "fence"
+    assert "[Example](missing.md)" in tokens[0].content
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("opener", ["```md", "~~~md", "~~~md `extra`", "```~~~"])
+def test_valid_unclosed_fences_hide_examples_to_end_of_document(bundle, opener):
+    markup = f"{opener}\n[Example](missing.md)\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert len(tokens) == 1 and tokens[0].type == "fence"
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_invalid_backtick_info_does_not_prevent_later_real_fences(bundle):
+    markup = (
+        "```literal code```\n\n~~~md\n[Example](missing.md)\n~~~\n"
+        "[Context](references/context.md#details)\n"
+    )
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert sum(token.type == "fence" for token in tokens) == 1
+    assert any(
+        child.type == "link_open" and child.attrGet("href") == "references/context.md#details"
+        for token in tokens for child in token.children or []
+    )
+    (bundle / SKILL / "SKILL.md").write_text(FRONTMATTER + "\n" + markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr

@@ -32,10 +32,14 @@ def unfenced_lines(text: str) -> list[tuple[int, str]]:
         if match:
             marker, tail = match.groups()
             if fence is None:
-                fence = (marker[0], len(marker))
-            elif marker[0] == fence[0] and len(marker) >= fence[1] and not tail.strip():
-                fence = None
-            continue
+                # Backticks in the info string rule out a backtick opener.
+                if marker[0] != "`" or "`" not in tail:
+                    fence = (marker[0], len(marker))
+                    continue
+            else:
+                if marker[0] == fence[0] and len(marker) >= fence[1] and not tail.strip():
+                    fence = None
+                continue
         if fence is None:
             result.append((number, line))
     return result
