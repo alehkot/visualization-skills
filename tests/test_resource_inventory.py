@@ -582,3 +582,85 @@ def test_invalid_backtick_info_does_not_prevent_later_real_fences(bundle):
     (bundle / SKILL / "SKILL.md").write_text(FRONTMATTER + "\n" + markup, encoding="utf-8")
     result = validate(bundle)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,name", [
+    ("assets/a&amp;b.svg", "assets/a&b.svg"),
+    ("assets/a&#38;b.svg", "assets/a&b.svg"),
+    ("assets/a&#x26;b.svg", "assets/a&b.svg"),
+    ("assets/a&#X26;b.svg", "assets/a&b.svg"),
+    ("assets/caf&eacute;.svg", "assets/café.svg"),
+    ("assets/a&#41;b.svg", "assets/a)b.svg"),
+    ("assets/a&lt;b.svg", "assets/a<b.svg"),
+    ("assets/a&#32;b.svg", "assets/a b.svg"),
+    ("assets/a&#9;b.svg", "assets/a\tb.svg"),
+    ("assets/a&#10;b.svg", "assets/a\nb.svg"),
+    (r"assets/a\&amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a&amp;amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a%26amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a&copy.svg", "assets/a&copy.svg"),
+    ("assets/a&MadeUpEntity;b.svg", "assets/a&MadeUpEntity;b.svg"),
+])
+@pytest.mark.parametrize("angle,image", [(False, False), (True, True)])
+def test_character_references_resolve_to_packaged_destination_once(bundle, target, name,
+                                                                 angle, image):
+    add_resource(bundle, name)
+    destination = f"<{target}>" if angle else target
+    markup = f"{'!' if image else ''}[Resource]({destination})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == name
+        for token in tokens
+    )
+    append_link(bundle, destination, image=image)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,decoy", [
+    ("assets/chart&#46;svg", "assets/chart&"),
+    ("assets/chart&#x2E;svg", "assets/chart&"),
+    ("assets/a&#10;b.svg", "assets/ab.svg"),
+    ("assets/a&#9;b.svg", "assets/ab.svg"),
+    ("assets/a&#13;b.svg", "assets/ab.svg"),
+])
+def test_character_reference_does_not_validate_a_different_existing_file(bundle, target, decoy):
+    add_resource(bundle, decoy)
+    markup = f"[Resource]({target})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    rendered = [unquote(token.attrGet("href")) for token in tokens if token.type == "link_open"]
+    assert len(rendered) == 1 and rendered[0] != decoy
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert f"broken local link {rendered[0]!r}" in result.stderr
+
+
+def test_character_reference_filename_and_fragment_count_as_direct_reference(bundle):
+    add_resource(bundle, "references/a&b.md", "# More details\n")
+    append_link(bundle, "references/a&amp;b.md&#35;more&#45;details")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,expected", [
+    ("&#46;&#46;/&#46;&#46;/public-files.json", "escapes the standalone skill"),
+    ("&#47;missing.svg", "must use a relative path"),
+    ("file&colon;/missing.svg", "must use a relative path"),
+    ("C&colon;/missing.svg", "must use a relative path"),
+    ("assets/local&#46;svg", "not in the tracked bundle inventory"),
+    ("references/context.md&#35;absent", "incorrect anchor"),
+])
+def test_character_references_keep_existing_resource_safeguards(bundle, target, expected):
+    add_resource(bundle, "assets/local.svg", declare=False, stage=False)
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert expected in result.stderr
+
+
+@pytest.mark.parametrize("target", ["https&colon;//example.com/chart.svg", "https&#58;//example.com"])
+def test_character_reference_external_scheme_is_still_external(bundle, target):
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr

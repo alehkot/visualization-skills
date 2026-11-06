@@ -54,6 +54,11 @@ Single-line code examples are ignored only when backtick delimiter runs match;
 escaped or unmatched backticks do not hide live resource links.
 Backticks inside a link destination or optional title stay literal; they cannot
 turn the destination or a later resource link into a code example.
+Destinations resolve named and numeric character references before checking paths,
+fragments, and URL schemes. Escaped ampersands stay literal, and decoding occurs
+only once. Entity-produced characters do not become Markdown delimiters; encoded
+tabs and line breaks remain part of the resource path instead of being discarded.
+See [CommonMark character references](https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references).
 A backtick run with more backticks in its info string does not open a fenced
 code block, so it cannot hide later resource links or headings. Tilde-fence info
 strings may contain backticks. See the [CommonMark fenced-code rules](https://spec.commonmark.org/0.31.2/#fenced-code-blocks).

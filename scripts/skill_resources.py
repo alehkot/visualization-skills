@@ -6,9 +6,10 @@ import unicodedata
 from urllib.parse import unquote, urlsplit
 
 from markdown_it import MarkdownIt
+from markdown_it.common.utils import unescapeAll
 
 
-_HEADING_MARKDOWN = MarkdownIt("commonmark").enable("strikethrough")
+_MARKDOWN = MarkdownIt("commonmark").enable("strikethrough")
 
 
 def _heading_text(title: str) -> str:
@@ -20,7 +21,7 @@ def _heading_text(title: str) -> str:
             if token.type in {"text", "code_inline", "image"}
         )
 
-    return collect(_HEADING_MARKDOWN.parseInline(title)[0].children or [])
+    return collect(_MARKDOWN.parseInline(title)[0].children or [])
 
 
 def unfenced_lines(text: str) -> list[tuple[int, str]]:
@@ -68,6 +69,11 @@ def markdown_headings(text: str) -> list[tuple[int, int, str, str]]:
     return result
 
 
+def _decode_destination(target: list[str]) -> str:
+    """Resolve escapes and character references together, exactly once."""
+    return unescapeAll("".join(target))
+
+
 def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     """Read a single-line inline destination and its optional title."""
     index = start
@@ -81,7 +87,9 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line):
         char = line[index]
         if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
-            target.append(line[index + 1])
+            # Keep escapes until destination parsing is complete, so an escaped
+            # ampersand cannot turn into an entity introducer during decoding.
+            target.append(line[index:index + 2])
             index += 2
             continue
         if angle:
@@ -109,7 +117,7 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line) and line[index] in " \t":
         index += 1
     if index < len(line) and line[index] == ")":
-        return "".join(target), index + 1
+        return _decode_destination(target), index + 1
     # A title must be separated from the destination by whitespace.
     if index == before_space or index >= len(line) or line[index] not in "\"'(":
         return None
@@ -132,7 +140,7 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line) and line[index] in " \t":
         index += 1
     if index < len(line) and line[index] == ")":
-        return "".join(target), index + 1
+        return _decode_destination(target), index + 1
     return None
 
 
@@ -197,7 +205,9 @@ def validate_reference_resources(skill_dir: Path, bundle_files: frozenset[Path])
         if path not in bundle_files:
             raise ValueError(f"{path}: resource is not in the tracked bundle inventory")
         for target in markdown_links(path.read_text(encoding="utf-8")):
-            parts = urlsplit(target)
+            # Preserve entity-produced whitespace as encoded URI bytes, rather
+            # than letting urlsplit silently discard tabs and line breaks.
+            parts = urlsplit(_MARKDOWN.normalizeLink(target))
             if parts.scheme == "file" or re.match(r"^[A-Za-z]:[/\\]", unquote(target)):
                 raise ValueError(f"{path}: local link {target!r} must use a relative path")
             if parts.scheme or parts.netloc:
