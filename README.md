@@ -45,6 +45,13 @@ the file before validating. Absolute filesystem paths (including rooted drive-le
 paths), `file:` URLs, and symlink aliases are rejected so local-only paths cannot
 stand in for distributed resources.
 
+Git filenames are read without text-mode line-ending conversion. A tracked name
+containing a carriage return must not authorize an untracked name containing a
+newline, even if both files exist locally. The inventory preserves their exact
+filesystem names; this does not make unusual filenames portable to every OS.
+See [Git's NUL-separated filename output](https://git-scm.com/docs/git-ls-files#_output)
+and [Python's binary versus text subprocess output](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
+
 These are offline maintenance checks for single-line inline Markdown links and
 images. They retain balanced parentheses in destinations (such as
 `assets/chart(1).svg`), angle-bracket destinations, backslash-escaped punctuation,

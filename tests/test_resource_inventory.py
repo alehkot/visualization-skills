@@ -1,6 +1,7 @@
 """Check local resource portability through the real validator and Git index."""
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -98,6 +99,54 @@ def test_declaration_and_staging_are_both_required(bundle, declare, stage, expec
     assert result.returncode == 1
     assert "Bundle inventory differs" in result.stderr
     assert expected in result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+@pytest.mark.parametrize("name,target", [
+    ("assets/local\rfile.txt", "assets/local%0Dfile.txt"),
+    ("assets/local\r\nfile.txt", "assets/local%0D%0Afile.txt"),
+    ("assets/local\nfile.txt", "assets/local%0Afile.txt"),
+    ("assets/local\tfile.txt", "assets/local%09file.txt"),
+])
+def test_preserves_literal_control_characters_in_tracked_filenames(bundle, name, target):
+    add_resource(bundle, name)
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+def test_cr_lf_and_crlf_names_remain_distinct_inventory_entries(bundle):
+    for control, encoded in (("\r", "%0D"), ("\n", "%0A"), ("\r\n", "%0D%0A")):
+        add_resource(bundle, f"assets/local{control}file.txt")
+        append_link(bundle, f"assets/local{encoded}file.txt")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+@pytest.mark.parametrize("tracked,decoy,encoded", [
+    ("\r", "\n", "%0A"),
+    ("\r\n", "\n", "%0A"),
+    ("\n", "\r", "%0D"),
+    ("\n", "\r\n", "%0D%0A"),
+])
+def test_rejects_untracked_decoy_with_different_line_break(bundle, tracked, decoy, encoded):
+    tracked_name = f"assets/local{tracked}file.txt"
+    decoy_name = f"assets/local{decoy}file.txt"
+    add_resource(bundle, tracked_name, declare=False)
+    decoy_path = add_resource(bundle, decoy_name, stage=False)
+    append_link(bundle, f"assets/local{encoded}file.txt")
+    # Prove the decoy exists but is absent from the actual binary Git index.
+    indexed = subprocess.check_output(["git", "ls-files", "-z"], cwd=bundle).split(b"\0")
+    assert os.fsencode(f"{SKILL}/{tracked_name}") in indexed
+    assert os.fsencode(f"{SKILL}/{decoy_name}") not in indexed
+    assert decoy_path.is_file()
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "Bundle inventory differs" in result.stderr
+    assert repr(f"{SKILL}/{decoy_name}") in result.stderr
+    assert repr(f"{SKILL}/{tracked_name}") in result.stderr
 
 
 @pytest.mark.parametrize("encoded", [False, True])
