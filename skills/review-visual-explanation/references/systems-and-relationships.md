@@ -10,6 +10,14 @@ Compare this reading with the source where available. Keep source statements, vi
 
 For rendered artifacts, follow a connector through crossings and close spacing to its endpoint. For briefs, review only the connections and arrangements they specify. Unspecified routing is not evidence of a future crossing or false connection.
 
+## Check what temporal ranges assert
+
+Read the range's label, legend, and marks together. Does it mean possible occurrence dates, activity known to persist throughout the interval, or a bound on activity? Compare that meaning with the source. A possible-date window alone does not justify continuous activity, an exact midpoint date, or a probability distribution within it. Check whether the artifact invents precision or endpoints for open-ended bounds.
+
+For overlapping possible-date windows, inspect any claimed simultaneity or ordering against independent evidence. Overlap alone establishes neither, but does not invalidate an ordering established elsewhere. Report the specific unsupported assertion, not the mere use of a horizontal range. A properly labeled range or table can be accepted without demanding special uncertainty marks. With a text brief alone, do not claim unseen positioning or legibility defects.
+
+An invented source places inspection A sometime during **3–7 May** and inspection B during **5–9 May**, with durations and order undocumented. A brief's **both inspections were underway on 5–7 May** converts dating uncertainty into simultaneous activity. **A preceded B**, inferred only from the window midpoints, is also unsupported. Repair these claims by preserving the possible dates and unresolved order, not by asserting that overlap was impossible. Exact midpoint dates are not observed dates. Accept **possible inspection date; duration unknown** alongside each range. If a separate record establishes A before B, retain that ordering despite overlap. If the source instead documents continuous activity from 3 through 7 May, an activity-duration band is justified. Missing source detail leaves an artifact's duration unverified, not automatically disproved.
+
 ## Probe the logic with a relevant case
 
 | Inspect | A useful probe | Material mismatch to look for |
@@ -79,6 +87,7 @@ State a repair in terms of the actual affected relationship: relabel a link, res
 
 ## Basis and limits
 
+- [CIDOC CRM 7.1.3, P81 and P82 scope notes](https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html) distinguish a minimum temporal extent from an enclosing maximum extent. This supports checking interval meaning, not requiring that ontology or a particular visual encoding. The inspection-date contrasts are original review probes, not measured comprehension results.
 - [Cursor pstack’s statechart skill](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/statechart/SKILL.md) distinguishes mixed failure groups and consequential hidden transitions. This practitioner implementation inspired the state-summary checks; its model checker, renderer, colors, and graph-size limits are not requirements here. The cancellation and pause contrasts are original regression examples, not measured model or reader outcomes.
 - [Camunda’s parallel-gateway](https://docs.camunda.io/docs/components/modeler/bpmn/parallel-gateways/) and [exclusive-gateway documentation](https://docs.camunda.io/docs/components/modeler/bpmn/exclusive-gateways/) illustrate synchronization versus alternative-path rejoining. These execution conventions inform the distinction, not a required notation or a measured comprehension benefit.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) explains how marks and arrangement contribute meanings; that does not make every possible interpretation an observed reader error.
