@@ -15,6 +15,10 @@ from markdown_it import MarkdownIt
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = "skills/example"
 FRONTMATTER = "---\nname: example\ndescription: A test skill.\n---\n\n# Example\n"
+INLINE_SEPARATORS = ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029")
+SEPARATOR_DESTINATIONS = [
+    (char, True) for char in INLINE_SEPARATORS
+] + [(char, False) for char in ("\x85", "\u2028", "\u2029")]
 
 
 @pytest.fixture
@@ -713,3 +717,73 @@ def test_character_reference_external_scheme_is_still_external(bundle, target):
     append_link(bundle, target)
     result = validate(bundle)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("separator,angle", SEPARATOR_DESTINATIONS)
+@pytest.mark.parametrize("local_only", [False, True])
+def test_inline_separators_do_not_hide_missing_or_untracked_resources(
+    bundle, separator, angle, local_only,
+):
+    if local_only and os.name == "nt" and ord(separator) < 32:
+        pytest.skip("Windows filenames cannot contain ASCII controls")
+    target = f"assets/missing{separator}.svg"
+    destination = f"<{target}>" if angle else target
+    markup = f"{'!' if angle else ''}[Resource]({destination})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == target
+        for token in tokens
+    )
+    if local_only:
+        add_resource(bundle, target, declare=False, stage=False)
+    append_link(bundle, destination, image=angle)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    expected = "not in the tracked bundle inventory" if local_only else "broken local link"
+    assert expected in result.stderr
+    assert repr(target) in result.stderr
+
+
+@pytest.mark.parametrize("separator,angle", SEPARATOR_DESTINATIONS)
+def test_accepts_bundled_resources_with_inline_separators(bundle, separator, angle):
+    if os.name == "nt" and ord(separator) < 32:
+        pytest.skip("Windows filenames cannot contain ASCII controls")
+    target = f"assets/bundled{separator}.svg"
+    add_resource(bundle, target)
+    append_link(bundle, f"<{target}>" if angle else target, image=angle)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("separator", INLINE_SEPARATORS)
+def test_inline_separators_do_not_create_fake_fence_openers(bundle, separator):
+    markup = f"Paragraph{separator}~~~\n[Resource](assets/missing.svg)\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(
+        child.type == "link_open" and child.attrGet("href") == "assets/missing.svg"
+        for token in tokens for child in (token.children or [])
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("ending", ["\n", "\r\n", "\r"])
+def test_commonmark_line_endings_preserve_fences_and_heading_anchors(bundle, ending):
+    content = (
+        FRONTMATTER + "\n[Context](references/context.md#details)\n"
+        "\n~~~\n[Example](assets/missing.svg)\n## Hidden\n~~~\n"
+        "\n## Visible\n[Here](#visible)\n"
+    )
+    entry = bundle / SKILL / "SKILL.md"
+    entry.write_bytes(content.replace("\n", ending).encode("utf-8"))
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    with entry.open("ab") as stream:
+        stream.write(f"{ending}[Not a heading](#hidden){ending}".encode("utf-8"))
+    result = validate(bundle)
+    assert result.returncode == 1
+    assert "incorrect anchor" in result.stderr

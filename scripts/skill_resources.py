@@ -28,7 +28,12 @@ def unfenced_lines(text: str) -> list[tuple[int, str]]:
     """Return numbered Markdown lines outside backtick and tilde fences."""
     result = []
     fence: tuple[str, int] | None = None
-    for number, line in enumerate(text.splitlines(), 1):
+    # CommonMark line endings are CRLF, LF, or CR. Other Unicode separators
+    # remain inline characters and must not split a resource destination.
+    lines = re.split(r"\r\n|\n|\r", text)
+    if lines[-1] == "":
+        lines.pop()
+    for number, line in enumerate(lines, 1):
         match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
         if match:
             marker, tail = match.groups()

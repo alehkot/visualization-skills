@@ -53,7 +53,10 @@ See [Git's NUL-separated filename output](https://git-scm.com/docs/git-ls-files#
 and [Python's binary versus text subprocess output](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
 
 These are offline maintenance checks for single-line inline Markdown links and
-images. They retain balanced parentheses in destinations (such as
+images. Lines end only at CRLF, LF, or CR; Unicode separators such as U+2028 and
+U+0085 remain within the line, so they cannot hide a local resource destination.
+See [CommonMark's character and line definitions](https://spec.commonmark.org/0.31.2/#characters-and-lines).
+The checks retain balanced parentheses in destinations (such as
 `assets/chart(1).svg`), angle-bracket destinations, backslash-escaped punctuation,
 and balanced brackets in labels. Optional single-line titles are separate from
 the resource path. These forms follow the [CommonMark link syntax](https://spec.commonmark.org/0.31.2/#links).
