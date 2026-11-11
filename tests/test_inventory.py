@@ -18,12 +18,15 @@ class InventoryTests(unittest.TestCase):
             (root / "public-files.json").write_text(json.dumps(["allowed.md"]))
             (root / "allowed.md").write_text("content")
             with patch.object(checker, "ROOT", root), patch.object(checker.subprocess, "check_output") as git:
-                git.return_value = "100644 abc 0\tallowed.md\0"
+                git.return_value = b"100644 abc 0\tallowed.md\0"
                 checker.check_inventory()
-                git.return_value += "100644 def 0\tunexpected.md\0"
+                git.assert_called_once_with(
+                    ["git", "-C", str(root), "ls-files", "--stage", "-z"]
+                )
+                git.return_value += b"100644 def 0\tunexpected.md\0"
                 with self.assertRaisesRegex(ValueError, "unexpected"):
                     checker.check_inventory()
-                git.return_value = "120000 abc 0\tallowed.md\0"
+                git.return_value = b"120000 abc 0\tallowed.md\0"
                 with self.assertRaisesRegex(ValueError, "ordinary"):
                     checker.check_inventory()
 

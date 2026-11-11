@@ -17,6 +17,14 @@ For each consequential relationship, identify its endpoints, direction if any, m
 
 The same arrow can serve several purposes only when its meaning remains recoverable in context. Direct relationship labels often suffice; different shapes or line styles are optional ways to reduce ambiguity, not requirements in themselves.
 
+## Keep possible dates distinct from activity duration
+
+Before placing an event on a timeline, establish what its supplied interval means: possible occurrence dates, activity known to persist throughout the interval, or a bound on activity. A possible-date window does not establish continuous activity, an exact midpoint date, or a probability distribution within the window. Preserve the source's precision and open-ended bounds rather than inventing endpoints to complete a mark.
+
+Overlapping possible-date windows alone establish neither simultaneity nor which event came first. Preserve any independent source-supported ordering even when the windows overlap. A labeled range, separate lanes, or a table can retain these distinctions; no special glyph is required. Match the label and the explained meaning of position or length to the evidence.
+
+For an invented archive, inspection A occurred sometime during **3–7 May** and inspection B during **5–9 May**. Their durations and order are undocumented. Retain both possible-date windows and leave their order unresolved. **A ran for five days**, **A preceded B**, or **both inspections were underway on 5–7 May** would add unsupported claims. Placing them at exact midpoint dates would also invent observations. If another record establishes that A preceded B, retain that relationship without manufacturing exact dates. In contrast, a source explicitly documenting continuous activity from 3 through 7 May supports an activity-duration band. A range labeled **possible inspection date; duration unknown** is valid without a different visual form.
+
 ## Make conditions executable in the reader's mind
 
 Check a normal case and a case at the boundary of the rule. Ask what the depicted logic would let the reader conclude, then compare that conclusion with the source.
@@ -81,6 +89,7 @@ Counterexample to drawing every dependency: a study-room access explanation need
 
 ## Basis and limits
 
+- [CIDOC CRM 7.1.3, P81 and P82 scope notes](https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html) distinguish a minimum temporal extent from an enclosing maximum extent. This motivates preserving interval meaning, not a required ontology, notation, or probability model. The inspection-date contrasts are original examples, not measured model or reader outcomes.
 - [Cursor pstack’s statechart skill](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/statechart/SKILL.md) distinguishes mixed failure groups and consequential hidden transitions. This practitioner implementation inspired the state-summary checks; its model checker, renderer, colors, and graph-size limits are not requirements here. The cancellation and pause contrasts are original regression examples, not measured model or reader outcomes.
 - [Camunda’s parallel-gateway](https://docs.camunda.io/docs/components/modeler/bpmn/parallel-gateways/) and [exclusive-gateway documentation](https://docs.camunda.io/docs/components/modeler/bpmn/exclusive-gateways/) illustrate synchronization versus alternative-path rejoining. These execution conventions inform the distinction, not a required notation or a measured comprehension benefit.
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how spatial arrangement and marks convey meaning, including the ambiguity of arrows. It does not prescribe one notation for all relationships.

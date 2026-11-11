@@ -1,17 +1,24 @@
 """Check local resource portability through the real validator and Git index."""
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
+from urllib.parse import unquote
 
 import pytest
+from markdown_it import MarkdownIt
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = "skills/example"
 FRONTMATTER = "---\nname: example\ndescription: A test skill.\n---\n\n# Example\n"
+INLINE_SEPARATORS = ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029")
+SEPARATOR_DESTINATIONS = [
+    (char, True) for char in INLINE_SEPARATORS
+] + [(char, False) for char in ("\x85", "\u2028", "\u2029")]
 
 
 @pytest.fixture
@@ -96,6 +103,54 @@ def test_declaration_and_staging_are_both_required(bundle, declare, stage, expec
     assert result.returncode == 1
     assert "Bundle inventory differs" in result.stderr
     assert expected in result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+@pytest.mark.parametrize("name,target", [
+    ("assets/local\rfile.txt", "assets/local%0Dfile.txt"),
+    ("assets/local\r\nfile.txt", "assets/local%0D%0Afile.txt"),
+    ("assets/local\nfile.txt", "assets/local%0Afile.txt"),
+    ("assets/local\tfile.txt", "assets/local%09file.txt"),
+])
+def test_preserves_literal_control_characters_in_tracked_filenames(bundle, name, target):
+    add_resource(bundle, name)
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+def test_cr_lf_and_crlf_names_remain_distinct_inventory_entries(bundle):
+    for control, encoded in (("\r", "%0D"), ("\n", "%0A"), ("\r\n", "%0D%0A")):
+        add_resource(bundle, f"assets/local{control}file.txt")
+        append_link(bundle, f"assets/local{encoded}file.txt")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows filenames cannot contain these controls")
+@pytest.mark.parametrize("tracked,decoy,encoded", [
+    ("\r", "\n", "%0A"),
+    ("\r\n", "\n", "%0A"),
+    ("\n", "\r", "%0D"),
+    ("\n", "\r\n", "%0D%0A"),
+])
+def test_rejects_untracked_decoy_with_different_line_break(bundle, tracked, decoy, encoded):
+    tracked_name = f"assets/local{tracked}file.txt"
+    decoy_name = f"assets/local{decoy}file.txt"
+    add_resource(bundle, tracked_name, declare=False)
+    decoy_path = add_resource(bundle, decoy_name, stage=False)
+    append_link(bundle, f"assets/local{encoded}file.txt")
+    # Prove the decoy exists but is absent from the actual binary Git index.
+    indexed = subprocess.check_output(["git", "ls-files", "-z"], cwd=bundle).split(b"\0")
+    assert os.fsencode(f"{SKILL}/{tracked_name}") in indexed
+    assert os.fsencode(f"{SKILL}/{decoy_name}") not in indexed
+    assert decoy_path.is_file()
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "Bundle inventory differs" in result.stderr
+    assert repr(f"{SKILL}/{decoy_name}") in result.stderr
+    assert repr(f"{SKILL}/{tracked_name}") in result.stderr
 
 
 @pytest.mark.parametrize("encoded", [False, True])
@@ -351,6 +406,384 @@ def test_formatted_headings_share_duplicate_anchor_namespace(bundle):
     result = validate(bundle)
     assert result.returncode == 0, result.stdout + result.stderr
     append_link(bundle, "references/context.md#details-4")
+    result = validate(bundle)
+    assert result.returncode == 1
+    assert "incorrect anchor" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    r"\`[Resource](assets/missing.svg)\`",
+    "`[Resource](assets/missing.svg)``",
+    "``[Resource](assets/missing.svg)`",
+    "`example` [Resource](assets/missing.svg)",
+    r"`example \` [Resource](assets/missing.svg) `",
+    r"\\\`[Resource](assets/missing.svg)\\\`",
+])
+def test_backtick_text_does_not_hide_live_resource_links(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(token.type == "link_open" and token.attrGet("href") == "assets/missing.svg"
+               for token in tokens)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "`` `[Example](assets/missing.svg)` ``",
+    "`` a ``` [Example](assets/missing.svg) ``",
+    r"\\`[Example](assets/missing.svg)`",
+    "`` [Example](assets/missing.svg) `` [Context](references/context.md#details)",
+    "`unmatched ``[Example](assets/missing.svg)``",
+])
+def test_exact_backtick_spans_hide_only_code_examples(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert not any(token.type == "link_open" and token.attrGet("href") == "assets/missing.svg"
+                   for token in tokens)
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Resource](assets/missing`draft`.svg)",
+    "[Resource](<assets/missing`draft`.svg>)",
+    r"[Resource](assets/missing\`draft\`.svg)",
+    "![Resource](assets/missing`draft`.svg)",
+    "[Resource `label`](assets/missing`draft`.svg)",
+    '[Resource](assets/missing`draft`.svg "Literal `title`")',
+])
+def test_backticks_in_destinations_preserve_resource_checks(bundle, markup):
+    target = "assets/missing`draft`.svg"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == target
+        for token in tokens
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert f"broken local link {target!r}" in result.stderr
+
+
+@pytest.mark.parametrize("title", ['"Use `"', "'Use `'", "(Use `)"])
+def test_title_backticks_do_not_hide_following_live_links(bundle, title):
+    markup = f"[Context](references/context.md {title}) [Resource](assets/missing.svg) `"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert [token.attrGet("href") for token in tokens if token.type == "link_open"] == [
+        "references/context.md", "assets/missing.svg",
+    ]
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Resource](assets/local`draft`.svg)",
+    "[Resource](<assets/local`draft`.svg>)",
+    "![Resource](assets/local`draft`.svg)",
+    '[Resource](assets/local`draft`.svg "Use ` [Example](missing.svg)") `',
+    '[![Resource](assets/local`draft`.svg)](references/context.md "Use `") `',
+])
+def test_accepts_packaged_backtick_destinations_and_literal_titles(bundle, markup):
+    add_resource(bundle, "assets/local`draft`.svg", "<svg/>\n")
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_backtick_reference_name_counts_as_direct_entrypoint_link(bundle):
+    add_resource(bundle, "references/code`example`.md", "# Example\n")
+    append_link(bundle, "references/code`example`.md#example")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "[Not a `link](assets/missing.svg`)",
+    "``[Example](assets/missing`draft`.svg)``",
+    '[Context `literal ](missing.svg)`](references/context.md "`title`")',
+])
+def test_code_spans_still_take_precedence_inside_labels(bundle, markup):
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert not any(
+        token.type == "link_open" and "missing" in (token.attrGet("href") or "")
+        for token in tokens
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("markup", [
+    "```literal code```\n\n[Resource](assets/missing.svg)",
+    "```language`extra\n[Resource](assets/missing.svg)",
+    "```language\\`extra\n[Resource](assets/missing.svg)",
+    "   ```literal code```\n\n[Resource](assets/missing.svg)",
+    "````literal ``` code```` [Resource](assets/missing.svg)",
+    "```literal code``` [Resource](assets/missing.svg)",
+    "```literal code``` ![Resource](assets/missing.svg)",
+])
+def test_invalid_backtick_fence_info_does_not_hide_live_resources(bundle, markup):
+    # Parse blocks too: parseInline cannot distinguish a fence from inline code.
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(
+        (child.type == "link_open" and child.attrGet("href") == "assets/missing.svg")
+        or (child.type == "image" and child.attrGet("src") == "assets/missing.svg")
+        for token in tokens for child in token.children or []
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("prefix", [
+    "```literal code```",
+    "```language`extra",
+    "```language\\`extra",
+    "   ````literal code````",
+])
+def test_invalid_backtick_fence_info_keeps_live_heading_anchors(bundle, prefix):
+    markup = f"# Context\n\n{prefix}\n\n## Details\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(token.type == "heading_open" and token.tag == "h2" for token in tokens)
+    (bundle / SKILL / "references/context.md").write_text(markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("opener,closer", [
+    ("```", "```"),
+    ("```md", "```"),
+    ("   ```md", "  ```` \t"),
+    ("```md ~~~", "```"),
+    ("~~~md", "~~~"),
+    ("~~~md ``` ~~~", "~~~"),
+    ("   ~~~~md `extra`", " ~~~~~ \t"),
+])
+def test_valid_fences_hide_examples_and_exclude_heading_anchors(bundle, opener, closer):
+    markup = (
+        f"# Context\n\n{opener}\n[Example](missing.md)\n## Details\n"
+        f"{closer}\n\n## Details\n"
+    )
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert sum(token.type == "fence" for token in tokens) == 1
+    assert sum(token.type == "heading_open" and token.tag == "h2" for token in tokens) == 1
+    (bundle / SKILL / "references/context.md").write_text(markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    append_link(bundle, "references/context.md#details-1")
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "incorrect anchor" in result.stderr
+
+
+@pytest.mark.parametrize("opener,non_closer,closer", [
+    ("````md", "```", "````"),
+    ("```md", "~~~", "```"),
+    ("```md", "``` extra", "```"),
+    ("```md", "```literal`info", "```"),
+    ("```md", "    ```", "```"),
+    ("~~~md", "~~~ extra", "~~~"),
+    ("~~~md", "```", "~~~"),
+    ("~~~~md", "~~~", "~~~~"),
+])
+def test_only_matching_bare_fences_end_code_blocks(bundle, opener, non_closer, closer):
+    markup = f"{opener}\n{non_closer}\n[Example](missing.md)\n{closer}\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert len(tokens) == 1 and tokens[0].type == "fence"
+    assert "[Example](missing.md)" in tokens[0].content
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup + "\n")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("opener", ["```md", "~~~md", "~~~md `extra`", "```~~~"])
+def test_valid_unclosed_fences_hide_examples_to_end_of_document(bundle, opener):
+    markup = f"{opener}\n[Example](missing.md)\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert len(tokens) == 1 and tokens[0].type == "fence"
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_invalid_backtick_info_does_not_prevent_later_real_fences(bundle):
+    markup = (
+        "```literal code```\n\n~~~md\n[Example](missing.md)\n~~~\n"
+        "[Context](references/context.md#details)\n"
+    )
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert sum(token.type == "fence" for token in tokens) == 1
+    assert any(
+        child.type == "link_open" and child.attrGet("href") == "references/context.md#details"
+        for token in tokens for child in token.children or []
+    )
+    (bundle / SKILL / "SKILL.md").write_text(FRONTMATTER + "\n" + markup, encoding="utf-8")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,name", [
+    ("assets/a&amp;b.svg", "assets/a&b.svg"),
+    ("assets/a&#38;b.svg", "assets/a&b.svg"),
+    ("assets/a&#x26;b.svg", "assets/a&b.svg"),
+    ("assets/a&#X26;b.svg", "assets/a&b.svg"),
+    ("assets/caf&eacute;.svg", "assets/café.svg"),
+    ("assets/a&#41;b.svg", "assets/a)b.svg"),
+    ("assets/a&lt;b.svg", "assets/a<b.svg"),
+    ("assets/a&#32;b.svg", "assets/a b.svg"),
+    ("assets/a&#9;b.svg", "assets/a\tb.svg"),
+    ("assets/a&#10;b.svg", "assets/a\nb.svg"),
+    (r"assets/a\&amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a&amp;amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a%26amp;b.svg", "assets/a&amp;b.svg"),
+    ("assets/a&copy.svg", "assets/a&copy.svg"),
+    ("assets/a&MadeUpEntity;b.svg", "assets/a&MadeUpEntity;b.svg"),
+])
+@pytest.mark.parametrize("angle,image", [(False, False), (True, True)])
+def test_character_references_resolve_to_packaged_destination_once(bundle, target, name,
+                                                                 angle, image):
+    add_resource(bundle, name)
+    destination = f"<{target}>" if angle else target
+    markup = f"{'!' if image else ''}[Resource]({destination})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == name
+        for token in tokens
+    )
+    append_link(bundle, destination, image=image)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,decoy", [
+    ("assets/chart&#46;svg", "assets/chart&"),
+    ("assets/chart&#x2E;svg", "assets/chart&"),
+    ("assets/a&#10;b.svg", "assets/ab.svg"),
+    ("assets/a&#9;b.svg", "assets/ab.svg"),
+    ("assets/a&#13;b.svg", "assets/ab.svg"),
+])
+def test_character_reference_does_not_validate_a_different_existing_file(bundle, target, decoy):
+    add_resource(bundle, decoy)
+    markup = f"[Resource]({target})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    rendered = [unquote(token.attrGet("href")) for token in tokens if token.type == "link_open"]
+    assert len(rendered) == 1 and rendered[0] != decoy
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert f"broken local link {rendered[0]!r}" in result.stderr
+
+
+def test_character_reference_filename_and_fragment_count_as_direct_reference(bundle):
+    add_resource(bundle, "references/a&b.md", "# More details\n")
+    append_link(bundle, "references/a&amp;b.md&#35;more&#45;details")
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("target,expected", [
+    ("&#46;&#46;/&#46;&#46;/public-files.json", "escapes the standalone skill"),
+    ("&#47;missing.svg", "must use a relative path"),
+    ("file&colon;/missing.svg", "must use a relative path"),
+    ("C&colon;/missing.svg", "must use a relative path"),
+    ("assets/local&#46;svg", "not in the tracked bundle inventory"),
+    ("references/context.md&#35;absent", "incorrect anchor"),
+])
+def test_character_references_keep_existing_resource_safeguards(bundle, target, expected):
+    add_resource(bundle, "assets/local.svg", declare=False, stage=False)
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert expected in result.stderr
+
+
+@pytest.mark.parametrize("target", ["https&colon;//example.com/chart.svg", "https&#58;//example.com"])
+def test_character_reference_external_scheme_is_still_external(bundle, target):
+    append_link(bundle, target)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("separator,angle", SEPARATOR_DESTINATIONS)
+@pytest.mark.parametrize("local_only", [False, True])
+def test_inline_separators_do_not_hide_missing_or_untracked_resources(
+    bundle, separator, angle, local_only,
+):
+    if local_only and os.name == "nt" and ord(separator) < 32:
+        pytest.skip("Windows filenames cannot contain ASCII controls")
+    target = f"assets/missing{separator}.svg"
+    destination = f"<{target}>" if angle else target
+    markup = f"{'!' if angle else ''}[Resource]({destination})"
+    tokens = MarkdownIt("commonmark").parseInline(markup)[0].children
+    assert any(
+        unquote(token.attrGet("href") or token.attrGet("src") or "") == target
+        for token in tokens
+    )
+    if local_only:
+        add_resource(bundle, target, declare=False, stage=False)
+    append_link(bundle, destination, image=angle)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    expected = "not in the tracked bundle inventory" if local_only else "broken local link"
+    assert expected in result.stderr
+    assert repr(target) in result.stderr
+
+
+@pytest.mark.parametrize("separator,angle", SEPARATOR_DESTINATIONS)
+def test_accepts_bundled_resources_with_inline_separators(bundle, separator, angle):
+    if os.name == "nt" and ord(separator) < 32:
+        pytest.skip("Windows filenames cannot contain ASCII controls")
+    target = f"assets/bundled{separator}.svg"
+    add_resource(bundle, target)
+    append_link(bundle, f"<{target}>" if angle else target, image=angle)
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("separator", INLINE_SEPARATORS)
+def test_inline_separators_do_not_create_fake_fence_openers(bundle, separator):
+    markup = f"Paragraph{separator}~~~\n[Resource](assets/missing.svg)\n"
+    tokens = MarkdownIt("commonmark").parse(markup)
+    assert not any(token.type == "fence" for token in tokens)
+    assert any(
+        child.type == "link_open" and child.attrGet("href") == "assets/missing.svg"
+        for token in tokens for child in (token.children or [])
+    )
+    with (bundle / SKILL / "SKILL.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n" + markup)
+    result = validate(bundle)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "broken local link 'assets/missing.svg'" in result.stderr
+
+
+@pytest.mark.parametrize("ending", ["\n", "\r\n", "\r"])
+def test_commonmark_line_endings_preserve_fences_and_heading_anchors(bundle, ending):
+    content = (
+        FRONTMATTER + "\n[Context](references/context.md#details)\n"
+        "\n~~~\n[Example](assets/missing.svg)\n## Hidden\n~~~\n"
+        "\n## Visible\n[Here](#visible)\n"
+    )
+    entry = bundle / SKILL / "SKILL.md"
+    entry.write_bytes(content.replace("\n", ending).encode("utf-8"))
+    result = validate(bundle)
+    assert result.returncode == 0, result.stdout + result.stderr
+    with entry.open("ab") as stream:
+        stream.write(f"{ending}[Not a heading](#hidden){ending}".encode("utf-8"))
     result = validate(bundle)
     assert result.returncode == 1
     assert "incorrect anchor" in result.stderr

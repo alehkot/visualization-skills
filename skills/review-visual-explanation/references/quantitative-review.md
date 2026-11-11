@@ -18,6 +18,18 @@ When supplied joint counts or compatible rates determine the requested ratio, re
 
 Do not assume that the reverse conditional determines the requested share. If the evidence leaves that share unresolved, identify the missing support and distinguish an unverified value from one the evidence rules out. A known empty intersection can refute a claimed positive share; replacing it with 0% also requires a known nonempty denominator. Otherwise, do not invent a replacement percentage or declare an independently supported label false. An explicitly hypothetical “per 1,000” population is a legitimate explanatory device when the supplied rates support it. It must not be presented as an observed sample or add unsupported precision. A correctly scoped conditional percentage does not need its reverse displayed unless the reader's task requires it.
 
+## Check whether odds have become risk in the headline
+
+Identify whether a displayed estimate is an odds ratio (OR), risk ratio (RR), probability or risk difference. Risk is the event proportion **p**; odds are **p / (1 − p)**. An OR compares odds, not probabilities. Check headlines, captions and scales for an OR relabeled as “times as likely,” a percentage increase in risk, or an event probability. Preserve the source's event, comparator, time horizon, adjustment and uncertainty. A correct odds-only forest plot or estimate table needs no automatic conversion to risk.
+
+When probabilities are requested, check the supplied group risks or the source's conversion and compatible comparator baseline. An assumed baseline makes a scenario, not an observed event rate. Do not combine an adjusted OR with an unrelated overall risk or treat sampled case/control fractions as population risks. Retain a supported design-specific interpretation or model-based probability comparison within its stated population. If required baseline or model information is missing, report that limit rather than inventing a probability or rejecting the OR itself. An interval obtained by transforming endpoints at a fixed baseline does not capture that baseline's uncertainty.
+
+## Worked example: an odds ratio on a probability headline
+
+An invented same-month source records delayed deliveries: **A: 20/100**, **B: 40/100**. A brief reports **B versus A OR = 2.67**, then headlines “B is 2.67 times as likely to be delayed.” The rounded OR is consistent with **(40/60) / (20/80) = 8/3**; the headline is not. The observed probability ratio is **(40/100) / (20/100) = 2**, with a **20-percentage-point** difference. Repair the probability headline or retain the odds interpretation, without changing correct source data or claiming a causal effect.
+
+A control brief stating “B had about 2.67 times A's odds of recorded delay” is valid for these counts. A separately supplied adjusted OR with its interval can also remain an odds-only row when no compatible baseline supports probabilities. Use **1** as the reference for ratio values, or **0** for explicitly plotted log-ratio values. Without a rendering, these are source/claim checks, not measured mark or legibility findings.
+
 ## Inspect marks independently of labels
 
 For an actual rendering, compare mark positions and extents with the stated scale. Use a clear view or available geometry when needed. Do not invent exact pixel measurements from a fuzzy screenshot.
@@ -128,6 +140,30 @@ Do not infer significance solely from whether two separate error bars overlap. E
 
 Check whether aggregation hides information required for the question: changing subgroup composition, paired changes, skew, or a relevant tail. Do not demand raw data on every summary chart. A faithful summary can be sufficient for a summary question; detailed analysis may be needed for a different inference.
 
+## Check “no difference” and “equivalent” claims
+
+When an artifact labels an estimated comparison “equal,” “no effect,” or “negligible,” inspect the source's actual claim and analysis. A difference interval containing 0, or a ratio interval containing 1, does not by itself establish any of those conclusions. Preserve the reported estimate, interval type, level, units and direction when repairing the wording. Do not replace an inconclusive estimate with zero or declare the populations different merely because equality was unsupported.
+
+For a practical-smallness claim, check whether the source supplies a meaningful-difference band and whether the displayed comparison uses its units and direction. Do not invent a band, assume every non-significant finding is small, or perform an equivalence test by visual inspection. A valid supplied equivalence analysis may support a bounded equivalence claim; preserve its criterion, method and assumptions rather than rejecting it just because exact equality is unproved. Equal observed values, or equal rounded labels accurately identified as such, need not imply equal population quantities.
+
+## Worked example: a neutral badge hiding uncertainty
+
+An invented source reports **new − old mean waiting time: +2 minutes**, with a **95% confidence interval of −3 to +7 minutes**. A comparison card replaces these with **“No effect: 0 minutes”**, based only on the interval crossing zero. Restore the source estimate and interval and describe the direction as unresolved under that analysis. The card lost both the observed estimate and potentially consequential changes in either direction; a neutral color alone would not repair it.
+
+If the source defines a practical-smallness band of **±1 minute**, the interval extends outside it, so “negligible difference” is also unsupported. As a control, a source 95% confidence interval **−0.2 to +0.4 minute** lies inside that band: “The reported interval is inside the source's ±1-minute band” is a valid bounded statement, not exact equality. It does not need a contradictory “anything could happen” warning, nor should the reviewer promote it to formal equivalence without the relevant analysis. A ratio example with a reported confidence interval **0.8 to 1.3** must use **1**, not 0, as its no-difference reference. Without a rendering, these are source/claim checks, not measured mark or layout findings.
+
+## Check claims made by comparing significance labels
+
+A significant result in one group or study and a non-significant result in another do not by themselves establish different effects. Check what each label tests: separate comparisons with a null are not the comparison between the effects. Identical significance labels also do not establish equal effects or replication. Inspect conclusions and visual emphasis such as “works here, not there” badges, not only whether the individual labels were transcribed correctly.
+
+For a between-group, changed-effect, or study-conflict claim, look for the source's direct contrast or relevant interaction analysis, retaining its direction, units, uncertainty and scope. Do not manufacture a contrast from significance labels, overlapping intervals, or an assumed independence of estimates that may share observations or controls. Missing comparison evidence leaves that conclusion unsupported; it does not establish equality or prove the source's individual results wrong. Accept a faithful, narrowly scoped listing of the individual results or descriptive point estimates when it makes no stronger claim. Preserve a valid supplied direct comparison even when the separate significance labels match.
+
+## Worked example: a false subgroup winner
+
+An invented report estimates mean time saved in two groups: **A: +6 minutes, 95% confidence interval 2 to 10**, and **B: +6 minutes, 95% confidence interval −2 to 14**. Its stated significance rule is whether the interval excludes zero. A brief faithfully marks A significant and B not significant, then headlines “The improvement is greater in A.” The two significance labels do not support that between-group inference. Retain the estimates and intervals, and use the source's direct comparison if available; otherwise qualify the headline rather than zeroing B or declaring the effects equal.
+
+A control brief saying “Both reported estimates are 6 minutes; only A met the report's significance criterion” makes no population-difference claim and needs no such correction. In a separate source that supplies an **A − B contrast of +4 minutes with a 95% confidence interval of 1 to 7**, a direction claim can be supported by that analysis, within its method and scope; do not reject it merely because the individual results have the same significance status. Without a rendering, these are claim checks, not measured badge prominence or layout findings.
+
 ## Check cumulative and period claims separately
 
 Determine what each timestamp means: activity in an interval, a running total from a stated start, a rolling-window summary, or a point-in-time balance. Compare that definition with the headline and requested judgment. A correctly rising running total can accompany falling additions; flag an unsupported daily-growth claim, not the cumulative form itself. A valid total-to-date lookup need not also display daily activity.
@@ -183,6 +219,12 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
+
+- [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
+
+- [U.S. Census reporting standard E2](https://www.census.gov/about/policies/quality/standards/standarde2.html) distinguishes an inconclusive comparison from equality of estimated population quantities. [Greenland et al.'s interpretation guide](https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/) discusses null compatibility, practical size and confidence-interval assumptions. These support the claim checks, not a universal confidence level, a new equivalence analysis, or measured review effectiveness. The queue and ratio controls are original teaching material.
 
 - [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 

@@ -6,9 +6,10 @@ import unicodedata
 from urllib.parse import unquote, urlsplit
 
 from markdown_it import MarkdownIt
+from markdown_it.common.utils import unescapeAll
 
 
-_HEADING_MARKDOWN = MarkdownIt("commonmark").enable("strikethrough")
+_MARKDOWN = MarkdownIt("commonmark").enable("strikethrough")
 
 
 def _heading_text(title: str) -> str:
@@ -20,22 +21,31 @@ def _heading_text(title: str) -> str:
             if token.type in {"text", "code_inline", "image"}
         )
 
-    return collect(_HEADING_MARKDOWN.parseInline(title)[0].children or [])
+    return collect(_MARKDOWN.parseInline(title)[0].children or [])
 
 
 def unfenced_lines(text: str) -> list[tuple[int, str]]:
     """Return numbered Markdown lines outside backtick and tilde fences."""
     result = []
     fence: tuple[str, int] | None = None
-    for number, line in enumerate(text.splitlines(), 1):
+    # CommonMark line endings are CRLF, LF, or CR. Other Unicode separators
+    # remain inline characters and must not split a resource destination.
+    lines = re.split(r"\r\n|\n|\r", text)
+    if lines[-1] == "":
+        lines.pop()
+    for number, line in enumerate(lines, 1):
         match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
         if match:
             marker, tail = match.groups()
             if fence is None:
-                fence = (marker[0], len(marker))
-            elif marker[0] == fence[0] and len(marker) >= fence[1] and not tail.strip():
-                fence = None
-            continue
+                # Backticks in the info string rule out a backtick opener.
+                if marker[0] != "`" or "`" not in tail:
+                    fence = (marker[0], len(marker))
+                    continue
+            else:
+                if marker[0] == fence[0] and len(marker) >= fence[1] and not tail.strip():
+                    fence = None
+                continue
         if fence is None:
             result.append((number, line))
     return result
@@ -64,6 +74,11 @@ def markdown_headings(text: str) -> list[tuple[int, int, str, str]]:
     return result
 
 
+def _decode_destination(target: list[str]) -> str:
+    """Resolve escapes and character references together, exactly once."""
+    return unescapeAll("".join(target))
+
+
 def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     """Read a single-line inline destination and its optional title."""
     index = start
@@ -77,7 +92,9 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line):
         char = line[index]
         if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
-            target.append(line[index + 1])
+            # Keep escapes until destination parsing is complete, so an escaped
+            # ampersand cannot turn into an entity introducer during decoding.
+            target.append(line[index:index + 2])
             index += 2
             continue
         if angle:
@@ -105,7 +122,7 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line) and line[index] in " \t":
         index += 1
     if index < len(line) and line[index] == ")":
-        return "".join(target), index + 1
+        return _decode_destination(target), index + 1
     # A title must be separated from the destination by whitespace.
     if index == before_space or index >= len(line) or line[index] not in "\"'(":
         return None
@@ -128,22 +145,39 @@ def _inline_destination(line: str, start: int) -> tuple[str, int] | None:
     while index < len(line) and line[index] in " \t":
         index += 1
     if index < len(line) and line[index] == ")":
-        return "".join(target), index + 1
+        return _decode_destination(target), index + 1
     return None
+
+
+def _skip_code_span(line: str, start: int) -> int:
+    """Skip a single-line code span, or just an unmatched opening backtick run."""
+    end = start + 1
+    while end < len(line) and line[end] == "`":
+        end += 1
+    width = end - start
+    # Inside code, backslashes do not escape a closing delimiter. Search
+    # complete runs so a longer run cannot masquerade as a matching one.
+    for closer in re.finditer(r"`+", line[end:]):
+        if len(closer[0]) == width:
+            return end + closer.end()
+    return end
 
 
 def markdown_links(text: str) -> list[str]:
     """Read single-line inline links, including balanced labels/destinations."""
     result = []
     for _, line in unfenced_lines(text):
-        # Code spans are examples, not resource links.
-        line = re.sub(r"(`+)(.*?)\1", lambda m: " " * len(m[0]), line)
         brackets: list[tuple[bool, bool]] = []
         index = 0
         while index < len(line):
             char = line[index]
             if char == "\\" and index + 1 < len(line) and line[index + 1] in string.punctuation:
                 index += 2
+                continue
+            if char == "`":
+                # Skip code only in inline text/labels. A parsed destination
+                # and title are consumed together below, with backticks literal.
+                index = _skip_code_span(line, index)
                 continue
             if char == "[":
                 brackets.append((index > 0 and line[index - 1] == "!", False))
@@ -176,7 +210,9 @@ def validate_reference_resources(skill_dir: Path, bundle_files: frozenset[Path])
         if path not in bundle_files:
             raise ValueError(f"{path}: resource is not in the tracked bundle inventory")
         for target in markdown_links(path.read_text(encoding="utf-8")):
-            parts = urlsplit(target)
+            # Preserve entity-produced whitespace as encoded URI bytes, rather
+            # than letting urlsplit silently discard tabs and line breaks.
+            parts = urlsplit(_MARKDOWN.normalizeLink(target))
             if parts.scheme == "file" or re.match(r"^[A-Za-z]:[/\\]", unquote(target)):
                 raise ValueError(f"{path}: local link {target!r} must use a relative path")
             if parts.scheme or parts.netloc:

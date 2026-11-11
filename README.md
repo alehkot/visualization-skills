@@ -45,11 +45,33 @@ the file before validating. Absolute filesystem paths (including rooted drive-le
 paths), `file:` URLs, and symlink aliases are rejected so local-only paths cannot
 stand in for distributed resources.
 
+Git filenames are read without text-mode line-ending conversion. A tracked name
+containing a carriage return must not authorize an untracked name containing a
+newline, even if both files exist locally. The inventory preserves their exact
+filesystem names; this does not make unusual filenames portable to every OS.
+See [Git's NUL-separated filename output](https://git-scm.com/docs/git-ls-files#_output)
+and [Python's binary versus text subprocess output](https://docs.python.org/3/library/subprocess.html#frequently-used-arguments).
+
 These are offline maintenance checks for single-line inline Markdown links and
-images. They retain balanced parentheses in destinations (such as
+images. Lines end only at CRLF, LF, or CR; Unicode separators such as U+2028 and
+U+0085 remain within the line, so they cannot hide a local resource destination.
+See [CommonMark's character and line definitions](https://spec.commonmark.org/0.31.2/#characters-and-lines).
+The checks retain balanced parentheses in destinations (such as
 `assets/chart(1).svg`), angle-bracket destinations, backslash-escaped punctuation,
 and balanced brackets in labels. Optional single-line titles are separate from
 the resource path. These forms follow the [CommonMark link syntax](https://spec.commonmark.org/0.31.2/#links).
+Single-line code examples are ignored only when backtick delimiter runs match;
+escaped or unmatched backticks do not hide live resource links.
+Backticks inside a link destination or optional title stay literal; they cannot
+turn the destination or a later resource link into a code example.
+Destinations resolve named and numeric character references before checking paths,
+fragments, and URL schemes. Escaped ampersands stay literal, and decoding occurs
+only once. Entity-produced characters do not become Markdown delimiters; encoded
+tabs and line breaks remain part of the resource path instead of being discarded.
+See [CommonMark character references](https://spec.commonmark.org/0.31.2/#entity-and-numeric-character-references).
+A backtick run with more backticks in its info string does not open a fenced
+code block, so it cannot hide later resource links or headings. Tilde-fence info
+strings may contain backticks. See the [CommonMark fenced-code rules](https://spec.commonmark.org/0.31.2/#fenced-code-blocks).
 The checker is not a complete Markdown parser: it does not validate remote URLs
 or cover every Markdown form, such as reference-style or multiline links. It
 does not measure the skills' explanation quality or reader comprehension.

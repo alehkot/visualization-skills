@@ -1,6 +1,7 @@
 """Check the exact tracked bundle inventory; no network access is needed."""
 
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -12,9 +13,11 @@ def check_inventory() -> frozenset[Path]:
     allowed = json.loads((ROOT / "public-files.json").read_text())
     if not isinstance(allowed, list) or len(allowed) != len(set(allowed)):
         raise ValueError("The bundle inventory must contain unique file paths")
-    output = subprocess.check_output(
-        ["git", "-C", str(ROOT), "ls-files", "--stage", "-z"], text=True
-    )
+    # Git's NUL-separated paths are literal filenames, not text lines. Text
+    # mode would change CR/CRLF in a tracked name into a different LF filename.
+    output = os.fsdecode(subprocess.check_output(
+        ["git", "-C", str(ROOT), "ls-files", "--stage", "-z"]
+    ))
     tracked = set()
     for entry in output.split("\0"):
         if not entry:

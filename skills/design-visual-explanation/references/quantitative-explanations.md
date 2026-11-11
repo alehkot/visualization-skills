@@ -18,6 +18,18 @@ When the requested direction differs from a supplied percentage, identify the in
 
 If the supplied information does not determine the requested ratio, name the missing information rather than reusing the reverse percentage. Do not combine incompatible populations, periods, or category definitions to fill the gap. When rates support an illustrative “per 1,000” explanation, label that population as hypothetical, preserve source precision, and do not present it as an observed sample size. A zero denominator makes the conditional share undefined, not zero.
 
+## Keep odds ratios distinct from risk ratios
+
+For a binary event, risk is the proportion with the event, **p**; odds are **p / (1 − p)**. A risk ratio (RR) compares probabilities, while an odds ratio (OR) compares odds. An OR of 2 does not generally mean “twice as likely” or “100% higher risk.” Keep the source's measure, event, comparison direction, period, adjustment and uncertainty explicit in headlines, labels and estimate rows. An odds-only forest plot can be valid; do not replace its measure merely because risks may be more familiar.
+
+If the reader needs event probabilities, use supported group risks or an applicable conversion. For a simple two-group comparison with an estimable OR and a compatible comparator risk **0 < p₀ < 1**, use **p₁ = OR × p₀ / (1 − p₀ + OR × p₀)**; **RR = p₁ / p₀** when p₀ is nonzero. Preserve whether the baseline is observed or assumed, and its population and time horizon. An adjusted OR and an overall event rate are not automatically compatible. Do not infer population risks from sampled case/control fractions; retain the source's study-design and model-based interpretation. Missing baseline or method leaves that probability view unresolved, not permission to invent one. Transforming interval endpoints with a fixed baseline does not include uncertainty in that baseline.
+
+## Worked example: larger odds are not the same risk multiplier
+
+An invented same-month record reports delays on **20 of 100 A deliveries** and **40 of 100 B deliveries**. The observed risks are **A: 20%, B: 40%**, and the corresponding odds are **20/80 = 1/4** and **40/60 = 2/3**. For B versus A, **OR = (2/3) / (1/4) = 8/3 ≈ 2.67**. The observed **RR is 2**, and the risk difference is **20 percentage points**. “B deliveries were 2.67 times as likely to be delayed” misreads the OR.
+
+For the probability question, show **40% versus 20%**, with the corresponding groups and period. For the odds question, “B had about 2.67 times A's odds of recorded delay” preserves the measure. Retain supplied uncertainty and use **1** as the no-difference reference on a ratio-valued axis; do not put an OR on a percentage-probability scale. Neither description establishes that choosing B causes delays.
+
 ## Choose an encoding for the required judgment
 
 | Reader needs to see | Candidate structure | Preserve or check |
@@ -133,6 +145,30 @@ When comparing estimates, a visually larger center is not by itself an establish
 
 If uncertainty is absent from the source, identify that limitation rather than fabricating error bars or declaring the value false.
 
+## Distinguish an unresolved difference from equality
+
+For an estimated comparison, preserve the direction, units, interval type and level, and the value meaning no difference: usually 0 for a difference and 1 for a ratio. An interval containing that value does not establish exact equality, no effect, or a practically negligible difference. Keep the point estimate and uncertainty visible rather than replacing them with a zero mark or an “equal” badge. A faithful account of equal observed values is different from a claim about the underlying populations.
+
+If practical importance is the question, use a meaningful-difference threshold or band only when the source supplies and justifies it. Show the interval in relation to that band with the same units and comparison direction. Do not invent a threshold, relabel a non-significant result as formal equivalence, or recompute a test from separate error bars. Preserve a supplied equivalence analysis within its stated method and assumptions. Lack of a direction claim must not obscure what the interval does or does not exclude.
+
+## Worked example: an inconclusive queue comparison
+
+An invented analysis estimates **new − old mean waiting time: +2 minutes**, with a **95% confidence interval from −3 to +7 minutes**. A proposed headline “The queues have equal waiting times” goes beyond that result. A difference mark with the reported interval and zero reference can instead say “Estimated wait is 2 minutes longer; the interval spans shorter and longer waits.” This is not a probability statement that the true difference has a 95% chance of lying in this particular interval.
+
+If the source also defines differences within **±1 minute** as practically small, this wide interval extends beyond that band in both directions. It does not support calling the difference negligible. A separate source analysis reporting **+0.1 minute, 95% confidence interval −0.2 to +0.4**, wholly inside the same band, can be described as “The reported interval lies within the source's ±1-minute practical band.” Keep its interval level and method; this geometric statement alone is not a new formal-equivalence test or proof of exact zero. If no practical band is supplied, show the estimate and interval without inventing one.
+
+## Compare effects, not their significance badges
+
+A result crossing a significance threshold in one group or study and not another does not by itself establish that the effects differ. Keep each estimate's own comparison with its null separate from the comparison between estimates. Different precision can produce different significance labels even when the point estimates are identical. Matching significance labels likewise do not establish equal effects or a successful replication.
+
+When a headline claims a stronger effect in one group, a change in the effect, or a contradiction between studies, look for the source's direct contrast or relevant interaction analysis. Preserve its units, direction, uncertainty and scope. Do not construct that analysis from badges, interval overlap, or an unsupported independence assumption: estimates can share participants or a control group. If the needed comparison is absent, show the available estimates and name that limit rather than inventing a between-group conclusion. A descriptive comparison of reported point estimates, or a faithful listing of each source's significance result, need not become a new inferential analysis.
+
+## Worked example: same estimates, different badges
+
+An invented report gives two studies' estimated mean time saved: **A: +6 minutes, 95% confidence interval 2 to 10**, and **B: +6 minutes, 95% confidence interval −2 to 14**. Its stated decision rule labels a result significant when that interval excludes zero. Only A meets the rule. A green “works” badge for A and a grey “no effect” badge for B would imply more than the report supports; “A has the stronger effect” is not established by those labels either.
+
+Use comparable estimate rows or another suitable form retaining both intervals and the same time-saving direction. The reported point estimates match, but that does not establish equal underlying effects. A narrowly worded “Only A met the report's significance criterion” can be accurate without claiming only A has an effect. If the reader asks whether the effects differ, preserve a supplied direct comparison or state that the badges do not answer it. Do not replace this uncertainty with an automatic claim that the studies agree or conflict.
+
 ## Separate totals to date from activity in each period
 
 Establish whether a time series records activity during each interval, a running total since a stated start, a rolling-window summary, or a point-in-time balance. Preserve that meaning in labels and the headline. A rising cumulative total does not establish rising daily activity: positive additions can shrink while the total continues upward. Use totals to date for accumulated progress and period amounts or rates for the pace question; neither view is universally preferable.
@@ -188,6 +224,12 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
+
+- [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
+
+- [U.S. Census reporting standard E2](https://www.census.gov/about/policies/quality/standards/standarde2.html) distinguishes an inconclusive comparison from equality of estimated population quantities. [Greenland et al.'s interpretation guide](https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/) distinguishes null compatibility, effect size, and uncertainty under the analysis assumptions. These support careful claim wording, not a universal confidence level, equivalence procedure, or measured benefit of this skill. The queue examples and proposed display are original teaching material.
 
 - [D3 stack documentation](https://d3js.org/d3-shape/stack) defines layer boundaries and distinguishes stack offsets. [Datawrapper's area-chart guidance](https://www.datawrapper.de/academy/what-to-consider-when-creating-area-charts) discusses total/composition and individual-series tasks. The two-period example is original arithmetic, not measured model behavior or reader comprehension; neither tool is required.
 
