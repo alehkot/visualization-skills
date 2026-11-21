@@ -33,6 +33,14 @@ For comparison tasks, examine the evidence the reader must integrate, including 
 
 Check a headline and its primary view independently of optional detail. If a claim becomes false without a hidden qualification, restoring the qualification is often a smaller repair than rebuilding the whole explanation.
 
+## Compare a revision with what it was meant to preserve
+
+For a targeted edit, check the requested change and trace a task-critical inference through the original and the revision. Identify whether the scale, category meaning, or a limiting qualification drifted; correcting an original source mismatch is not drift. For exploratory alternatives, judge the intended difference while checking that the options still use the supplied evidence and answer the same question unless the scope changed. A different layout or encoding is not a defect if it preserves the supported inference.
+
+Where an existing convention carries meaning, check that the cue keeps the same role across corresponding views or that a clear replacement key preserves the mapping. For example, if amber marks an estimate, verify that the estimate is identifiable without hue and that the same key does not use amber for an unrelated status.
+
+An invented desktop figure compares East’s **30 requests** with West’s **60** on the same **0–80** scale, excluding overnight requests in both panels. A narrow revision stacks equal-height panels and labels both values correctly, but changes the axes to **0–30** and **0–60** and omits the exclusion. The specified scales make the bars equally tall and the omission leaves the counts’ scope unclear. Restore the common scale and show the exclusion where it applies to both. Accept a stacked revision that preserves both or a requested table alternative with the same comparable counts and qualification. A brief establishes only the specified content and scales, not actual render quality.
+
 ## Verify claimed changes between snapshots
 
 Check whether a claimed addition, removal, replacement, relocation, or changed connection follows from the supplied snapshots and their scope. A renamed entity can retain its identity; the same label can also be reused for a replacement. Do not settle that question from appearance alone. For a changed connection, compare the actual endpoints and meaning. Rerouting a schematic line around a label is not a change in the subject when path geometry carries no subject meaning; a changed physical route can matter even if its endpoints stay the same.
@@ -67,6 +75,7 @@ Prefer a local change—an explicit label, aligned comparison, moved qualificati
 
 ## Basis and limits
 
+- [Stitch’s edit and variant modes](https://github.com/google-labs-code/stitch-skills/blob/62fdcd679747aca0792e5dd6591b10ddfad56825/plugins/stitch-design/skills/generate-design/SKILL.md#L205) and [Stitch’s style-role guidance](https://github.com/google-labs-code/stitch-skills/blob/62fdcd679747aca0792e5dd6591b10ddfad56825/plugins/stitch-utilities/skills/design-md/SKILL.md#L64-L115) inspired the distinction between targeted revision, exploration, and continuity of visual meaning. The example is original; no Stitch workflow, file format, or renderer is required.
 - [ggalluvial’s data-format documentation](https://corybrunson.github.io/ggalluvial/articles/ggalluvial.html) describes joint/cohort data for alluvial paths. [D3 Sankey’s link contract](https://github.com/d3/d3-sankey#sankey_links) specifies each flow’s source, target, and quantity. These motivate evidence checks, not a mandated tool or an evaluation of this skill. The two transition possibilities are original arithmetic controls.
 
 - [Green and Blackwell, Cognitive Dimensions tutorial](https://www.cl.cam.ac.uk/~afb21/CognitiveDimensions/CDtutorial.pdf) treats visibility and other properties as activity-dependent tradeoffs, not automatic defects.

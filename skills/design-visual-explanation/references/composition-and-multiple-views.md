@@ -32,6 +32,14 @@ Use repeated labels when they prevent identity loss across panels, page turns, o
 
 Use only as many views as the questions warrant. No universal node count determines when to split. Expertise, available space, labels, task, and connection structure all affect whether a split helps.
 
+## State what stays fixed when revising a view
+
+For a targeted edit, identify what should change and the task, evidence, comparisons, and qualifications that should stay intact. Leave unrelated choices alone unless they prevent the requested edit or contradict the source. If a necessary change alters how readers compare or interpret the evidence, say what changed and why. For exploration, say what each option varies and hold the reader task and source evidence fixed unless the user asks to explore those too. An alternative encoding is fine when it supports the same inference; a targeted edit need not produce alternatives.
+
+When the supplied design already gives a cue a meaning, preserve that meaning across corresponding views where it still applies. If amber means “estimate,” keep the “estimate” label rather than letting hue carry the distinction by itself, and don't reuse the cue for “late” within the same key. A deliberate replacement is fine if its meaning and correspondence are clear.
+
+An invented desktop figure puts two station panels side by side: East handled **30 requests** and West **60** on the same **0–80** scale. Both counts exclude overnight requests. For a narrow-screen edit, stack the panels with the same scale and keep the overnight exclusion visible for both. Do not autoscale the panels to **0–30** and **0–60**: equal plot heights would make the bars equally tall despite the 2-to-1 difference. For a requested exploratory alternative, a two-row table with both counts and the same exclusion supports the comparison without requiring bars.
+
 ## Separate changes in the subject from changes in the drawing
 
 For a before/after comparison, name the snapshots and establish which entities correspond. Distinguish a retained entity with changed attributes from a replacement; a rename or a new position on the page does not settle identity. For schematic connections, describe changes through their endpoints and meaning rather than incidental bends. If path geometry encodes a physical route or another consequential property, preserve that information too. Include concise old/new descriptions for consequential differences rather than relying on absence or color alone.
@@ -68,6 +76,7 @@ For a requested narrow or static version, describe how the information relations
 
 ## Basis and limits
 
+- [Stitch’s edit and variant modes](https://github.com/google-labs-code/stitch-skills/blob/62fdcd679747aca0792e5dd6591b10ddfad56825/plugins/stitch-design/skills/generate-design/SKILL.md#L205) and [Stitch’s style-role guidance](https://github.com/google-labs-code/stitch-skills/blob/62fdcd679747aca0792e5dd6591b10ddfad56825/plugins/stitch-utilities/skills/design-md/SKILL.md#L64-L115) inspired the distinction between targeted revision, exploration, and continuity of visual meaning. The example is original; no Stitch workflow, file format, or renderer is required.
 - [ggalluvial’s data-format documentation](https://corybrunson.github.io/ggalluvial/articles/ggalluvial.html) documents categorical joint/cohort data for alluvial paths. [D3 Sankey’s link contract](https://github.com/d3/d3-sankey#sankey_links) requires source, target, and quantity for each flow. These support the information requirements, not a required plotting tool. The two transition tables are an original arithmetic counterexample, not a model-behavior or comprehension evaluation.
 
 - [Larkin and Simon](https://onlinelibrary.wiley.com/doi/10.1111/j.1551-6708.1987.tb00863.x) analyze locality and information search in computational representations; this is not a measured cognitive-load score for a proposed layout.
