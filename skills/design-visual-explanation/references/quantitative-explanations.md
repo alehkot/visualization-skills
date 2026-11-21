@@ -77,6 +77,12 @@ Retain each rate's period and definition. Do not chain overlapping year-over-yea
 
 For an invented comparable activity index, **100 → 120 → 96** gives successive changes of **+20% and −20%**, but the last observation is **4% below the first**, not unchanged. A level view can show those three readings. An additive waterfall can instead use the **+20 and −24 index-point changes**; stacking +20% and −20% as if they shared the original base would give a false endpoint. A chart only comparing the two period rates may keep both correct labels without adding a net summary. Percentage-point changes in a percentage-valued series are additive differences, not these relative growth factors. Explicit contributions on a common reference can also add; retain that definition instead of relabeling them as consecutive growth rates.
 
+## Anchor waterfall changes to adjacent totals
+
+Use a waterfall when the reader needs to follow signed, additive contributions from a start level to an end level in the same unit. Compute the level before and after each contribution. Draw each change between those two levels on one value scale; draw a start, subtotal, or end shown as a magnitude bar from zero, not as another change. If the data don't support a full reconciliation, identify the missing contribution or use a form that doesn't imply one.
+
+An invented stock count starts at **80 boxes**, receives **30**, ships **15**, and receives **5** more. The successive levels are **80 → 110 → 95 → 100 boxes**. The shipment mark spans **110 to 95**, not **100 to 85** or zero to 15. Those intervals have the same size, but only the first shows where the shipment took the count. Any intermediate subtotal should read 95 and anchor at zero if shown as a total bar. When the task is only to compare quantities received and shipped, a signed bar chart can be simpler and need not show the running levels.
+
 ## Make close comparisons readable
 
 When close bars and coarse ticks leave needed values or differences to estimation, specify source-backed labels near the relevant bar ends, clearly associated with category and series. Keep the zero baseline for magnitude bars; finer ticks alone may not resolve the task.
@@ -225,6 +231,7 @@ A correctly labeled explanation of the first question need not also teach the se
 
 ## Basis and limits
 
+- [Diagram Design’s waterfall reference](https://github.com/cathrynlavery/diagram-design/blob/d74d8c2d0c78a9e1efd43137f6a9a51182a8b5f0/skills/diagram-design/references/type-waterfall.md) inspired checking a floating change against its before-and-after totals. The example here is original and does not adopt the upstream renderer, markup, or layout rules.
 - [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
 
 - [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.

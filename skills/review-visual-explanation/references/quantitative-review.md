@@ -106,6 +106,12 @@ For an invented comparable activity index **100 → 120 → 96**, correct period
 
 When the required rates, compatible endpoints, or source method are unavailable, report the unsupported derivation or verification limit rather than inventing a corrected net figure. An independently reported total is not proven wrong merely because its calculation cannot be reconstructed. Without a rendering, these are arithmetic and claim checks, not measured geometry findings.
 
+## Check where each waterfall change begins and ends
+
+For a waterfall, recompute the running levels from the source rather than inferring them from correctly printed changes. On one value scale, check that each floating change starts at its prior level and ends at the next one, and that any carry lines meet those levels. Verify that total bars use the total-bar baseline and that subtotals are not added a second time. If only a brief is available, verify its specified values and endpoints without claiming to have inspected rendered geometry.
+
+An invented stock count starts at **80 boxes** and changes by **+30, −15, +5**, ending at **100**. The correctly labeled **−15** bar occupies **100 to 85** on the stated axis, so its height and label agree but its location is wrong. The preceding level is **110** and the shipment leaves **95**. Move that bar to **110→95** and reconnect any affected carry lines; the **+5** then starts at 95 and ends at 100. Accept that correctly anchored waterfall. Do not apply the floating-bar rule to a separately labeled zero-based chart that correctly compares only the signed changes.
+
 ## Check pooled medians and percentiles
 
 When an overall median or percentile appears beside group values, inspect how it was obtained if that evidence is available. Averaging group percentiles, even with group-count weights, does not generally give the percentile of all observations. This is different from reconstructing a pooled proportion using compatible numerators and denominators. Check the population, units, period, overlap, and percentile definition before comparing or recomputing values.
@@ -220,6 +226,7 @@ Accept legitimate conventions and summaries when no material mismatch is establi
 
 ## Basis and limits
 
+- [Diagram Design’s waterfall reference](https://github.com/cathrynlavery/diagram-design/blob/d74d8c2d0c78a9e1efd43137f6a9a51182a8b5f0/skills/diagram-design/references/type-waterfall.md) inspired checking a floating change against its before-and-after totals. The example here is original and does not adopt the upstream renderer, markup, or layout rules.
 - [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
 
 - [Gelman and Stern, The Difference Between “Significant” and “Not Significant” Is Not Itself Statistically Significant](https://sites.stat.columbia.edu/gelman/research/published/signif4.pdf) distinguishes separate significance decisions from the comparison between effects. [Coulson et al.'s two interpretation studies](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2010.00026/full) found that displaying confidence intervals alone did not reliably prevent this mistake; low survey response rates limit generalization. These motivate preserving the comparison's meaning, not a prescribed threshold or a measured improvement in this skill. The time-saving examples are original teaching controls.
