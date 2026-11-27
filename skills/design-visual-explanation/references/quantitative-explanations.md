@@ -69,6 +69,12 @@ An invented record gives **A: 40 then 60 orders** and **B: 900 then 700 orders**
 
 As a control, one temperature series with matched **0–100°C** and **32–212°F** axes has a fixed conversion, **°F = 1.8 × °C + 32**. Corresponding ticks, including **50°C = 122°F**, occupy the same positions. This is not two independently scaled series and does not need to be rejected for having a second axis.
 
+## Keep a base-100 comparison about change
+
+For comparable counts or other quantities with a meaningful zero and a positive base value, a base-100 value is 100 times the observation divided by that series' value in the stated base period. Use the same base period for cross-series comparisons; retain each denominator in the handoff, and label the display with the period and “= 100.” Do not quietly use each series' first available date when they differ. If data do not support a shared base, show original units or state the different windows rather than treating them as equivalent.
+
+For invented monthly visits, Oak goes from **100 to 150** and Pine from **400 to 480**. With January = 100, their February indices are **150 and 120**. “Oak grew more in percentage terms” is supported (**+50% vs +20%**); “Oak had more visits” and “Oak added more visits” are not. If the reader also needs volume or absolute additions, keep raw counts or changes available alongside the index instead of asking the index to answer both questions.
+
 ## Keep successive percentage changes on their own bases
 
 For a first-to-last change, distinguish consecutive period growth rates from additive contributions. When each rate describes the same comparable quantity relative to its immediately preceding value, combine the growth factors: **(1 + r₁) × (1 + r₂) × … − 1**, with rates written as fractions. Adding the percentages generally gives the wrong net change because their bases differ. For an ordinary unadjusted series, compatible first and last values also give **last / first − 1**, with a nonzero first value and a meaningful ratio interpretation.
@@ -230,6 +236,8 @@ For “What share of faulty parts were flagged?”, use **90/100 = 90%**. For �
 A correctly labeled explanation of the first question need not also teach the second. If only “90% of faulty parts were flagged” were supplied, it would not establish the share faulty among all flagged parts. Preserve that limit rather than inventing the sound-part counts.
 
 ## Basis and limits
+
+- [BLS CPI concepts](https://www.bls.gov/opub/hom/cpi/concepts.htm) distinguishes a change since the base period from a comparison of absolute price levels. [BLS rebasing guidance](https://www.bls.gov/cpi/factsheets/rebasing.htm) explains what changing the reference period preserves. These sources motivate the distinction; the visit counts are invented and do not measure reader comprehension.
 
 - [Diagram Design’s waterfall reference](https://github.com/cathrynlavery/diagram-design/blob/d74d8c2d0c78a9e1efd43137f6a9a51182a8b5f0/skills/diagram-design/references/type-waterfall.md) inspired checking a floating change against its before-and-after totals. The example here is original and does not adopt the upstream renderer, markup, or layout rules.
 - [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.

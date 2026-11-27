@@ -68,6 +68,10 @@ An invented brief supplies **A: 40 then 60 orders**, **B: 900 then 700 orders**,
 
 A repair can use a shared order scale and source-backed values for the magnitude comparison. The control claim “A rose while B fell” is supported by these two observations. Neither version establishes intermediate-month values. Another control is one temperature series with correctly matched **0–100°C** and **32–212°F** scales, including **50°C = 122°F**. Its second axis is a conversion, not an independent-scale defect. With no rendering, these are checks of the supplied specification, not evidence of actual tick placement or legibility.
 
+## Check what a base-100 index can establish
+
+Identify the base period. When raw values are available, check the plotted values against each series’ own denominator. If the claim compares growth over the same interval, check that the periods actually match; “first observation = 100” may hide different start dates. With invented visits, Oak moves from **100 to 150**, Pine from **400 to 480**. Their correctly plotted January-based February indices are **150 and 120**, respectively. “Oak had more visits” is false even though Oak's index is higher. For a relative-growth task, use “Oak grew more in percentage terms” (**+50% vs +20%**). For a volume task, use the original counts (**Oak 150 vs Pine 480 visits**). Accept the same indexed marks with a correctly scoped percentage-growth headline. If raw levels are unavailable, flag the volume claim as unsupported rather than guessing the other way.
+
 ## Check whether a close comparison can be read
 
 For values or small differences the task requires, check whether labels, ticks, or associated content let the reader recover them. Coarse ticks and absent direct labels are not intrinsically defective: broad-pattern reading or an adequate table may need no repair.
@@ -225,6 +229,8 @@ Name the location, affected comparison, supporting source or internal arithmetic
 Accept legitimate conventions and summaries when no material mismatch is established. A preference for dots over bars is not itself evidence that the existing explanation fails.
 
 ## Basis and limits
+
+- [BLS CPI concepts](https://www.bls.gov/opub/hom/cpi/concepts.htm) distinguishes a change since the base period from a comparison of absolute price levels. [BLS rebasing guidance](https://www.bls.gov/cpi/factsheets/rebasing.htm) explains what changing the reference period preserves. These sources motivate the distinction; the visit counts are invented and do not measure reader comprehension.
 
 - [Diagram Design’s waterfall reference](https://github.com/cathrynlavery/diagram-design/blob/d74d8c2d0c78a9e1efd43137f6a9a51182a8b5f0/skills/diagram-design/references/type-waterfall.md) inspired checking a floating change against its before-and-after totals. The example here is original and does not adopt the upstream renderer, markup, or layout rules.
 - [Cochrane Handbook chapter 6](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-06), sections 6.4.1.1–3, distinguishes risks, odds and their ratios. [Chapter 15](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-15), section 15.4.4, requires comparator risk for conversion and identifies baseline-uncertainty limits. [A Most Odd Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC5253299/) discusses design-dependent interpretation and model-based probabilities. These support preserving measure and scope, not a universal conversion rule or measured benefit of this skill. The delay examples are original arithmetic controls.
