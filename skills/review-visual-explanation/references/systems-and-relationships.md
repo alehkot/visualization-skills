@@ -18,6 +18,12 @@ For overlapping possible-date windows, inspect any claimed simultaneity or order
 
 An invented source places inspection A sometime during **3–7 May** and inspection B during **5–9 May**, with durations and order undocumented. A brief's **both inspections were underway on 5–7 May** converts dating uncertainty into simultaneous activity. **A preceded B**, inferred only from the window midpoints, is also unsupported. Repair these claims by preserving the possible dates and unresolved order, not by asserting that overlap was impossible. Exact midpoint dates are not observed dates. Accept **possible inspection date; duration unknown** alongside each range. If a separate record establishes A before B, retain that ordering despite overlap. If the source instead documents continuous activity from 3 through 7 May, an activity-duration band is justified. Missing source detail leaves an artifact's duration unverified, not automatically disproved.
 
+## Check which schedule each finish date belongs to
+
+For a status report, trace each consequential date to the stated baseline revision, the recorded actual, or the current forecast. Confirm the reporting cutoff rather than assuming it matches the day the report was published. A mark before the cutoff is not necessarily actual, and a legend that correctly calls a mark “forecast” does not repair a headline claiming the task already finished. Do not infer dates worked from percent complete alone.
+
+In an invented rollout report issued **12 June**, progress is current through **10 June**. Training’s saved baseline finish is **12 June**, its forecast finish is **16 June**, and it is still open at the cutoff. “Training is forecast to finish four calendar days after the baseline” is supported. “Training finished four days late” mistakes the forecast for an actual, and “Training is four days overdue” mistakes expected finish variance for elapsed lateness. If a different source instead records completion on **16 June** at a later cutoff, the actual-finish wording can be correct. Without a baseline, even a valid finish date cannot establish baseline variance. A task finish variance alone does not establish that the project finish moved.
+
 ## Probe the logic with a relevant case
 
 | Inspect | A useful probe | Material mismatch to look for |
@@ -100,5 +106,6 @@ State a repair in terms of the actual affected relationship: relabel a link, res
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) explains how marks and arrangement contribute meanings; that does not make every possible interpretation an observed reader error.
 - [C4 notation guidance](https://c4model.com/diagrams/notation) and [arc42's building block view](https://docs.arc42.org/section-5/) illustrate explicit labels and scoped architectural views. Their domain conventions are not mandatory for other diagrams.
 - [Cascade Institute's causal-loop handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) explains qualitative loop conventions, not empirical validation of the reviewed causal account.
+- Microsoft Project documents [saved baseline versus current and actual data](https://support.microsoft.com/en-us/project/create-or-update-a-baseline-or-an-interim-plan-in-project-desktop) and [the reporting status date](https://support.microsoft.com/en-us/project/set-the-status-date-for-project-reporting). The invented rollout example applies these distinctions without assuming Microsoft-specific calculation settings or chart styles.
 
 The probes, publication and delivery contrasts, and catalog contrast are original examples of source-based review, not a validated comprehension test.

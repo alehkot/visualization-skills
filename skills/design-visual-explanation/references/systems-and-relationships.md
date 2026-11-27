@@ -25,6 +25,12 @@ Overlapping possible-date windows alone establish neither simultaneity nor which
 
 For an invented archive, inspection A occurred sometime during **3–7 May** and inspection B during **5–9 May**. Their durations and order are undocumented. Retain both possible-date windows and leave their order unresolved. **A ran for five days**, **A preceded B**, or **both inspections were underway on 5–7 May** would add unsupported claims. Placing them at exact midpoint dates would also invent observations. If another record establishes that A preceded B, retain that relationship without manufacturing exact dates. In contrast, a source explicitly documenting continuous activity from 3 through 7 May supports an activity-duration band. A range labeled **possible inspection date; duration unknown** is valid without a different visual form.
 
+## Separate the baseline, actuals, and forecast
+
+When the question is “How is this schedule tracking?”, name the saved plan used for comparison, the status date through which progress is reported, and which dates are actual versus still expected. The status date may differ from the report date. For tasks that cross the cutoff, show only the progress the source records; a percentage or the passage of time alone does not locate the actual work on the calendar. A planned date in the past is not a record of completion.
+
+An invented rollout report issued **12 June** is based on progress through **10 June**. The saved plan had training finishing **12 June**; training is still open at the cutoff with a forecast finish of **16 June**. Show “Forecast 16 June, four calendar days after the baseline; not complete as of 10 June,” not “Finished four days late.” Use aligned labeled dates, a simple table, or distinguished timeline marks. If there is no saved baseline for this task, omit the variance rather than using the current forecast as the original plan. A finish change on one task does not by itself establish a change to the project finish.
+
 ## Make conditions executable in the reader's mind
 
 Check a normal case and a case at the boundary of the rule. Ask what the depicted logic would let the reader conclude, then compare that conclusion with the source.
@@ -102,5 +108,6 @@ Counterexample to drawing every dependency: a study-room access explanation need
 - [Tversky, Visualizing Thought](https://doi.org/10.1111/j.1756-8765.2010.01113.x) discusses how spatial arrangement and marks convey meaning, including the ambiguity of arrows. It does not prescribe one notation for all relationships.
 - [Cascade Institute, Causal Loop Diagrams handbook](https://cascadeinstitute.org/wp-content/uploads/2024/06/Causal-Loop-Diagrams-Handbook-June-27-2024.pdf) supplies conventions for qualitative causal-loop modeling. Those conventions do not prove the links in an arbitrary source.
 - [arc42, Building block view](https://docs.arc42.org/section-5/) illustrates scoped decomposition and selective detail; [C4 notation guidance](https://c4model.com/diagrams/notation) remains notation independent. These are software-architecture practices, adapted here only where their structural reasoning fits.
+- Microsoft Project documents [saved baseline versus current and actual data](https://support.microsoft.com/en-us/project/create-or-update-a-baseline-or-an-interim-plan-in-project-desktop) and [the reporting status date](https://support.microsoft.com/en-us/project/set-the-status-date-for-project-reporting). The invented rollout example applies these distinctions without assuming Microsoft-specific calculation settings or chart styles.
 
 The condition checks, publication and delivery examples, and archive example are original operational guidance, not a claim of measured comprehension improvement.
